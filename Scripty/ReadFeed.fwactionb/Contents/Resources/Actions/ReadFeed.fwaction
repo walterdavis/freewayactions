@@ -1,0 +1,154 @@
+<item-action name="ReadFeed">
+<action-version version="0.3">
+ReadFeed Action
+Walter Davis Studio 2008
+</action-version>
+<action-file name="Feed" var/>
+<action-url name="url" title="URL" />
+<action-label name="Temp" title="Template:">/><action-button name="editTemplate" title="Edit" onClick="EditCode('template');" advance="no"/>
+<action-text name="elements" title="Elements" default="link, title, description"/>
+<action-text name="cache" title="Cache Time" default="120"/><action-label name="c" title="(minutes, 0 = no cache)" advance="no" />
+<action-text name="max_items" title="Number of Items" default="0" /><action-label name="n" title="(0 = show all)" advance="no" />
+<action-text var name="template" default=""/>
+<action-label name="warning" title="Warning! Please change the filename of this page to end in .php" />
+<action-markup name="t"><a href="%s" rel="new_window">%s</a><br />%s</action-markup>
+<action-markup name="php"><?php
+$url="~url~";
+$rss = new Feed();
+$rss->cache_time = ~cache~;
+$rss->max_items = ~max_items~;
+$rss->item_template = '~template~';
+$rss->item_parts = '~elements~';
+$rss->cache_dir = dirname(__FILE__) . '/_cache';
+$rss->Read($url);
+?>
+</action-markup>
+<action-javascript>
+	function EditCode(codeName){ //Cut down from Tim Plumb's Source Code Snooper
+		if(fwParameters[codeName].fwValue == '') fwParameters[codeName].fwValue = fwMarkups['t'].toString();
+		var mycustomcode = fwParameters[codeName].toString();
+		var myprompt = "Each list item will be formatted through this template.";
+		var mycustomcodeprompt = fwBigPrompt(myprompt, mycustomcode);
+		if (mycustomcodeprompt != null) { //if the cancel button was not hit
+			if (mycustomcodeprompt != mycustomcode) {//check that the code has changed
+				fwParameters[codeName].fwValue = mycustomcodeprompt;
+			}
+		}
+	}
+	function RequirePhpFile(file){
+		var h = fwDocument.fwTags.fwFind('html').fwEnclosing;
+		var path = this.fwPathName;
+		var prefix = path.substring(0, path.lastIndexOf(":")) + ':Support Files~:';
+		if(!fwPage.phpList) fwPage.phpList = new Object();
+		if (h){
+			if (file && !fwPage.phpList[file]){
+				myFile = new FWFile;
+				myFile.fwOpenRead(prefix + file + '.php');
+				myFile.fwClose();
+				if (fwParameters[file]) {
+					fwParameters[file].fwSpecify(myFile);
+					var path = fwParameters[file].toString();
+					fwPage.phpList[file] = path;
+				}else{
+					alert (file + ' was not found in the action bundle');
+				}
+				return h.fwAddRawln('<?php require_once(\'' + path + '\'); ?>',h);
+			}
+		}
+		return false;
+	}
+
+	function fwInterface(){
+		fwPage.phpList = new Object();
+		fwParameters['warning'].fwVisible = (fwPage.fwFileName.toString().indexOf('.php') == -1);
+	}
+	
+	function fwBeforeStartHead()
+	{
+		RequirePhpFile('Feed');
+	}
+	
+	function fwBeforeEndBody(){
+		thisObj = fwDocument.fwTags.fwFind("td", fwItem);
+		if (thisObj){
+			addToObj(thisObj,true);
+		}else{
+			div = fwDocument.fwTags.fwFind(fwItem);
+			if(GetCSSAttribute(div,'font-size') == '1px') SetCSSAttribute(div,'font-size',null);
+			thisObj = fwDocument.fwTags.fwFind("", fwItem);
+			if(thisObj){
+				addToObj(thisObj,false);
+			}
+		}
+	}
+	function addToObj(thisObj,wrapper){
+		var allAtts = thisObj.fwFindAllAttributes();
+		myContents = thisObj.fwFindAllContent();
+		if (myContents){
+			var moreCode = fwMarkups['php'].toString();
+			if(fwParameters['template'].toString() == '') fwParameters['template'].fwValue = fwMarkups['t'].toString();
+			moreCode = moreCode.replace(/~template~/,fwParameters['template'].toString());
+			moreCode = moreCode.replace(/~url~/,fwParameters['url'].toString());
+			moreCode = moreCode.replace(/~elements~/,fwParameters['elements'].toString());
+			moreCode = moreCode.replace(/~cache~/,fwParameters['cache'].toString());
+			moreCode = moreCode.replace(/~max_items~/,fwParameters['max_items'].toString());
+			dummy = thisObj.fwAddEnclosing("",true);
+			dummy.fwMove(myContents);
+			dummy.fwAddRaw(moreCode);
+			if(wrapper){ dummy.fwAddEnclosing("td",true); }
+			newTD = dummy.fwFindEnclosing("td");
+			if (newTD){
+				for (i in allAtts){
+					newTD[allAtts[i].fwTitle] = allAtts[i].fwValue;
+				}
+			}
+			thisObj.fwDelete();
+		}
+	}
+
+	function SetCSSAttribute(tag, attributeName, attributeValue) { 
+		// Sets a "CSS" attribute such as "position:absolute" in a tag value 
+		// Passing an attribute value of null removes that attribute entirely
+		if (tag==null) return; 
+		var tagField = tag['style']; 
+		if (tagField == null){
+			tag['style'] = '"'+attributeName+':'+attributeValue+'"'; 
+		}else{
+			var tagField = tagField.toString();
+			var pairs = tagField.slice(1,-1).split(';');
+			var out = new Array();
+			if(attributeValue != null && tagField.indexOf(attributeName) < 0) out.push(attributeName+':'+attributeValue);
+			for(i in pairs){
+				pairs[i] = pairs[i].replace(/^\s*(\S*(\s+\S+)*)\s*$/, "$1"); //javascript equivalent of trim
+				if(pairs[i].slice(0,pairs[i].indexOf(':')) == attributeName) {
+					if(attributeValue != null) out.push(attributeName+':'+attributeValue);
+				}else{
+					out.push(pairs[i]);
+				}
+			}
+			tag['style']= fwQuote(out.join('; ')); 
+		}
+	} 
+	function GetCSSAttribute(tag, attributeName) { 
+		// Gets a "CSS" attribute such as "position:absolute" from a tag value 
+		// returns NULL if the attribute can not be found 
+		if (tag==null) return null; 
+		var tagField = tag['style']; 
+		if (tagField == null) {
+			return null; 
+		}else { 
+			var tagField = tagField.toString(); 
+			var pairs = tagField.slice(1,-1).split(';');
+			for(i in pairs){
+				pairs[i] = pairs[i].replace(/^\s*(\S*(\s+\S+)*)\s*$/, "$1"); //javascript equivalent of trim
+				if(pairs[i].slice(0,pairs[i].indexOf(':')) == attributeName) {
+					return pairs[i].slice(pairs[i].indexOf(':')+1,pairs[i].length);
+				}
+			}
+			return null; 
+		} 
+	} 
+
+	
+</action-javascript>
+</item-action>

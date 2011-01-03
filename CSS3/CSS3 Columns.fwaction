@@ -1,0 +1,94 @@
+<item-action name="com.wdstudio.css3columns" title="CSS3 Columns">
+<action-appliesto html4 html32css xhtml xhtmlstrict />
+<action-version version="0.2">
+“CSS3 Columns” Action
+Walter Davis Studio 2009
+
+Apply to an HTML item to give it a multiple columns using pure CSS3.
+</action-version>
+<action-popup name="columnCount" title="Column Count">
+<value name="auto">
+<value name="2" default>
+<value name="3">
+<value name="4">
+<value name="5">
+<value name="6">
+<value name="7">
+<value name="8">
+</action-popup>
+<action-text name="columnWidth" title="Column Width" />
+<action-text name="columnGap" title="Column Gap" default="1em" />
+<action-popup name="columnRuleStyle" title="Column Rule Style">
+	<value name="none">
+	<value name="solid" default>
+	<value name="dotted">
+	<value name="dashed">
+	<value name="double">
+	<value name="groove">
+	<value name="ridge">
+	<value name="inset">
+	<value name="outset">
+</action-popup>
+<action-popup name="columnRuleWidth" title="Column Rule Width">
+	<value name="1" default>
+	<value name="2">
+	<value name="3">
+	<value name="4">
+	<value name="5">
+	<value name="6">
+	<value name="7">
+	<value name="8">
+	<value name="9">
+	<value name="10">
+	<value name="11">
+	<value name="12">
+	<value name="13">
+	<value name="14">
+	<value name="15">
+</action-popup>
+<action-color name="columnRuleColor" title="Column Rule Color" default="#cccccc" />
+<action-javascript>
+	function fwInterface(){
+		fwParameters['columnWidth'].fwVisible = (fwParameters['columnCount'].fwValue == 'auto');
+		fwParameters['columnRuleColor'].fwVisible = fwParameters['columnRuleWidth'].fwVisible = (fwParameters['columnRuleStyle'].fwValue != 'none');
+	}
+	function fwParameterChanged(newParam,oldParam){
+		return fwInterface('foo');
+	}
+	function fwAfterEndHTML(){
+		var myhead = fwDocument.fwTags.fwFind("head");
+		var columnCount = fwParameters['columnCount'].fwValue;
+		var columnGap = fwParameters['columnGap'].fwValue;
+		var columnWidth = fwParameters['columnWidth'].fwValue;
+		var columnRuleWidth = fwParameters['columnRuleWidth'].fwValue;
+		var columnRuleStyle = fwParameters['columnRuleStyle'].fwValue;
+		var columnRuleColor = fwParameters['columnRuleColor'].fwValue.fwHex;
+		if(columnRuleColor != undefined){
+			columnRuleColor = '#' + columnRuleColor;
+		}else{
+			columnRuleColor = '';
+		}
+		var myTags = Array("div","td");
+		var myItem = fwDocument.fwTags.fwFindAll(myTags,fwItem);
+		for (var i in myItem){
+			if (myItem[i] && myItem[i] != null){
+				if(!myItem[i].ID){ 
+					myItem[i].ID = fwQuote(fwItem);
+				}
+				var myID = myItem[i].ID;
+				myID = fwQuote(myID,'','"');//"
+				if (myhead){
+					var cssStyles = myhead.fwAddCSSStyles();
+					var count = (columnCount == 'auto') ? '' : ' -moz-column-count: ' + columnCount + '; -webkit-column-count: ' + columnCount + ';';
+					var gap = ' -moz-column-gap: ' + columnGap + '; -webkit-column-gap: ' + columnGap + ';';
+					var rule = (columnRuleStyle == 'none') ? '' : ' -moz-column-rule: ' + columnRuleWidth + 'px ' + columnRuleStyle + ' ' + columnRuleColor + '; -webkit-column-rule: ' + columnRuleWidth + 'px ' + columnRuleStyle + ' ' + columnRuleColor + ';';
+					var width = (columnCount == 'auto') ? ' -moz-column-width: ' + columnWidth + '; -webkit-column-width: ' + columnWidth + ';' : '';
+					cssStyles.fwAddRawln("#" + myID + " { " + count + gap + rule + width + " }");
+				}
+			}
+		}
+	}
+
+</action-javascript>
+
+</item-action>

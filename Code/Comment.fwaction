@@ -1,0 +1,30 @@
+<item-action name="Comment">
+<action-version version="0.1b">
+Comment
+Copyright 2008 Walter Lee Davis
+
+Apply the action to a table cell or HTML box to add content before the opening P tag.
+</action-version>
+<action-checkbox name="Activate">
+<action-text name="comment" title="Comment" />
+<action-javascript>
+	function fwBeforeEndBody(){
+		var activate = fwParameters["Activate"].fwBoolValue;
+		if(activate){
+			thisObj = fwDocument.fwTags.fwFind(fwItem);
+			if (thisObj){
+				addComment(thisObj);
+			}
+		}
+	}
+	function addComment(thisObj){
+		var startComment = '<!-- start: ' + fwParameters.comment.toString() + ' -->';
+		var endComment = '<!-- end: ' + fwParameters.comment.toString() + ' -->';
+		var dummy = thisObj.fwAddEnclosing("",true);
+		var c = dummy.fwAddRawln(startComment);
+		dummy.fwMove(thisObj,c);//this puts the comment first
+		dummy.fwAddRawln('');
+		dummy.fwAddRaw(endComment);
+	}
+</action-javascript>
+</item-action>

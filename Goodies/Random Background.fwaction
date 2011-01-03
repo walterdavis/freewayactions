@@ -1,0 +1,1138 @@
+<page-action name="com.wdstudio.randombackground" title="Random Background">
+<action-appliesto html4 html32css xhtml xhtmlstrict />
+<action-version version="0.1">
+“Random Background” Action
+Walter Davis Studio 2009
+
+Apply to the page to define multiple background styles, one of which will be chosen at random when the page loads.
+</action-version>
+<action-checkbox name="original" title="Use current page background as a random option" />
+<action-label name="divider_1" title="------------------" />
+<action-label name="label_1" title="Option 1:"/>
+<action-color name="background_color_1" title="Background Color" />
+<action-file name="background_image_1" title="Background Image" web-graphic />
+<action-popup name="horizontal_1" title="Horizontal">
+<value name="Tile" default>
+<value name="Left">
+<value name="Center">
+<value name="Right">
+<value name="Expert">
+</action-popup>
+<action-text name="horizontal_expert_1" title="Horizontal (Expert)" />
+<action-popup name="vertical_1" title="Vertical">
+	<value name="Tile" default>
+	<value name="Top">
+	<value name="Center">
+	<value name="Bottom">
+	<value name="Expert">
+</action-popup>
+<action-text name="vertical_expert_1" title="Vertical (Expert)" />
+<action-checkbox name="scrolls_1" title="Background Scrolls" default=yes />
+
+<action-label name="divider_2" title="------------------" />
+<action-label name="label_2" title="Option 2:"/>
+<action-color name="background_color_2" title="Background Color" />
+<action-file name="background_image_2" title="Background Image" web-graphic />
+<action-popup name="horizontal_2" title="Horizontal">
+<value name="Tile" default>
+<value name="Left">
+<value name="Center">
+<value name="Right">
+<value name="Expert">
+</action-popup>
+<action-text name="horizontal_expert_2" title="Horizontal (Expert)" />
+<action-popup name="vertical_2" title="Vertical">
+	<value name="Tile" default>
+	<value name="Top">
+	<value name="Center">
+	<value name="Bottom">
+<value name="Expert">
+</action-popup>
+<action-text name="vertical_expert_2" title="Vertical (Expert)" />
+<action-checkbox name="scrolls_2" title="Background Scrolls" default=yes />
+
+<action-label name="divider_3" title="------------------" />
+<action-label name="label_3" title="Option 3:"/>
+<action-color name="background_color_3" title="Background Color" />
+<action-file name="background_image_3" title="Background Image" web-graphic />
+<action-popup name="horizontal_3" title="Horizontal">
+<value name="Tile" default>
+<value name="Left">
+<value name="Center">
+<value name="Right">
+<value name="Expert">
+</action-popup>
+<action-text name="horizontal_expert_3" title="Horizontal (Expert)" />
+<action-popup name="vertical_3" title="Vertical">
+	<value name="Tile" default>
+	<value name="Top">
+	<value name="Center">
+	<value name="Bottom">
+<value name="Expert">
+</action-popup>
+<action-text name="vertical_expert_3" title="Vertical (Expert)" />
+<action-checkbox name="scrolls_3" title="Background Scrolls" default=yes />
+
+<action-label name="divider_4" title="------------------" />
+<action-label name="label_4" title="Option 4:"/>
+<action-color name="background_color_4" title="Background Color" />
+<action-file name="background_image_4" title="Background Image" web-graphic />
+<action-popup name="horizontal_4" title="Horizontal">
+<value name="Tile" default>
+<value name="Left">
+<value name="Center">
+<value name="Right">
+<value name="Expert">
+</action-popup>
+<action-text name="horizontal_expert_4" title="Horizontal (Expert)" />
+<action-popup name="vertical_4" title="Vertical">
+	<value name="Tile" default>
+	<value name="Top">
+	<value name="Center">
+	<value name="Bottom">
+<value name="Expert">
+</action-popup>
+<action-text name="vertical_expert_4" title="Vertical (Expert)" />
+<action-checkbox name="scrolls_4" title="Background Scrolls" default=yes />
+
+<action-label name="divider_5" title="------------------" />
+<action-label name="label_5" title="Option 5:"/>
+<action-color name="background_color_5" title="Background Color" />
+<action-file name="background_image_5" title="Background Image" web-graphic />
+<action-popup name="horizontal_5" title="Horizontal">
+<value name="Tile" default>
+<value name="Left">
+<value name="Center">
+<value name="Right">
+<value name="Expert">
+</action-popup>
+<action-text name="horizontal_expert_5" title="Horizontal (Expert)" />
+<action-popup name="vertical_5" title="Vertical">
+	<value name="Tile" default>
+	<value name="Top">
+	<value name="Center">
+	<value name="Bottom">
+<value name="Expert">
+</action-popup>
+<action-text name="vertical_expert_5" title="Vertical (Expert)" />
+<action-checkbox name="scrolls_5" title="Background Scrolls" default=yes />
+
+<action-label name="divider_6" title="------------------" />
+<action-label name="label_6" title="Option 6:"/>
+<action-color name="background_color_6" title="Background Color" />
+<action-file name="background_image_6" title="Background Image" web-graphic />
+<action-popup name="horizontal_6" title="Horizontal">
+<value name="Tile" default>
+<value name="Left">
+<value name="Center">
+<value name="Right">
+<value name="Expert">
+</action-popup>
+<action-text name="horizontal_expert_6" title="Horizontal (Expert)" />
+<action-popup name="vertical_6" title="Vertical">
+	<value name="Tile" default>
+	<value name="Top">
+	<value name="Center">
+	<value name="Bottom">
+<value name="Expert">
+</action-popup>
+<action-text name="vertical_expert_6" title="Vertical (Expert)" />
+<action-checkbox name="scrolls_6" title="Background Scrolls" default=yes />
+
+<action-label name="divider_7" title="------------------" />
+<action-label name="label_7" title="Option 7:"/>
+<action-color name="background_color_7" title="Background Color" />
+<action-file name="background_image_7" title="Background Image" web-graphic />
+<action-popup name="horizontal_7" title="Horizontal">
+<value name="Tile" default>
+<value name="Left">
+<value name="Center">
+<value name="Right">
+<value name="Expert">
+</action-popup>
+<action-text name="horizontal_expert_7" title="Horizontal (Expert)" />
+<action-popup name="vertical_7" title="Vertical">
+	<value name="Tile" default>
+	<value name="Top">
+	<value name="Center">
+	<value name="Bottom">
+<value name="Expert">
+</action-popup>
+<action-text name="vertical_expert_7" title="Vertical (Expert)" />
+<action-checkbox name="scrolls_7" title="Background Scrolls" default=yes />
+
+<action-label name="divider_8" title="------------------" />
+<action-label name="label_8" title="Option 8:"/>
+<action-color name="background_color_8" title="Background Color" />
+<action-file name="background_image_8" title="Background Image" web-graphic />
+<action-popup name="horizontal_8" title="Horizontal">
+<value name="Tile" default>
+<value name="Left">
+<value name="Center">
+<value name="Right">
+<value name="Expert">
+</action-popup>
+<action-text name="horizontal_expert_8" title="Horizontal (Expert)" />
+<action-popup name="vertical_8" title="Vertical">
+	<value name="Tile" default>
+	<value name="Top">
+	<value name="Center">
+	<value name="Bottom">
+<value name="Expert">
+</action-popup>
+<action-text name="vertical_expert_8" title="Vertical (Expert)" />
+<action-checkbox name="scrolls_8" title="Background Scrolls" default=yes />
+
+<action-label name="divider_9" title="------------------" />
+<action-label name="label_9" title="Option 9:"/>
+<action-color name="background_color_9" title="Background Color" />
+<action-file name="background_image_9" title="Background Image" web-graphic />
+<action-popup name="horizontal_9" title="Horizontal">
+<value name="Tile" default>
+<value name="Left">
+<value name="Center">
+<value name="Right">
+<value name="Expert">
+</action-popup>
+<action-text name="horizontal_expert_9" title="Horizontal (Expert)" />
+<action-popup name="vertical_9" title="Vertical">
+	<value name="Tile" default>
+	<value name="Top">
+	<value name="Center">
+	<value name="Bottom">
+<value name="Expert">
+</action-popup>
+<action-text name="vertical_expert_9" title="Vertical (Expert)" />
+<action-checkbox name="scrolls_9" title="Background Scrolls" default=yes />
+
+<action-label name="divider_10" title="------------------" />
+<action-label name="label_10" title="Option 10:"/>
+<action-color name="background_color_10" title="Background Color" />
+<action-file name="background_image_10" title="Background Image" web-graphic />
+<action-popup name="horizontal_10" title="Horizontal">
+<value name="Tile" default>
+<value name="Left">
+<value name="Center">
+<value name="Right">
+<value name="Expert">
+</action-popup>
+<action-text name="horizontal_expert_10" title="Horizontal (Expert)" />
+<action-popup name="vertical_10" title="Vertical">
+	<value name="Tile" default>
+	<value name="Top">
+	<value name="Center">
+	<value name="Bottom">
+<value name="Expert">
+</action-popup>
+<action-text name="vertical_expert_10" title="Vertical (Expert)" />
+<action-checkbox name="scrolls_10" title="Background Scrolls" default=yes />
+
+<action-label name="divider_11" title="------------------" />
+<action-label name="label_11" title="Option 11:"/>
+<action-color name="background_color_11" title="Background Color" />
+<action-file name="background_image_11" title="Background Image" web-graphic />
+<action-popup name="horizontal_11" title="Horizontal">
+<value name="Tile" default>
+<value name="Left">
+<value name="Center">
+<value name="Right">
+<value name="Expert">
+</action-popup>
+<action-text name="horizontal_expert_11" title="Horizontal (Expert)" />
+<action-popup name="vertical_11" title="Vertical">
+	<value name="Tile" default>
+	<value name="Top">
+	<value name="Center">
+	<value name="Bottom">
+<value name="Expert">
+</action-popup>
+<action-text name="vertical_expert_11" title="Vertical (Expert)" />
+<action-checkbox name="scrolls_11" title="Background Scrolls" default=yes />
+
+<action-label name="divider_12" title="------------------" />
+<action-label name="label_12" title="Option 12:"/>
+<action-color name="background_color_12" title="Background Color" />
+<action-file name="background_image_12" title="Background Image" web-graphic />
+<action-popup name="horizontal_12" title="Horizontal">
+<value name="Tile" default>
+<value name="Left">
+<value name="Center">
+<value name="Right">
+<value name="Expert">
+</action-popup>
+<action-text name="horizontal_expert_12" title="Horizontal (Expert)" />
+<action-popup name="vertical_12" title="Vertical">
+	<value name="Tile" default>
+	<value name="Top">
+	<value name="Center">
+	<value name="Bottom">
+<value name="Expert">
+</action-popup>
+<action-text name="vertical_expert_12" title="Vertical (Expert)" />
+<action-checkbox name="scrolls_12" title="Background Scrolls" default=yes />
+
+<action-label name="divider_13" title="------------------" />
+<action-label name="label_13" title="Option 13:"/>
+<action-color name="background_color_13" title="Background Color" />
+<action-file name="background_image_13" title="Background Image" web-graphic />
+<action-popup name="horizontal_13" title="Horizontal">
+<value name="Tile" default>
+<value name="Left">
+<value name="Center">
+<value name="Right">
+<value name="Expert">
+</action-popup>
+<action-text name="horizontal_expert_13" title="Horizontal (Expert)" />
+<action-popup name="vertical_13" title="Vertical">
+	<value name="Tile" default>
+	<value name="Top">
+	<value name="Center">
+	<value name="Bottom">
+<value name="Expert">
+</action-popup>
+<action-text name="vertical_expert_13" title="Vertical (Expert)" />
+<action-checkbox name="scrolls_13" title="Background Scrolls" default=yes />
+
+<action-label name="divider_14" title="------------------" />
+<action-label name="label_14" title="Option 14:"/>
+<action-color name="background_color_14" title="Background Color" />
+<action-file name="background_image_14" title="Background Image" web-graphic />
+<action-popup name="horizontal_14" title="Horizontal">
+<value name="Tile" default>
+<value name="Left">
+<value name="Center">
+<value name="Right">
+<value name="Expert">
+</action-popup>
+<action-text name="horizontal_expert_14" title="Horizontal (Expert)" />
+<action-popup name="vertical_14" title="Vertical">
+	<value name="Tile" default>
+	<value name="Top">
+	<value name="Center">
+	<value name="Bottom">
+<value name="Expert">
+</action-popup>
+<action-text name="vertical_expert_14" title="Vertical (Expert)" />
+<action-checkbox name="scrolls_14" title="Background Scrolls" default=yes />
+
+<action-label name="divider_15" title="------------------" />
+<action-label name="label_15" title="Option 15:"/>
+<action-color name="background_color_15" title="Background Color" />
+<action-file name="background_image_15" title="Background Image" web-graphic />
+<action-popup name="horizontal_15" title="Horizontal">
+<value name="Tile" default>
+<value name="Left">
+<value name="Center">
+<value name="Right">
+<value name="Expert">
+</action-popup>
+<action-text name="horizontal_expert_15" title="Horizontal (Expert)" />
+<action-popup name="vertical_15" title="Vertical">
+	<value name="Tile" default>
+	<value name="Top">
+	<value name="Center">
+	<value name="Bottom">
+<value name="Expert">
+</action-popup>
+<action-text name="vertical_expert_15" title="Vertical (Expert)" />
+<action-checkbox name="scrolls_15" title="Background Scrolls" default=yes />
+
+<action-label name="divider_16" title="------------------" />
+<action-label name="label_16" title="Option 16:"/>
+<action-color name="background_color_16" title="Background Color" />
+<action-file name="background_image_16" title="Background Image" web-graphic />
+<action-popup name="horizontal_16" title="Horizontal">
+<value name="Tile" default>
+<value name="Left">
+<value name="Center">
+<value name="Right">
+<value name="Expert">
+</action-popup>
+<action-text name="horizontal_expert_16" title="Horizontal (Expert)" />
+<action-popup name="vertical_16" title="Vertical">
+	<value name="Tile" default>
+	<value name="Top">
+	<value name="Center">
+	<value name="Bottom">
+<value name="Expert">
+</action-popup>
+<action-text name="vertical_expert_16" title="Vertical (Expert)" />
+<action-checkbox name="scrolls_16" title="Background Scrolls" default=yes />
+
+<action-label name="divider_17" title="------------------" />
+<action-label name="label_17" title="Option 17:"/>
+<action-color name="background_color_17" title="Background Color" />
+<action-file name="background_image_17" title="Background Image" web-graphic />
+<action-popup name="horizontal_17" title="Horizontal">
+<value name="Tile" default>
+<value name="Left">
+<value name="Center">
+<value name="Right">
+<value name="Expert">
+</action-popup>
+<action-text name="horizontal_expert_17" title="Horizontal (Expert)" />
+<action-popup name="vertical_17" title="Vertical">
+	<value name="Tile" default>
+	<value name="Top">
+	<value name="Center">
+	<value name="Bottom">
+<value name="Expert">
+</action-popup>
+<action-text name="vertical_expert_17" title="Vertical (Expert)" />
+<action-checkbox name="scrolls_17" title="Background Scrolls" default=yes />
+
+<action-label name="divider_18" title="------------------" />
+<action-label name="label_18" title="Option 18:"/>
+<action-color name="background_color_18" title="Background Color" />
+<action-file name="background_image_18" title="Background Image" web-graphic />
+<action-popup name="horizontal_18" title="Horizontal">
+<value name="Tile" default>
+<value name="Left">
+<value name="Center">
+<value name="Right">
+<value name="Expert">
+</action-popup>
+<action-text name="horizontal_expert_18" title="Horizontal (Expert)" />
+<action-popup name="vertical_18" title="Vertical">
+	<value name="Tile" default>
+	<value name="Top">
+	<value name="Center">
+	<value name="Bottom">
+<value name="Expert">
+</action-popup>
+<action-text name="vertical_expert_18" title="Vertical (Expert)" />
+<action-checkbox name="scrolls_18" title="Background Scrolls" default=yes />
+
+<action-label name="divider_19" title="------------------" />
+<action-label name="label_19" title="Option 19:"/>
+<action-color name="background_color_19" title="Background Color" />
+<action-file name="background_image_19" title="Background Image" web-graphic />
+<action-popup name="horizontal_19" title="Horizontal">
+<value name="Tile" default>
+<value name="Left">
+<value name="Center">
+<value name="Right">
+<value name="Expert">
+</action-popup>
+<action-text name="horizontal_expert_19" title="Horizontal (Expert)" />
+<action-popup name="vertical_19" title="Vertical">
+	<value name="Tile" default>
+	<value name="Top">
+	<value name="Center">
+	<value name="Bottom">
+<value name="Expert">
+</action-popup>
+<action-text name="vertical_expert_19" title="Vertical (Expert)" />
+<action-checkbox name="scrolls_19" title="Background Scrolls" default=yes />
+
+<action-label name="divider_20" title="------------------" />
+<action-label name="label_20" title="Option 20:"/>
+<action-color name="background_color_20" title="Background Color" />
+<action-file name="background_image_20" title="Background Image" web-graphic />
+<action-popup name="horizontal_20" title="Horizontal">
+<value name="Tile" default>
+<value name="Left">
+<value name="Center">
+<value name="Right">
+<value name="Expert">
+</action-popup>
+<action-text name="horizontal_expert_20" title="Horizontal (Expert)" />
+<action-popup name="vertical_20" title="Vertical">
+	<value name="Tile" default>
+	<value name="Top">
+	<value name="Center">
+	<value name="Bottom">
+<value name="Expert">
+</action-popup>
+<action-text name="vertical_expert_20" title="Vertical (Expert)" />
+<action-checkbox name="scrolls_20" title="Background Scrolls" default=yes />
+
+<action-javascript>
+	function fwInterface(){
+		for(var i = 1; i < 21; i++){
+			fwParameters['horizontal_' + i].fwVisible = fwParameters['vertical_' + i].fwVisible = fwParameters['scrolls_' + i].fwVisible = fwParameters['background_image_' + i].fwHasFile;
+			fwParameters['horizontal_expert_' + i].fwVisible = (fwParameters['horizontal_' + i].fwVisible && fwParameters['horizontal_' + i].fwValue == 'Expert');
+			fwParameters['vertical_expert_' + i].fwVisible = (fwParameters['vertical_' + i].fwVisible && fwParameters['vertical_' + i].fwValue == 'Expert');
+		}
+	}
+	function fwParameterChanged(newParam,oldParam){
+		return fwInterface('foo');
+	}
+	function fwAfterEndHTML(){
+		var head = fwDocument.fwTags.fwFind("head");
+		var cssStyles = head.fwAddCSSStyles();
+		var opts = [];
+		for(var i = 1; i < 21; i++){
+			var style = [];
+			if (fwParameters['background_image_' + i].fwHasFile || fwParameters['background_color_' + i].fwValue.fwHex != undefined){
+				opts.push(i);
+				if (fwParameters['background_image_' + i].fwHasFile){
+					var path = fwParameters['background_image_' + i].toString();
+					style.push('background-image:url(' + path + ')');
+					var hz;
+					var vt;
+					switch(fwParameters['horizontal_' + i].fwValue){
+						case 'Left':
+							hz = 'left';
+						break;
+						case 'Center':
+							hz = 'center';
+						break;
+						case 'Right':
+							hz = 'right';
+						break;
+						case 'Expert':
+							hz = fwParameters['horizontal_expert_' + i].fwValue || 0;
+						break;
+						default:
+							hz = 'tile';
+						break;
+					}//repeat-x
+					switch(fwParameters['vertical_' + i].fwValue){
+						case 'Top':
+							vt = 'top';
+						break;
+						case 'Center':
+							vt = 'center';
+						break;
+						case 'Bottom':
+							vt = 'bottom';
+						break;
+						case 'Expert':
+							vt = fwParameters['vertical_expert_' + i].fwValue || 0;
+						break;
+						default:
+							vt = 'tile';
+						break;
+					} //repeat-y
+					if(hz == vt && vt == 'tile'){
+						style.push('background-repeat:repeat !important');
+						style.push('background-position:left top !important');
+					}else{
+						if(hz == 'tile') {
+							style.push('background-repeat:repeat-x !important');
+							style.push('background-position:left ' + vt + ' !important');
+						}
+						if(vt == 'tile') {
+							style.push('background-repeat:repeat-y !important');
+							style.push('background-position:' + hz + ' top !important');
+						}
+						if(vt != 'tile' && hz != 'tile') {
+							style.push('background-repeat:no-repeat !important');
+							style.push('background-position:' + hz + ' ' + vt + ' !important');
+						}
+					}
+					if(fwParameters['scrolls_' + i].fwBoolValue) {
+						style.push('background-attachment:scroll !important');
+					}else{
+						style.push('background-attachment:fixed !important');
+					}
+				}else{
+					style.push('background-image:none !important');
+				}
+				var backgroundColor = fwParameters['background_color_' + i].fwValue.fwHex;
+				if(backgroundColor != undefined){
+					style.push('background-color:#' + backgroundColor + ' !important');
+				}else{
+					style.push('background-color:transparent !important');
+				}
+				cssStyles.fwAddRawln("body.random_" + i + "{ " + style.join('; ') + " }");
+			}
+		}
+		var bodytag = fwDocument.fwTags.fwFind('body'); 
+		var js = bodytag.fwAddJavaScript();
+		js.fwAddRawln('(function () {');
+		if(fwParameters['original'].fwBoolValue){
+			js.fwAddRawln('	var r = Math.floor(Math.random() * (' + opts.length + ' + 1));');
+		}else{
+			js.fwAddRawln('	var r = Math.ceil(Math.random() * ' + opts.length + ');');
+		}
+		js.fwAddRawln('	if (r > 0) document.body["className"] = (document.body.className) ? document.body.className + " random_" + r : "random_" + r');
+		js.fwAddRawln('})();');
+	}
+
+</action-javascript>
+
+</page-action>
+
+
+
+
+
+<item-action name="com.wdstudio.randomitembackground" title="Random Item Background">
+<action-appliesto layer non-html32/>
+<action-version version="0.1">
+“Random Item Background” Action
+Walter Davis Studio 2009
+
+Apply to a page element to define multiple background styles, one of which will be chosen at random when the page loads.
+</action-version>
+<action-checkbox name="original" title="Use current element background as a random option" />
+<action-label name="divider_1" title="------------------" />
+<action-label name="label_1" title="Option 1:"/>
+<action-color name="background_color_1" title="Background Color" />
+<action-file name="background_image_1" title="Background Image" web-graphic />
+<action-popup name="horizontal_1" title="Horizontal">
+<value name="Tile" default>
+<value name="Left">
+<value name="Center">
+<value name="Right">
+<value name="Expert">
+</action-popup>
+<action-text name="horizontal_expert_1" title="Horizontal (Expert)" />
+<action-popup name="vertical_1" title="Vertical">
+	<value name="Tile" default>
+	<value name="Top">
+	<value name="Center">
+	<value name="Bottom">
+	<value name="Expert">
+</action-popup>
+<action-text name="vertical_expert_1" title="Vertical (Expert)" />
+<action-checkbox name="scrolls_1" title="Background Scrolls" default=yes />
+
+<action-label name="divider_2" title="------------------" />
+<action-label name="label_2" title="Option 2:"/>
+<action-color name="background_color_2" title="Background Color" />
+<action-file name="background_image_2" title="Background Image" web-graphic />
+<action-popup name="horizontal_2" title="Horizontal">
+<value name="Tile" default>
+<value name="Left">
+<value name="Center">
+<value name="Right">
+<value name="Expert">
+</action-popup>
+<action-text name="horizontal_expert_2" title="Horizontal (Expert)" />
+<action-popup name="vertical_2" title="Vertical">
+	<value name="Tile" default>
+	<value name="Top">
+	<value name="Center">
+	<value name="Bottom">
+<value name="Expert">
+</action-popup>
+<action-text name="vertical_expert_2" title="Vertical (Expert)" />
+<action-checkbox name="scrolls_2" title="Background Scrolls" default=yes />
+
+<action-label name="divider_3" title="------------------" />
+<action-label name="label_3" title="Option 3:"/>
+<action-color name="background_color_3" title="Background Color" />
+<action-file name="background_image_3" title="Background Image" web-graphic />
+<action-popup name="horizontal_3" title="Horizontal">
+<value name="Tile" default>
+<value name="Left">
+<value name="Center">
+<value name="Right">
+<value name="Expert">
+</action-popup>
+<action-text name="horizontal_expert_3" title="Horizontal (Expert)" />
+<action-popup name="vertical_3" title="Vertical">
+	<value name="Tile" default>
+	<value name="Top">
+	<value name="Center">
+	<value name="Bottom">
+<value name="Expert">
+</action-popup>
+<action-text name="vertical_expert_3" title="Vertical (Expert)" />
+<action-checkbox name="scrolls_3" title="Background Scrolls" default=yes />
+
+<action-label name="divider_4" title="------------------" />
+<action-label name="label_4" title="Option 4:"/>
+<action-color name="background_color_4" title="Background Color" />
+<action-file name="background_image_4" title="Background Image" web-graphic />
+<action-popup name="horizontal_4" title="Horizontal">
+<value name="Tile" default>
+<value name="Left">
+<value name="Center">
+<value name="Right">
+<value name="Expert">
+</action-popup>
+<action-text name="horizontal_expert_4" title="Horizontal (Expert)" />
+<action-popup name="vertical_4" title="Vertical">
+	<value name="Tile" default>
+	<value name="Top">
+	<value name="Center">
+	<value name="Bottom">
+<value name="Expert">
+</action-popup>
+<action-text name="vertical_expert_4" title="Vertical (Expert)" />
+<action-checkbox name="scrolls_4" title="Background Scrolls" default=yes />
+
+<action-label name="divider_5" title="------------------" />
+<action-label name="label_5" title="Option 5:"/>
+<action-color name="background_color_5" title="Background Color" />
+<action-file name="background_image_5" title="Background Image" web-graphic />
+<action-popup name="horizontal_5" title="Horizontal">
+<value name="Tile" default>
+<value name="Left">
+<value name="Center">
+<value name="Right">
+<value name="Expert">
+</action-popup>
+<action-text name="horizontal_expert_5" title="Horizontal (Expert)" />
+<action-popup name="vertical_5" title="Vertical">
+	<value name="Tile" default>
+	<value name="Top">
+	<value name="Center">
+	<value name="Bottom">
+<value name="Expert">
+</action-popup>
+<action-text name="vertical_expert_5" title="Vertical (Expert)" />
+<action-checkbox name="scrolls_5" title="Background Scrolls" default=yes />
+
+<action-label name="divider_6" title="------------------" />
+<action-label name="label_6" title="Option 6:"/>
+<action-color name="background_color_6" title="Background Color" />
+<action-file name="background_image_6" title="Background Image" web-graphic />
+<action-popup name="horizontal_6" title="Horizontal">
+<value name="Tile" default>
+<value name="Left">
+<value name="Center">
+<value name="Right">
+<value name="Expert">
+</action-popup>
+<action-text name="horizontal_expert_6" title="Horizontal (Expert)" />
+<action-popup name="vertical_6" title="Vertical">
+	<value name="Tile" default>
+	<value name="Top">
+	<value name="Center">
+	<value name="Bottom">
+<value name="Expert">
+</action-popup>
+<action-text name="vertical_expert_6" title="Vertical (Expert)" />
+<action-checkbox name="scrolls_6" title="Background Scrolls" default=yes />
+
+<action-label name="divider_7" title="------------------" />
+<action-label name="label_7" title="Option 7:"/>
+<action-color name="background_color_7" title="Background Color" />
+<action-file name="background_image_7" title="Background Image" web-graphic />
+<action-popup name="horizontal_7" title="Horizontal">
+<value name="Tile" default>
+<value name="Left">
+<value name="Center">
+<value name="Right">
+<value name="Expert">
+</action-popup>
+<action-text name="horizontal_expert_7" title="Horizontal (Expert)" />
+<action-popup name="vertical_7" title="Vertical">
+	<value name="Tile" default>
+	<value name="Top">
+	<value name="Center">
+	<value name="Bottom">
+<value name="Expert">
+</action-popup>
+<action-text name="vertical_expert_7" title="Vertical (Expert)" />
+<action-checkbox name="scrolls_7" title="Background Scrolls" default=yes />
+
+<action-label name="divider_8" title="------------------" />
+<action-label name="label_8" title="Option 8:"/>
+<action-color name="background_color_8" title="Background Color" />
+<action-file name="background_image_8" title="Background Image" web-graphic />
+<action-popup name="horizontal_8" title="Horizontal">
+<value name="Tile" default>
+<value name="Left">
+<value name="Center">
+<value name="Right">
+<value name="Expert">
+</action-popup>
+<action-text name="horizontal_expert_8" title="Horizontal (Expert)" />
+<action-popup name="vertical_8" title="Vertical">
+	<value name="Tile" default>
+	<value name="Top">
+	<value name="Center">
+	<value name="Bottom">
+<value name="Expert">
+</action-popup>
+<action-text name="vertical_expert_8" title="Vertical (Expert)" />
+<action-checkbox name="scrolls_8" title="Background Scrolls" default=yes />
+
+<action-label name="divider_9" title="------------------" />
+<action-label name="label_9" title="Option 9:"/>
+<action-color name="background_color_9" title="Background Color" />
+<action-file name="background_image_9" title="Background Image" web-graphic />
+<action-popup name="horizontal_9" title="Horizontal">
+<value name="Tile" default>
+<value name="Left">
+<value name="Center">
+<value name="Right">
+<value name="Expert">
+</action-popup>
+<action-text name="horizontal_expert_9" title="Horizontal (Expert)" />
+<action-popup name="vertical_9" title="Vertical">
+	<value name="Tile" default>
+	<value name="Top">
+	<value name="Center">
+	<value name="Bottom">
+<value name="Expert">
+</action-popup>
+<action-text name="vertical_expert_9" title="Vertical (Expert)" />
+<action-checkbox name="scrolls_9" title="Background Scrolls" default=yes />
+
+<action-label name="divider_10" title="------------------" />
+<action-label name="label_10" title="Option 10:"/>
+<action-color name="background_color_10" title="Background Color" />
+<action-file name="background_image_10" title="Background Image" web-graphic />
+<action-popup name="horizontal_10" title="Horizontal">
+<value name="Tile" default>
+<value name="Left">
+<value name="Center">
+<value name="Right">
+<value name="Expert">
+</action-popup>
+<action-text name="horizontal_expert_10" title="Horizontal (Expert)" />
+<action-popup name="vertical_10" title="Vertical">
+	<value name="Tile" default>
+	<value name="Top">
+	<value name="Center">
+	<value name="Bottom">
+<value name="Expert">
+</action-popup>
+<action-text name="vertical_expert_10" title="Vertical (Expert)" />
+<action-checkbox name="scrolls_10" title="Background Scrolls" default=yes />
+
+<action-label name="divider_11" title="------------------" />
+<action-label name="label_11" title="Option 11:"/>
+<action-color name="background_color_11" title="Background Color" />
+<action-file name="background_image_11" title="Background Image" web-graphic />
+<action-popup name="horizontal_11" title="Horizontal">
+<value name="Tile" default>
+<value name="Left">
+<value name="Center">
+<value name="Right">
+<value name="Expert">
+</action-popup>
+<action-text name="horizontal_expert_11" title="Horizontal (Expert)" />
+<action-popup name="vertical_11" title="Vertical">
+	<value name="Tile" default>
+	<value name="Top">
+	<value name="Center">
+	<value name="Bottom">
+<value name="Expert">
+</action-popup>
+<action-text name="vertical_expert_11" title="Vertical (Expert)" />
+<action-checkbox name="scrolls_11" title="Background Scrolls" default=yes />
+
+<action-label name="divider_12" title="------------------" />
+<action-label name="label_12" title="Option 12:"/>
+<action-color name="background_color_12" title="Background Color" />
+<action-file name="background_image_12" title="Background Image" web-graphic />
+<action-popup name="horizontal_12" title="Horizontal">
+<value name="Tile" default>
+<value name="Left">
+<value name="Center">
+<value name="Right">
+<value name="Expert">
+</action-popup>
+<action-text name="horizontal_expert_12" title="Horizontal (Expert)" />
+<action-popup name="vertical_12" title="Vertical">
+	<value name="Tile" default>
+	<value name="Top">
+	<value name="Center">
+	<value name="Bottom">
+<value name="Expert">
+</action-popup>
+<action-text name="vertical_expert_12" title="Vertical (Expert)" />
+<action-checkbox name="scrolls_12" title="Background Scrolls" default=yes />
+
+<action-label name="divider_13" title="------------------" />
+<action-label name="label_13" title="Option 13:"/>
+<action-color name="background_color_13" title="Background Color" />
+<action-file name="background_image_13" title="Background Image" web-graphic />
+<action-popup name="horizontal_13" title="Horizontal">
+<value name="Tile" default>
+<value name="Left">
+<value name="Center">
+<value name="Right">
+<value name="Expert">
+</action-popup>
+<action-text name="horizontal_expert_13" title="Horizontal (Expert)" />
+<action-popup name="vertical_13" title="Vertical">
+	<value name="Tile" default>
+	<value name="Top">
+	<value name="Center">
+	<value name="Bottom">
+<value name="Expert">
+</action-popup>
+<action-text name="vertical_expert_13" title="Vertical (Expert)" />
+<action-checkbox name="scrolls_13" title="Background Scrolls" default=yes />
+
+<action-label name="divider_14" title="------------------" />
+<action-label name="label_14" title="Option 14:"/>
+<action-color name="background_color_14" title="Background Color" />
+<action-file name="background_image_14" title="Background Image" web-graphic />
+<action-popup name="horizontal_14" title="Horizontal">
+<value name="Tile" default>
+<value name="Left">
+<value name="Center">
+<value name="Right">
+<value name="Expert">
+</action-popup>
+<action-text name="horizontal_expert_14" title="Horizontal (Expert)" />
+<action-popup name="vertical_14" title="Vertical">
+	<value name="Tile" default>
+	<value name="Top">
+	<value name="Center">
+	<value name="Bottom">
+<value name="Expert">
+</action-popup>
+<action-text name="vertical_expert_14" title="Vertical (Expert)" />
+<action-checkbox name="scrolls_14" title="Background Scrolls" default=yes />
+
+<action-label name="divider_15" title="------------------" />
+<action-label name="label_15" title="Option 15:"/>
+<action-color name="background_color_15" title="Background Color" />
+<action-file name="background_image_15" title="Background Image" web-graphic />
+<action-popup name="horizontal_15" title="Horizontal">
+<value name="Tile" default>
+<value name="Left">
+<value name="Center">
+<value name="Right">
+<value name="Expert">
+</action-popup>
+<action-text name="horizontal_expert_15" title="Horizontal (Expert)" />
+<action-popup name="vertical_15" title="Vertical">
+	<value name="Tile" default>
+	<value name="Top">
+	<value name="Center">
+	<value name="Bottom">
+<value name="Expert">
+</action-popup>
+<action-text name="vertical_expert_15" title="Vertical (Expert)" />
+<action-checkbox name="scrolls_15" title="Background Scrolls" default=yes />
+
+<action-label name="divider_16" title="------------------" />
+<action-label name="label_16" title="Option 16:"/>
+<action-color name="background_color_16" title="Background Color" />
+<action-file name="background_image_16" title="Background Image" web-graphic />
+<action-popup name="horizontal_16" title="Horizontal">
+<value name="Tile" default>
+<value name="Left">
+<value name="Center">
+<value name="Right">
+<value name="Expert">
+</action-popup>
+<action-text name="horizontal_expert_16" title="Horizontal (Expert)" />
+<action-popup name="vertical_16" title="Vertical">
+	<value name="Tile" default>
+	<value name="Top">
+	<value name="Center">
+	<value name="Bottom">
+<value name="Expert">
+</action-popup>
+<action-text name="vertical_expert_16" title="Vertical (Expert)" />
+<action-checkbox name="scrolls_16" title="Background Scrolls" default=yes />
+
+<action-label name="divider_17" title="------------------" />
+<action-label name="label_17" title="Option 17:"/>
+<action-color name="background_color_17" title="Background Color" />
+<action-file name="background_image_17" title="Background Image" web-graphic />
+<action-popup name="horizontal_17" title="Horizontal">
+<value name="Tile" default>
+<value name="Left">
+<value name="Center">
+<value name="Right">
+<value name="Expert">
+</action-popup>
+<action-text name="horizontal_expert_17" title="Horizontal (Expert)" />
+<action-popup name="vertical_17" title="Vertical">
+	<value name="Tile" default>
+	<value name="Top">
+	<value name="Center">
+	<value name="Bottom">
+<value name="Expert">
+</action-popup>
+<action-text name="vertical_expert_17" title="Vertical (Expert)" />
+<action-checkbox name="scrolls_17" title="Background Scrolls" default=yes />
+
+<action-label name="divider_18" title="------------------" />
+<action-label name="label_18" title="Option 18:"/>
+<action-color name="background_color_18" title="Background Color" />
+<action-file name="background_image_18" title="Background Image" web-graphic />
+<action-popup name="horizontal_18" title="Horizontal">
+<value name="Tile" default>
+<value name="Left">
+<value name="Center">
+<value name="Right">
+<value name="Expert">
+</action-popup>
+<action-text name="horizontal_expert_18" title="Horizontal (Expert)" />
+<action-popup name="vertical_18" title="Vertical">
+	<value name="Tile" default>
+	<value name="Top">
+	<value name="Center">
+	<value name="Bottom">
+<value name="Expert">
+</action-popup>
+<action-text name="vertical_expert_18" title="Vertical (Expert)" />
+<action-checkbox name="scrolls_18" title="Background Scrolls" default=yes />
+
+<action-label name="divider_19" title="------------------" />
+<action-label name="label_19" title="Option 19:"/>
+<action-color name="background_color_19" title="Background Color" />
+<action-file name="background_image_19" title="Background Image" web-graphic />
+<action-popup name="horizontal_19" title="Horizontal">
+<value name="Tile" default>
+<value name="Left">
+<value name="Center">
+<value name="Right">
+<value name="Expert">
+</action-popup>
+<action-text name="horizontal_expert_19" title="Horizontal (Expert)" />
+<action-popup name="vertical_19" title="Vertical">
+	<value name="Tile" default>
+	<value name="Top">
+	<value name="Center">
+	<value name="Bottom">
+<value name="Expert">
+</action-popup>
+<action-text name="vertical_expert_19" title="Vertical (Expert)" />
+<action-checkbox name="scrolls_19" title="Background Scrolls" default=yes />
+
+<action-label name="divider_20" title="------------------" />
+<action-label name="label_20" title="Option 20:"/>
+<action-color name="background_color_20" title="Background Color" />
+<action-file name="background_image_20" title="Background Image" web-graphic />
+<action-popup name="horizontal_20" title="Horizontal">
+<value name="Tile" default>
+<value name="Left">
+<value name="Center">
+<value name="Right">
+<value name="Expert">
+</action-popup>
+<action-text name="horizontal_expert_20" title="Horizontal (Expert)" />
+<action-popup name="vertical_20" title="Vertical">
+	<value name="Tile" default>
+	<value name="Top">
+	<value name="Center">
+	<value name="Bottom">
+<value name="Expert">
+</action-popup>
+<action-text name="vertical_expert_20" title="Vertical (Expert)" />
+<action-checkbox name="scrolls_20" title="Background Scrolls" default=yes />
+
+<action-javascript>
+	function fwInterface(){
+		for(var i = 1; i < 21; i++){
+			fwParameters['horizontal_' + i].fwVisible = fwParameters['vertical_' + i].fwVisible = fwParameters['scrolls_' + i].fwVisible = fwParameters['background_image_' + i].fwHasFile;
+			fwParameters['horizontal_expert_' + i].fwVisible = (fwParameters['horizontal_' + i].fwVisible && fwParameters['horizontal_' + i].fwValue == 'Expert');
+			fwParameters['vertical_expert_' + i].fwVisible = (fwParameters['vertical_' + i].fwVisible && fwParameters['vertical_' + i].fwValue == 'Expert');
+		}
+	}
+	function fwParameterChanged(newParam,oldParam){
+		return fwInterface('foo');
+	}
+	function fwAfterEndHTML(){
+		var head = fwDocument.fwTags.fwFind("head");
+		var item = fwDocument.fwTags.fwFind(fwItem);
+		if(!item.id || item.id.toString == '') item['id'] = fwQuote(fwItem.toString());
+		var itemID = fwQuote(item['id'],'','"')
+		var cssStyles = head.fwAddCSSStyles();
+		var opts = [];
+		for(var i = 1; i < 21; i++){
+			var style = [];
+			if (fwParameters['background_image_' + i].fwHasFile || fwParameters['background_color_' + i].fwValue.fwHex != undefined){
+				opts.push(i);
+				if (fwParameters['background_image_' + i].fwHasFile){
+					var path = fwParameters['background_image_' + i].toString();
+					style.push('background-image:url(' + path + ')');
+					var hz;
+					var vt;
+					switch(fwParameters['horizontal_' + i].fwValue){
+						case 'Left':
+							hz = 'left';
+						break;
+						case 'Center':
+							hz = 'center';
+						break;
+						case 'Right':
+							hz = 'right';
+						break;
+						case 'Expert':
+							hz = fwParameters['horizontal_expert_' + i].fwValue || 0;
+						break;
+						default:
+							hz = 'tile';
+						break;
+					}//repeat-x
+					switch(fwParameters['vertical_' + i].fwValue){
+						case 'Top':
+							vt = 'top';
+						break;
+						case 'Center':
+							vt = 'center';
+						break;
+						case 'Bottom':
+							vt = 'bottom';
+						break;
+						case 'Expert':
+							vt = fwParameters['vertical_expert_' + i].fwValue || 0;
+						break;
+						default:
+							vt = 'tile';
+						break;
+					} //repeat-y
+					if(hz == vt && vt == 'tile'){
+						style.push('background-repeat:repeat !important');
+						style.push('background-position:left top !important');
+					}else{
+						if(hz == 'tile') {
+							style.push('background-repeat:repeat-x !important');
+							style.push('background-position:left ' + vt + ' !important');
+						}
+						if(vt == 'tile') {
+							style.push('background-repeat:repeat-y !important');
+							style.push('background-position:' + hz + ' top !important');
+						}
+						if(vt != 'tile' && hz != 'tile') {
+							style.push('background-repeat:no-repeat !important');
+							style.push('background-position:' + hz + ' ' + vt + ' !important');
+						}
+					}
+					if(fwParameters['scrolls_' + i].fwBoolValue) {
+						style.push('background-attachment:scroll !important');
+					}else{
+						style.push('background-attachment:fixed !important');
+					}
+				}else{
+					style.push('background-image:none !important');
+				}
+				var backgroundColor = fwParameters['background_color_' + i].fwValue.fwHex;
+				if(backgroundColor != undefined){
+					style.push('background-color:#' + backgroundColor + ' !important');
+				}else{
+					style.push('background-color:transparent !important');
+				}
+				cssStyles.fwAddRawln("#" + itemID + ".random_" + i + "{ " + style.join('; ') + " }");
+			}
+		}
+	}
+	
+	function fwBeforeEndBody(){
+		var item = fwDocument.fwTags.fwFind(fwItem);
+		if(!item.id || item.id.toString() == '') item['id'] = fwQuote(fwItem.toString());
+		var itemID = fwQuote(item['id'],'','"')
+		var opts = [];
+		for(var i = 1; i < 21; i++){
+			if (fwParameters['background_image_' + i].fwHasFile || fwParameters['background_color_' + i].fwValue.fwHex != undefined){
+				opts.push(i);
+			}
+		}
+		var bodytag = fwDocument.fwTags.fwFind('body'); 
+		var js = bodytag.fwAddJavaScript();
+		js.fwAddRawln('(function () {');
+		if(fwParameters['original'].fwBoolValue){
+			js.fwAddRawln('	var r = Math.floor(Math.random() * (' + opts.length + ' + 1));');
+		}else{
+			js.fwAddRawln('	var r = Math.ceil(Math.random() * ' + opts.length + ');');
+		}
+		js.fwAddRawln('	var elm = document.getElementById(' + item.id + ');');
+		js.fwAddRawln('	if (r > 0) elm["className"] = (elm.className) ? elm.className + " random_" + r : "random_" + r');
+		js.fwAddRawln('})();');
+	}
+
+</action-javascript>
+
+</item-action>
+
+
+(function () {
+  //Put your script code in here
+})();

@@ -1,0 +1,33 @@
+<page-action name="PageDiv Extended">
+<action-version version="0.2">
+PageDiv Extended Action
+Walter Davis Studio 2009
+</action-version>
+<action-checkbox name="Activate" default=yes>
+<action-text name="styleCode" title="Style" default=""/>
+<action-checkbox name="clearStyle" title="Remove Existing Style" advance=no />
+<action-text name="className" title="Class" default=""/>
+<action-javascript>
+	function GetPageDiv(){
+		var divs = fwDocument.fwTags.fwFindAll('div');
+		for (i in divs){
+			if (divs[i] && divs[i].id && divs[i].id.toString().indexOf('PageDiv') > -1) return divs[i];
+		}
+		return false;
+	}
+	function fwAfterEndBody(){
+		if(fwParameters['Activate'].fwBoolValue){
+			var pd = GetPageDiv();
+			if(pd){
+				pd.style = (fwParameters['clearStyle'].fwBoolValue) ? null : pd.style;
+				pd.CLASS = null;
+				if(fwParameters['className'].fwValue.toString().length > 0) pd.CLASS = fwQuote(fwParameters['className'].fwValue);
+				if(fwParameters['styleCode'].fwValue.toString().length > 0) {
+					var style = (null != pd.style) ? pd.style.toString().slice(1,-1) + '; ' : '';
+					pd.style = fwQuote(style + fwParameters['styleCode'].fwValue);
+				}
+			}
+		}
+	}
+</action-javascript>
+</page-action>

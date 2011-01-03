@@ -1,0 +1,146 @@
+<item-action name="AddSelector">
+<action-version version="0.2b">
+AddSelector
+©2004 Walter Lee Davis
+
+Apply the action to an HTML box to add CSS ID or Class attributes.
+
+</action-version>
+<action-popup name="appliesTo" title="Add Selector to Tag">
+	<value name="p" title="Paragraph" default>
+	<value name="td" title="TD">
+	<value name="tr" title="TR">
+	<value name="table" title="TABLE">
+	<value name="div" title="DIV">
+	<value name="element" title="Form Element">
+	<value name="form" title="FORM">
+</action-popup>
+
+<action-text name="id" title="ID">
+<action-text name="class" title="Class">
+<action-javascript>
+	function fwInterface(myField,myAction){
+		if (myField && myAction){
+		//alert (myField + " = " + myAction);
+			if (myAction == "yes"){
+				fwParameters[myField].fwEnable= true;
+			}else{
+				fwParameters[myField].fwEnable = false;
+			}
+		}
+		if(fwParameters["appliesTo"].fwValue != "p"){
+			fwParameters["id"].fwEnable = true;
+		}else{
+			fwParameters["id"].fwEnable = false;
+		}
+	}
+	function fwParameterChanged(newParam,oldParam){
+		if (newParam.fwName == "appliesTo"){
+			if(newParam.fwValue.toString() != "p"){
+			   return fwInterface("id","yes");
+			}
+			return fwInterface("id","no");
+	   }
+	}
+	function fwAfterEndBody(){
+		var thisItem = fwDocument.fwTags.fwFind("", fwItem);
+		if (thisItem){
+		//alert(thisItem);
+			var myTag=fwParameters["appliesTo"].fwValue;
+			if(myTag == "element"){
+				myTag = Array("input","textarea","select");
+			}
+			if (myTag == "p" || myTag[0] == "input" || (myTag == "table" && fwItem.fwIsTable == true)){
+				var myItem = fwDocument.fwTags.fwFindAll(myTag,fwItem);
+				for (var i in myItem){
+					if (myItem[i] && myItem[i] != null){
+						enclosingTag = myItem[i];
+						if (enclosingTag){
+							var myID = fwParameters["id"].fwValue;
+							var myClass = fwParameters["class"].fwValue;
+							if(myID && ( myTag[0] == "input" || myTag == "table")){
+								enclosingTag.ID = fwQuote(myID);
+							}
+							if(myClass){
+								enclosingTag.CLASS = fwQuote(myClass);
+							}
+						}
+					}
+				}
+				//alert (enclosingTag);
+			}else{
+				var enclosingTag = thisItem.fwFindEnclosing(myTag);
+				if(enclosingTag){
+					var myID = fwParameters["id"].fwValue;
+					var myClass = fwParameters["class"].fwValue;
+					if(myID){
+						enclosingTag.ID = fwQuote(myID);
+					}
+					if(myClass){
+						enclosingTag.CLASS = fwQuote(myClass);
+					}
+				}else{
+					alert("The Action AddSelector applied to " + fwItem + " failed to produce any results.");
+				}
+			}
+		}
+	}
+</action-javascript>
+</item-action>
+<action name="com.wdstudio.addselector" title="AddSelector" height="12">
+<action-version version="0.1">
+AddSelector
+Copyright 2010 Walter Lee Davis
+</action-version>
+<action-text name="id" title="ID">
+<action-text name="class" title="Class">
+<action-javascript>
+	String.prototype.strip = function() {
+		return this.replace(/^\s+/, '').replace(/\s+$/, '');
+	}
+
+	var hasClassName = function(element, className) {
+		className = fwQuote(className,'','"'); //"
+		var elementClassName = (element["class"]) ? fwQuote(element["class"],'','"') : ''; //"
+		return ((elementClassName.length > 0) && (elementClassName == className || new RegExp("\\b" + className + "\\b").test(elementClassName)));
+	};
+
+	var addClassName = function(element, className) {
+		className = fwQuote(className,'','"'); //"
+		if (!hasClassName(element,className)){
+			var elementClassName = (element["class"]) ? fwQuote(element["class"],'','"') : ''; //"
+			var out = (elementClassName + ' ' + className).strip();
+			return element["class"] = fwQuote(out);
+		}
+	};
+
+	var removeClassName = function(element, className) {
+		var className = fwQuote(className,'','"');//"
+		var elementClassName = (element['class']) ? fwQuote(element['class'],'','"') : '';//"
+		elementClassName = elementClassName.replace(
+			new RegExp("(^|\\s+)" + className + "(\\s+|$)"), ' ').replace(/(^\s+|\s+$)/g,'');
+		return element['class'] = fwQuote(elementClassName);
+	};
+
+	function fwBeforeEndBody(){
+		var thisItem = fwDocument.fwTags.fwFind(fwItem);
+		var blockTags = ['blockquote','p','li','dd','dt','h1','h2','h3','h4','h5','h6'];
+		if(thisItem && thisItem.fwFindEnclosing(blockTags)){
+			var thisPara = thisItem.fwFindEnclosing(blockTags);
+			if (thisPara){
+				if(fwParameters['id'].fwValue){
+					thisPara['id'] = fwQuote(fwParameters['id'].fwValue);
+				}
+				if(fwParameters['class'].fwValue){
+					addClassName(thisPara,fwParameters['class'].fwValue);
+				}
+			}else{
+				alert('A surrounding tag could not be detected. Your code was not added to the page.');
+			}
+		}
+	}
+	function strip_tags(theString){
+		return theString.replace(/<[^>]+?>/g,'');
+	}
+</action-javascript>
+</action>

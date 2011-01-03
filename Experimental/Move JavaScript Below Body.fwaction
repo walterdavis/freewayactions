@@ -1,0 +1,46 @@
+<page-action name="Move JavaScript Below Body">
+<action-version version="0.1">
+Move JavaScript Below Body
+
+Highly experimental Action to move all JavaScript below the content of the page body.
+</action-version>
+
+<action-javascript>
+	function fwAfterEndHTML() {
+		var head = fwDocument.fwTags.fwFind('head');
+		var body = fwDocument.fwTags.fwFind('body');
+		var scriptsToMove = {};
+		var scripts = head.fwFindAll('script');
+		for (i in scripts){
+			var s = scripts[i].fwToHTML();
+			if(s.indexOf('script src="') == -1){ //"
+				body.fwMove(scripts[i]);
+			}
+		}
+		if(body){
+// 			for(i in scriptsToMove){
+// 				body.fwAddRaw(scriptsToMove[i]);
+// 				body.fwAddRawln('');
+// 			}
+			if(body.onload){
+				var onload = body.onload.toString().slice(1,-1).split(';');
+				var js = body.fwAddJavaScript();
+				for(var i = 0; i < onload.length; i++){
+					js.fwAddRaw(onload[i]);
+					js.fwAddRawln(';');
+				}
+				body.onload = null;
+			}
+			if(body.onunload){
+				var unload = body.onunload.toString().slice(1,-1).split(';');
+				var js = body.fwAddJavaScript();
+				for(var i = 0; i < unload.length; i++){
+					js.fwAddRawln(unload[i]);
+					js.fwAddRawln(';');
+				}
+				body.onunload = null;
+			}
+		}
+	}
+</action-javascript> 
+</page-action>

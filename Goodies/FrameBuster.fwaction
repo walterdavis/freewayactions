@@ -1,0 +1,16 @@
+﻿<action! ======================= frame buster =======================/>
+<action!/>
+<action! ©2002 walter lee davis/>
+<action! http://www.walterdavisstudio.com />
+
+<page-action name="Frame Buster">
+<action-html after-start-head>
+<script type="text/javascript">
+<!--
+if(top.location.href != self.location.href){
+	top.location.href = self.location.href;
+}
+//-->
+</script>
+</action-html>
+</page-action>

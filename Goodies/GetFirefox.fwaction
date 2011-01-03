@@ -1,0 +1,35 @@
+<page-action name="com.wdstudio.GetFirefox" title="GetFirefox">
+<action-version version="0.1">
+“GetFirefox” Action
+Walter Davis Studio 2007
+</action-version>
+<action-markup custom name="comment">
+<!--[if IE]>
+	<div class="warning">
+		<h1><a href='http://www.getfirefox.com/'>
+			Get Firefox!
+		</a></h1>
+		<p>Please protect yourself <em>and</em> the Internet. Download a safer browser today.</p>
+	</div>
+<![endif]-->
+</action-markup>
+<action-javascript>
+	function fwAfterEndBody()
+	{
+		var bodyTag = fwDocument.fwTags.fwFind("body");
+		if (!bodyTag)
+			return;
+		var contents = bodyTag.fwFindAllContent();
+		var theMarkup = fwMarkups['comment'];
+		theMarkup.fwConvertLineEndings = true;
+		lastTag = bodyTag.fwAddRaw(theMarkup);
+		bodyTag.fwMove(contents,lastTag);
+		var myHead = fwDocument.fwTags.fwFind("head");
+		var cssStyles = myHead.fwAddCSSStyles();
+		cssStyles.fwAddRawln('div.warning { width:380px; border:4px solid #FF3300; background-color:#FFFF99; padding:8px 12px; margin:12px auto }');
+		cssStyles.fwAddRawln('div.warning h1 { margin:0; padding:0; font-size:32px; font-family:Lucida,"Lucida Sans Unicode","Lucida Grande", sans-serif }');
+		cssStyles.fwAddRawln('div.warning h1 a { color:#FF3300; padding:14px 0 14px 84px; margin:0; display:block; background: url(http://freewaypro.com/firefox.gif) no-repeat }');
+		cssStyles.fwAddRawln('div.warning p { color:#000000; font-size:19px; padding:0; margin:6px 0 0; font-family:Lucida,"Lucida Sans Unicode","Lucida Grande", sans-serif }');
+	}
+</action-javascript>
+</page-action>

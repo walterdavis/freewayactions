@@ -1,0 +1,124 @@
+<item-action name="com.walterdavisstudio.simplerss" title="SimpleRSS">
+<action-version version="0.02">
+ÒSimpleRSSÓ Action
+
+(c) Copyright 2004,2006 Walter Davis Studio 
+<http://www.walterdavisstudio.com>
+
+Create an RSS feed for your page. Apply the action to an HTML box which contains a list of links.
+</action-version>
+<action-checkbox name="Activate">
+<action-checkbox name="Delete Source">
+<action-file var name="XML File" keepwithhtml>
+<action-text name="title">
+<action-text name="link">
+<action-text name="description">
+<action-popup name="language">
+	<value name="en-us" default>
+</action-popup>
+<action-javascript>
+	function fwBeforeEndHTML(){
+		var activate = fwParameters["Activate"].fwBoolValue;
+		if(activate){
+			paras = fwDocument.fwTags.fwFindAll("p",fwItem);
+			myHead = fwDocument.fwTags.fwFind("head");
+			if(myHead){
+				var rssXML = myHead.fwAdd("");
+			}
+			rssXML.fwAddRawln("<?xml version=\"1.0\" ?>");
+			rssXML.fwAddRawln("<rss version=\"0.91\">");
+			rssXML.fwIndent();
+			rssXML.fwAddRawln("<channel>");
+			rssXML.fwIndent();
+			rssXML.fwAddRawln("<title>" + fixXML(fwParameters["title"].fwValue) + "</title>");
+			rssXML.fwAddRawln("<link>" + fwParameters["link"].fwValue + "</link>");
+			rssXML.fwAddRawln("<description>" + fixXML(fwParameters["description"].fwValue) + "</description>");
+			rssXML.fwAddRawln("<language>" + fwParameters["language"].fwValue + "</language>");
+			if(paras){
+				for (i=0; i< paras.length;i++){
+					var myP = paras[i].fwFindContent();
+					if (myP){
+						var myTitle = myP.fwFindContent();
+						if(myTitle == "a" || myTitle == "span"){
+							myTitle = myTitle.fwFindContent();
+						}
+						var myLink = fwQuote(myP.href,'','"');//"
+						if (myLink){
+							if (myLink.toString().slice(0,7)!= "http://"){
+								myLink = fwParameters["link"].fwValue + myLink.toString();
+							}
+						}
+					}
+					i++;
+					if(paras[i]){
+						var myDescription = paras[i].fwFindContent();
+						if(myDescription == "a" || myDescription == "span"){
+							myDescription = myDescription.fwFindContent();
+						}
+					}
+					rssXML.fwAddRawln("<item>");
+					rssXML.fwIndent();
+					rssXML.fwAddRawln("<title>" + fixXML(myTitle) + "</title>");
+					rssXML.fwAddRawln("<link>" + myLink + "</link>");
+					rssXML.fwAddRawln("<description>" + fixXML(myDescription) + "</description>");
+					rssXML.fwOutdent();
+					rssXML.fwAddRawln("</item>");
+				}
+			}
+			rssXML.fwOutdent();
+			rssXML.fwAddRawln("</channel>");
+			rssXML.fwOutdent();
+			rssXML.fwAddRawln("</rss>");
+			output = rssXML.fwToHTML();
+			rssXML.fwDelete();
+			addLink(myHead,output);
+			var deleteme = fwParameters["Delete Source"].fwBoolValue;
+			if(deleteme){
+				var attachedTo = fwDocument.fwTags.fwFind(fwItem);
+				attachedTo.fwDelete();
+			}
+		}
+	}
+
+	function addLink(where,what){
+			if (where && what){
+			myXML = makeXML(what);
+			var myLink = where.fwAdd("link");
+			myLink.rel = fwQuote("alternate");
+			myLink.type = fwQuote("application/rss+xml");
+			myLink.href = fwQuote(myXML);
+			myLink.fwAddRawOpt("");
+		}
+	}
+
+
+	function fixXML(str){
+		find = new Array("&","<",">",'"',"'","&amp;amp;");//"
+		replace = new Array("&amp;","&lt;","&gt;",'&quot;',"&apos;","&amp;");
+		text = new String(str);
+		for (f in find){
+			fx = new RegExp(find[f],'gi');
+			text = text.replace(fx,replace[f]);
+		}
+		return text;
+	}
+
+
+
+	function makeXML(textStream){
+		outFile = new FWFile;
+		var myName = fwPage.fwFileName;
+		myName = myName.slice(0,myName.indexOf("."));
+		if (outFile.fwOpenWrite(myName+".xml", "TEXT", "R*ch")){
+			outFile.fwWrite(textStream);
+			
+			outFile.fwClose();
+			fwParameters["XML File"].fwSpecify(outFile);
+			
+			return fwParameters["XML File"].toString();
+		}		
+		return null;
+	}
+	
+</action-javascript> 
+</item-action>

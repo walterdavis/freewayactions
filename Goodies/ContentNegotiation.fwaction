@@ -1,0 +1,56 @@
+<folder-action name="com.wdstudio.contentnegotiation" title="ContentNegotiation">
+<action-version version="0.2">
+"ContentNegotiation" action
+Apply this Action to a folder to generate an index.var file for Apache Content Negotiation.
+</action-version>
+<action-file name="index" var keepwithhtml causeschange="no" />
+<action-text name="filename" title="Type Map" default="index.var" />
+<action-javascript>
+function makeVarfile(textStream){
+	outFile = new FWFile;
+	if (outFile.fwOpenWrite(fwParameters['filename'],true,"TEXT","R*ch")){
+		outFile.fwWrite(textStream);
+		outFile.fwClose();
+		fwParameters["index"].fwSpecify(outFile);
+		var file = fwParameters["index"].toString();
+		return true;
+	}		
+	return null;
+}
+function readVarfile(){
+	outFile = new FWFile;
+	if (outFile.fwOpenRead(fwParameters['filename'])){
+		var str = outFile.fwReadString(outFile.fwAvailable);
+		outFile.fwClose();
+		return str;
+	}		
+	return null;
+}
+
+function fwIsDirty(){
+	fwItem.fwLastPage.fwSetDirty();
+	return;
+}
+
+function fwAfterEndHTML(){
+	if(fwFolder.fwLastPage && fwPage == fwFolder.fwLastPage){
+		var contents = fwFolder.fwItems;
+		var pages = new Array;
+		for (i in contents){
+			var page = contents[i].fwFileName.toString();
+			if( page.substr(0,6) == 'index_'){
+				var lan = page.substr(6,(page.indexOf('.') - 6));
+				if(lan != 'alternative'){
+					pages.push( 'URI: ' + page + "\nContent-type: text/html\nContent-language: " + lan + "\n");
+				}else{
+					pages.push( 'URI: ' + page + "\nContent-type: text/html\n");
+				}
+			}
+		}
+		if(pages.length > 0 ) {
+			makeVarfile(pages.join('\n'));
+		}
+	}
+}
+</action-javascript>
+</folder-action>

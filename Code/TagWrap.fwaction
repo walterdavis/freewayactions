@@ -1,0 +1,78 @@
+<item-action name="TagWrap">
+<action-version version="0.4">
+Comment
+Copyright 2008 Walter Lee Davis
+
+Apply the action to a table cell or HTML box to add a bit of code to either side.
+</action-version>
+<action-checkbox name="Activate">
+<action-checkbox name="anon" title="Remove ID">
+<action-checkbox title="Remove Positioning" name = "removePositioning" default=no/>
+<action-checkbox title="Remove Dimensions" name = "removeDimensions" default=no/>
+<action-text name="Before" />
+<action-text name="After" />
+<action-javascript>
+	function fwBeforeEndBody(){
+		var activate = fwParameters["Activate"].fwBoolValue;
+		if(activate){
+			thisObj = fwDocument.fwTags.fwFind(fwItem);
+			if (thisObj){
+				if(fwParameters["anon"].fwBoolValue) {
+					var children = thisObj.fwFindAll('div');
+					for (i in children) {
+						children[i].id = null;
+					}
+					thisObj.id = null;
+				}
+				addComment(thisObj);
+				if(fwParameters['removePositioning'].fwBoolValue == true){
+					SetCSSAttribute(thisObj,"style","z-index",null);
+					SetCSSAttribute(thisObj,"style","top",null);
+					SetCSSAttribute(thisObj,"style","left",null);
+					SetCSSAttribute(thisObj,"style","bottom",null);
+					SetCSSAttribute(thisObj,"style","right",null);
+					SetCSSAttribute(thisObj,"style","position","relative");
+				}
+				if(fwParameters['removeDimensions'].fwBoolValue == true){
+					SetCSSAttribute(thisObj,"style","width",null);
+					SetCSSAttribute(thisObj,"style","height",null);
+				}
+			}
+		}
+	}
+	function addComment(thisObj){
+		var startComment = fwParameters.Before.toString();
+		var endComment = fwParameters.After.toString();
+		if(startComment.length > 0 && endComment.length > 0){
+			var dummy = thisObj.fwAddEnclosing("",true);
+			var c = dummy.fwAddRawln(startComment);
+			dummy.fwMove(thisObj,c);//this puts the comment first
+			dummy.fwAddRawln('');
+			dummy.fwAddRaw(endComment);
+		}
+	}
+	function SetCSSAttribute(tag, fieldName, attributeName, attributeValue) { 
+		// Sets a "CSS" attribute such as "position:absolute" in a tag value 
+		// Passing an attribute value of null removes that attribute entirely
+		if (tag==null) return; 
+		var tagField = tag[fieldName]; 
+		if (tagField == null){
+			if(attributeValue != null) tag[fieldName] = '"'+attributeName+':'+attributeValue+'"'; 
+		}else{
+			var tagField = tagField.toString();
+			var pairs = tagField.slice(1,-1).split(';');
+			var out = new Array();
+			if(attributeValue != null && tagField.indexOf(attributeName) < 0) out.push(attributeName+':'+attributeValue);
+			for(i in pairs){
+				pairs[i] = pairs[i].replace(/^\s*(\S*(\s+\S+)*)\s*$/, "$1"); //javascript equivalent of trim
+				if(pairs[i].slice(0,pairs[i].indexOf(':')) == attributeName) {
+					if(attributeValue != null) out.push(attributeName+':'+attributeValue);
+				}else{
+					out.push(pairs[i]);
+				}
+			}
+			tag[fieldName]= fwQuote(out.join('; ')); 
+		}
+	} 
+</action-javascript>
+</item-action>

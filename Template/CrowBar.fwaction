@@ -1,0 +1,233 @@
+<item-action name="com.wdstudio.crowbar" title="CrowBar">
+<action-version version="0.3">
+CrowBar
+Copyright 2005 Walter Lee Davis
+
+Apply the action to a table cell or HTML box to add content before the opening P tag.
+</action-version>
+<action-checkbox name="Activate">
+<action-popup name="position" title="Add Code To">
+	<value name="b" title="Beginning" default>
+	<value name="e" title="End">
+</action-popup>
+<action-button name="Code" onClick=EditCode();>
+<action-text var name="custom" default="">
+
+<action-javascript>
+	function EditCode(){ //Cut down from Tim Plumb's Source Code Snooper
+		var mycustomcode = fwParameters.custom.toString();
+		var myprompt = "This code will be added into the object.";
+		var mycustomcodeprompt = fwBigPrompt(myprompt, mycustomcode);
+		if (mycustomcodeprompt != null) { //if the cancel button was not hit
+			if (mycustomcodeprompt != mycustomcode) {//check that the code has changed
+				fwParameters["custom"].fwValue = mycustomcodeprompt;
+			}
+		}
+	}
+	function fwBeforeEndBody(){
+		var activate = fwParameters["Activate"].fwBoolValue;
+		if(activate){
+			thisObj = fwDocument.fwTags.fwFind("td", fwItem);
+			if (thisObj){
+				addToObj(thisObj,true);
+			}else{
+				thisObj = fwDocument.fwTags.fwFind("", fwItem);
+				if(thisObj){
+					addToObj(thisObj,false);
+				}
+			}
+		}
+	}
+	function addToObj(thisObj,wrapper){
+		var allAtts = thisObj.fwFindAllAttributes();
+		var position=fwParameters["position"].fwValue;
+		myContents = thisObj.fwFindAllContent();
+		if (myContents){
+			var moreCode = fwParameters.custom.toString();
+			dummy = thisObj.fwAddEnclosing("",true);
+			if (position == 'b') dummy.fwAddRaw(moreCode);
+			dummy.fwMove(myContents);
+			if (position == 'e') dummy.fwAddRaw(moreCode);
+			if(wrapper){ dummy.fwAddEnclosing("td",true); }
+			newTD = dummy.fwFindEnclosing("td");
+			if (newTD){
+				for (i in allAtts){
+					newTD[allAtts[i].fwTitle] = allAtts[i].fwValue;
+				}
+			}
+			thisObj.fwDelete();
+		}
+	}
+</action-javascript>
+</item-action>
+
+<action name="com.wdstudio.crowbar" title="CrowBar" height="12">
+<action-version version="0.3">
+CrowBar
+Copyright 2008 Walter Lee Davis
+
+Insert the action at the beginning or end of a run of text to move your code outside of the P tag.
+
+If you insert the action within a run of text, your code will be output within the surrounding text.
+
+If you insert the action as the only character in a line of text, the surrounding P tag will not be output, and your code will have to generate a valid HTML element to contain its output.
+</action-version>
+<action-checkbox name="Activate">
+<action-button name="Code" onClick=EditCode();>
+<action-text var name="custom" default="">
+<action-javascript>
+	function GetPageDiv(){
+		var divs = fwDocument.fwTags.fwFindAll('div');
+		for (i in divs){
+			if (divs[i] && divs[i].id && divs[i].id.toString() == '"PageDiv"') return divs[i];
+		}
+		return false;
+	}
+
+	function EditCode(){ //Cut down from Tim Plumb's Source Code Snooper
+		var mycustomcode = fwParameters.custom.toString();
+		var myprompt = "This code will be added into the object.";
+		var mycustomcodeprompt = fwBigPrompt(myprompt, mycustomcode);
+		if (mycustomcodeprompt != null) { //if the cancel button was not hit
+			if (mycustomcodeprompt != mycustomcode) {//check that the code has changed
+				fwParameters["custom"].fwValue = mycustomcodeprompt;
+			}
+		}
+	}
+	function fwAtContent(){
+		if(fwParameters["Activate"].fwBoolValue){
+			var thisItem = fwDocument.fwTags.fwFind(fwItem);
+			fwDocument.fwWrite('&' + fwItem.toString() + ';');
+		}
+	}
+
+	function fwBeforeEndBody(){
+		var activate = fwParameters["Activate"].fwBoolValue;
+		if(activate){
+			var thisItem = fwDocument.fwTags.fwFind(fwItem);
+			var blockTags = ['blockquote','p','li','dd','dt','h1','h2','h3','h4','h5','h6'];
+			if(thisItem && thisItem.fwFindEnclosing(blockTags)){
+				var thisPara = thisItem.fwFindEnclosing(blockTags);
+				var container = thisPara.fwFindEnclosing('div');
+				var temp = strip_tags(thisPara.fwToHTML());
+				var me = '&' + fwItem.toString() + ';';
+				if (thisPara){
+					var position = '';
+					var pos = temp.indexOf(me);
+					switch (pos){
+						case 0:
+							position = (temp.length == me.length) ? 'replace' : 'start';
+							break;
+						case (temp.length - me.length):
+							position = 'end';
+							break;
+						default:
+							position = 'middle';
+							break;
+					};
+					addToObj(thisPara,position);
+				}
+			}else{
+				alert('A surrounding tag could not be detected. Your code was not added to the page.');
+			}
+		}else{
+			var thisItem = fwDocument.fwTags.fwFind(fwItem);
+			var blockTags = ['blockquote','p','li','dd','dt','h1','h2','h3','h4','h5','h6'];
+			if(thisItem){
+				if(thisItem.fwFindEnclosing(blockTags)){
+					thisItem.fwFindEnclosing(blockTags).fwDelete();
+				}else{
+					thisItem.fwDelete();
+				}
+			}
+		}
+	}
+	function addToObj(thisObj,position){
+		if (thisObj){
+			var moreCode = fwParameters.custom.toString();
+			if(position == 'start'){
+				var dummy = thisObj.fwAddEnclosing("",true);
+				dummy.fwAddRaw(moreCode);
+				dummy.fwAddRaw(thisObj.fwToHTML().replace('&' + fwItem.toString() + ';',''));
+			}
+			if (position == 'end'){
+				var dummy = thisObj.fwAddEnclosing("",true);
+				dummy.fwAddRaw(thisObj.fwToHTML().replace('&' + fwItem.toString() + ';',''));
+				dummy.fwAddRaw(moreCode);
+			}
+			if (position == 'middle'){
+				var dummy = thisObj.fwAddEnclosing("",true);
+				dummy.fwAddRaw(thisObj.fwToHTML().replace('&' + fwItem.toString() + ';',moreCode));
+			}
+			if (position == 'replace'){
+				var dummy = thisObj.fwAddEnclosing("",true);
+				dummy.fwAddRaw(moreCode);
+			}
+			thisObj.fwDelete();
+		}
+	}
+	function strip_tags(theString){
+		return theString.replace(/<[^>]+?>/g,'');
+	}
+</action-javascript>
+</action>
+
+<page-action name="com.wdstudio.crowbar" title="CrowBar">
+<action-version version="0.1">
+“CrowBar” Action
+Walter Davis Studio 2008
+</action-version>
+<action-checkbox name="Activate">
+<action-button name="b" title="Beginning" onClick=EditCode('beginning');>
+<action-button name="e" title="End" onClick=EditCode('end');>
+<action-text var name="beginning" default="">
+<action-text var name="end" default="">
+
+<action-javascript>
+
+	function GetPageDiv(){
+		var divs = fwDocument.fwTags.fwFindAll('div');
+		for (i in divs){
+			if (divs[i] && divs[i].id && divs[i].id.toString() == '"PageDiv"') return divs[i];
+		}
+		return false;
+	}
+
+	function EditCode(position){ //Cut down from Tim Plumb's Source Code Snooper
+		var mycustomcode = fwParameters[position].toString();
+		var myprompt = "This code will be added into the PageDiv.";
+		var mycustomcodeprompt = fwBigPrompt(myprompt, mycustomcode);
+		if (mycustomcodeprompt != null) { //if the cancel button was not hit
+			if (mycustomcodeprompt != mycustomcode) {//check that the code has changed
+				fwParameters[position].fwValue = mycustomcodeprompt;
+			}
+		}
+	}
+
+	
+	function fwBeforeEndBody(){
+		var activate = fwParameters["Activate"].fwBoolValue;
+		if(activate){
+			var PD = GetPageDiv();
+			var dummy = PD.fwAddEnclosing('div',true);
+			//deep copy all attributes to dummy
+			var allAtts = PD.fwFindAllAttributes();
+			for (i in allAtts){
+				dummy[allAtts[i].fwTitle] = allAtts[i].fwValue;
+			}
+			var content = PD.fwFindAllContent();
+			if(fwParameters.beginning.toString() != ''){
+				dummy.fwAddRawOpt('');
+				dummy.fwAddRaw(fwParameters.beginning.toString());
+			}
+			dummy.fwMove(content);
+			if(fwParameters.end.toString() != ''){
+				dummy.fwAddRaw(fwParameters.end.toString());
+				dummy.fwAddRawOpt('');
+			}
+			PD.fwDelete();
+		}
+	}
+</action-javascript>
+
+</page-action>

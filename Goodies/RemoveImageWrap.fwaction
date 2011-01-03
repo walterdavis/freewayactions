@@ -1,0 +1,23 @@
+<item-action name="RemoveImageWrap">
+<action-applies-to image>
+<action-version version="0.3">
+RemoveImageWrap
+(c)2009 Walter Lee Davis
+
+Apply the Action to an image that is stuck in a table cell to remove the pesky P tag.
+</action-version>
+<action-javascript>
+function fwAfterEndBody(){
+	var thisItem = fwDocument.fwTags.fwFind(fwItem);
+	if (thisItem){
+		var p = thisItem.fwFindEnclosing('p');
+		if(p)
+		var c = p.fwFindEnclosing('td');
+		if(c) {
+			c.fwMove(thisItem);
+			p.fwDelete();
+		}
+	}
+}
+</action-javascript>
+</item-action>

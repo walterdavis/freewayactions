@@ -1,0 +1,33 @@
+<item-action name="Anonymous">
+<action-version version="0.1b">
+Anonymous
+Copyright 2008 Walter Lee Davis
+
+Apply the action to an object to remove the ID.
+</action-version>
+<action-checkbox name="Activate">
+
+<action-javascript>
+	function fwBeforeEndBody(){
+		var activate = fwParameters["Activate"].fwBoolValue;
+		if(activate){
+			thisObj = fwDocument.fwTags.fwFind("td", fwItem);
+			if (thisObj && thisObj.id){
+				thisObj.id = null;
+			}
+			if(!thisObj){
+				thisObj = fwDocument.fwTags.fwFind(fwItem);
+				if(thisObj && thisObj.id){
+					thisObj.id = null;
+				}
+			}
+			if(!thisObj){
+				thisObj = fwDocument.fwTags.fwFind("",fwItem);
+				if(thisObj && thisObj.id){
+					thisObj.id = null;
+				}
+			}
+		}
+	}
+</action-javascript>
+</item-action>

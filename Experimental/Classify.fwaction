@@ -1,0 +1,45 @@
+<item-action name="Classify">
+<action-appliesto layer non-html32/>
+<action-version version="0.2">
+Classify
+Copyright 2010 Walter Lee Davis
+</action-version>
+<action-text name="custom" title="New Class" />
+<action-checkbox name="convert" title="Convert ID to Class" />
+<action-checkbox name="remove" title="Remove Id" />
+<action-javascript>
+//className functions ported from Prototype.js to Freeway Action stylie
+String.prototype.strip = function() {
+	return this.replace(/^\s+/, '').replace(/\s+$/, '');
+}
+
+var hasClassName = function(element, className) {
+	className = fwQuote(className,'','"'); //"
+	var elementClassName = (element["class"]) ? fwQuote(element["class"],'','"') : ''; //"
+	return (elementClassName.length > 0 && (elementClassName == className || new RegExp("(^|\\s)" + className + "(\\s|$)").test(elementClassName)));
+};
+
+var addClassName = function(element, className) {
+	className = fwQuote(className,'','"'); //"
+	if (!hasClassName(element,className)){
+		var elementClassName = (element["class"]) ? fwQuote(element["class"],'','"') : ''; //"
+		var out = (elementClassName + ' ' + className).strip();
+		return element["class"] = fwQuote(out);
+	}
+};
+function fwBeforeEndHTML(){
+	me = fwDocument.fwTags.fwFind(fwItem);
+	if(fwParameters["convert"].fwBoolValue){
+		if (me && me.id){
+			addClassName(me,me.id);
+		}
+	}
+	if(fwParameters["remove"].fwBoolValue){
+		me.id = null;
+	}
+	if(fwParameters["custom"].toString().length > 0){
+		addClassName(me,fwParameters["custom"].toString());
+	}
+}
+</action-javascript>
+</item-action>
