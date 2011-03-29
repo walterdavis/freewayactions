@@ -13,21 +13,21 @@
 Glider = Class.create();
 Object.extend(Object.extend(Glider.prototype, Abstract.prototype), {
 	initialize: function(wrapper, options){
-	    this.scrolling  = false;
-	    this.wrapper    = $(wrapper);
-	    this.scroller   = this.wrapper;
-	    this.sections   = this.wrapper.select('div.section');
-	    this.options    = Object.extend({ controlsEvent:'click', duration: 1.0, frequency: 3 }, options || {});
+		this.scrolling  = false;
+		this.wrapper    = $(wrapper);
+		this.scroller   = this.wrapper;
+		this.sections   = this.wrapper.select('div.section');
+		this.options    = Object.extend({ controlsEvent:'click', duration: 1.0, frequency: 3 }, options || {});
 
-	    this.sections.each( function(section, index) {
-	      section._index = index;
-	    });    
+		this.sections.each( function(section, index) {
+			section._index = index;
+		});    
 
-	    this.events = {
-	      click: this.click.bind(this)
-	    };
+		this.events = {
+			click: this.click.bind(this)
+		};
 
-	    this.addObservers();
+		this.addObservers();
 		if(this.options.initialSection) {
 			this.moveTo(this.options.initialSection, this.scroller, { duration:this.options.duration });  // initialSection should be the id of the section you want to show up on load
 			mark = this.options.initialSection;
@@ -51,94 +51,94 @@ Object.extend(Object.extend(Glider.prototype, Abstract.prototype), {
 			}			
 		});
 
-	  },
+	},
 	
-  addObservers: function() {
+	addObservers: function() {
 		var obj = this;                      
 		this.controls = $$('.controls a').findAll(function(elm){ 
 			return obj.wrapper.select('div.section').find(function(e){ 
 				return e.id == elm.href.split('#')[1]
 			})
 		});
-//		this.controls = this.wrapper.select('.controls a');
+		//		this.controls = this.wrapper.select('.controls a');
 		this.controls.invoke('observe', this.options.controlsEvent, this.events.click);
-  },	
+	},	
 
-  click: function(event) {
+	click: function(event) {
 		this.stop();
-    var element = Event.findElement(event, 'a');
-    if (this.scrolling) this.scrolling.cancel();
-    
-	var myTarget = $(element.href.split("#")[1])
-//	var myTarget = this.wrapper.down('#'+element.href.split("#")[1])
-    this.moveTo(myTarget, this.scroller, { duration:this.options.duration });     
-    Event.stop(event);
+		var element = Event.findElement(event, 'a');
+		if (this.scrolling) this.scrolling.cancel();
 
-	this.controls.each(function(control){
-		if (control == element) {
-			if(control.down('img')){
-				control.down('img').addClassName("active");
+		var myTarget = $(element.href.split("#")[1])
+		//	var myTarget = this.wrapper.down('#'+element.href.split("#")[1])
+		this.moveTo(myTarget, this.scroller, { duration:this.options.duration });     
+		Event.stop(event);
+
+		this.controls.each(function(control){
+			if (control == element) {
+				if(control.down('img')){
+					control.down('img').addClassName("active");
+				}else{
+					control.addClassName('active');
+				}
 			}else{
-				control.addClassName('active');
+				if(control.down('img')){
+					control.down('img').removeClassName("active");
+				}else{
+					control.removeClassName('active');
+				}
 			}
-		}else{
-			if(control.down('img')){
-				control.down('img').removeClassName("active");
-			}else{
-				control.removeClassName('active');
-			}
-		}			
-	});
-  },
+		});
+	},
 
 	moveTo: function(element, container, options){
-			this.current = $(element);
-			Position.prepare();
-	    var containerOffset = Position.cumulativeOffset(container),
-	     elementOffset = Position.cumulativeOffset($(element));
+		this.current = $(element);
+		Position.prepare();
+		var containerOffset = Position.cumulativeOffset(container),
+		elementOffset = Position.cumulativeOffset($(element));
 
-		  this.scrolling 	= new Effect.SmoothScroll(container, 
-				{duration:options.duration, x:(elementOffset[0]-containerOffset[0]), y:(elementOffset[1]-containerOffset[1])});
-	this.controls.each(function(control){
-		if (control.href.split('#')[1] == element.id) {
-			if(control.down('img')){
-				control.down('img').addClassName("active");
-			}else{
-				control.addClassName('active');
-			}
-		}else{
-			if(control.down('img')){
-				control.down('img').removeClassName("active");
-			}else{
-				control.removeClassName('active');
-			}
-		}			
-	});
-		  return false;
+		this.scrolling 	= new Effect.SmoothScroll(container, 
+			{duration:options.duration, x:(elementOffset[0]-containerOffset[0]), y:(elementOffset[1]-containerOffset[1])});
+			this.controls.each(function(control){
+				if (control.href.split('#')[1] == element.id) {
+					if(control.down('img')){
+						control.down('img').addClassName("active");
+					}else{
+						control.addClassName('active');
+					}
+				}else{
+					if(control.down('img')){
+						control.down('img').removeClassName("active");
+					}else{
+						control.removeClassName('active');
+					}
+				}
+			});
+			return false;
 		},
 		
-  next: function(){
-    if (this.current) {
-      var currentIndex = this.current._index;
-      var nextIndex = (this.sections.length - 1 == currentIndex) ? 0 : currentIndex + 1;      
-    } else var nextIndex = 1;
+	next: function(){
+		if (this.current) {
+			var currentIndex = this.current._index;
+			var nextIndex = (this.sections.length - 1 == currentIndex) ? 0 : currentIndex + 1;      
+			} else var nextIndex = 1;
 
-    this.moveTo(this.sections[nextIndex], this.scroller, { 
-      duration: this.options.duration
-    });
-  },
+			this.moveTo(this.sections[nextIndex], this.scroller, { 
+				duration: this.options.duration
+			});
+		},
 	
-  previous: function(){
-    if (this.current) {
-      var currentIndex = this.current._index;
-      var prevIndex = (currentIndex == 0) ? this.sections.length - 1 : 
-       currentIndex - 1;
-    } else var prevIndex = this.sections.length - 1;
-    
-    this.moveTo(this.sections[prevIndex], this.scroller, { 
-      duration: this.options.duration
-    });
-  },
+	previous: function(){
+		if (this.current) {
+			var currentIndex = this.current._index;
+			var prevIndex = (currentIndex == 0) ? this.sections.length - 1 : 
+			currentIndex - 1;
+			} else var prevIndex = this.sections.length - 1;
+
+			this.moveTo(this.sections[prevIndex], this.scroller, { 
+				duration: this.options.duration
+			});
+		},
 
 	stop: function()
 	{

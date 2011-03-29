@@ -709,7 +709,7 @@ Copyright (c) Walter Davis Studio 2008 - 2010
 
 <item-action name="Carousel">
 <action-appliesto non-html32/>
-<action-version version="1.2.15">
+<action-version version="1.2.16">
 Carousel
 Action (c)2007-10 Walter Lee Davis, big help from Joe Billings in March 2010.
 Glider.js (c)2007 Curbly LLC - author Bruno Bornsztein <bruno@missingmethod.com>
@@ -728,13 +728,27 @@ Apply the action to a group of HTML items to turn them into a smooth-scrolling c
 	$$('.__glideClass__.next').each(function(elm){
 		elm.observe('click',function(evt){
 			Event.stop(evt);
+			my_glider.stop();
 			return my_glider.next();
 		});
 	});
 	$$('.__glideClass__.previous').each(function(elm){
 		elm.observe('click',function(evt){
 			Event.stop(evt);
+			my_glider.stop();
 			return my_glider.previous();
+		});
+	});
+	$$('.__glideClass__.start').each(function(elm){
+		elm.observe('click',function(evt){
+			Event.stop(evt);
+			return my_glider.start();
+		});
+	});
+	$$('.__glideClass__.stop').each(function(elm){
+		elm.observe('click',function(evt){
+			Event.stop(evt);
+			return my_glider.start();
 		});
 	});
 });
@@ -951,7 +965,7 @@ Apply the action to any layer to designate a Carousel pane.
 
 <item-action name="Carousel Button">
 <action-appliesto graphic pass-through/>
-<action-version version="0.9.10">
+<action-version version="0.9.11">
 Carousel Button
 (c)2007 Walter Lee Davis
 
@@ -959,9 +973,11 @@ Apply the action to any linked (or linkable) graphic to create scroll buttons fo
 
 </action-version>
 <action-itemref name="targets" title="Target" filter="activeTarget"/>
-<action-popup name="direction" title="Scroll Direction">
+<action-popup name="direction" title="Control">
 <value name="previous">
 <value name="next">
+<value name="start" title="Start Auto-Glide">
+<value name="stop" title="Stop Auto-Glide">
 </action-popup>
 <action-file name ="prototype1610packer" var/>
 <action-file name ="scriptaculous183packer" var/>
