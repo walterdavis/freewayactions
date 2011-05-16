@@ -1,7 +1,7 @@
 <item-action name="ReadFeed">
-<action-version version="0.3">
+<action-version version="0.4">
 ReadFeed Action
-Walter Davis Studio 2008
+Walter Davis Studio 2008 - 2011
 </action-version>
 <action-file name="Feed" var/>
 <action-url name="url" title="URL" />

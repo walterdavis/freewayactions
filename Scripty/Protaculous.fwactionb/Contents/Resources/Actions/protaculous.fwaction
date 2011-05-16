@@ -748,7 +748,7 @@ Apply the action to a group of HTML items to turn them into a smooth-scrolling c
 	$$('.__glideClass__.stop').each(function(elm){
 		elm.observe('click',function(evt){
 			Event.stop(evt);
-			return my_glider.start();
+			return my_glider.stop();
 		});
 	});
 });

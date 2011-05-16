@@ -1,4 +1,4 @@
-<?
+<?php
 class Feed{
 	var $xml_parser;
 	var $rss_content;
@@ -53,7 +53,7 @@ class Feed{
 		echo '<ul class="feedlist">';
 		$i = 0;
 		$max = ($this->max_items > 0) ? $this->max_items : count($this->rss_content['items']);
-		$this->item_parts = array_flip($this->w('item_parts'));
+		$this->item_parts = array_flip(array_map('strtolower',$this->w('item_parts')));
 		if(is_array($this->rss_content['items'])){
 			foreach ($this->rss_content['items'] as $content) {
 				foreach($this->item_parts as $k=>$v){
