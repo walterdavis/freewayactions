@@ -1,0 +1,36 @@
+ScriptyPageless implementation idea
+
+Goals: Simple implementation of the "pageless" Ajax content update within Freeway. Don't want the user to have to think about it too much, and also want to leave the page unchanged -- with normal links to normal pages -- in the absence of scripting (Google and pals).
+
+Two Page Actions: ScriptyPageless goes on the parent page, ScriptyPageless Option goes on the fragment page. 
+
+In ScriptyPageless, you choose one DIV out of a list of all DIVs on the page, and use that as your target element (all updates happen within that box). On publish, all links on the page are traversed within Freeway, and if they point to a page that has ScriptyPageless Option applied to it, they are flagged with a classname in the generated HTML.
+
+If you visit the parent page in a scripted browser, all links that have been flagged will be overridden to perform an Ajax.Updater call instead of a normal request. This will load a fragment named _page_filename.html, where the original link was to page_filename.html. At the same time, the location hash will be updated to #page_filename so that the URL is navigable and shareable. If you arrive at the parent page (in a scripted browser) from a URL that contains a hash, the appropriate option would load. If you're in an unscripted browser, then you would see the default content. (This is the only hole I see in this otherwise wonderful scheme. F.e.: scripted blog author makes a link to the hashed URL, robot follows that link to content that doesn't quite match the link description. Minor SEO fail. Subsequent crawling of the entire target site would still work, so maybe extra brownie points for that.)
+
+In ScripyPageless Option, you choose one DIV out of a list of all DIVs on the page, and use that as your update element for the parent page. This element will be duplicated into a fragment named _page_filename.html (prepend underscore). The element will have its positioning and dimensions removed, so that it will function within the parent element. 
+
+Another implementation of this would use PHP and the isAjax() function to determine whether to serve the entire page, or just a fragment culled from the entire page source. This could be done with a single PHP file, reading the page source and regexing out all but the target DIV (marked with a classname), or by forcing all Option pages to be written in PHP. Benefit of this method would be that you wouldn't potentially have so much trouble with Freeway renaming fragment files it "forgot" it made. Downsides would include the difficulty of also rewriting the dimensions and positioning code, along with re-parenting any forms used in the outer page body.
+
+Following is a naive JS implementation, ignoring the ideas of flagging links and also ignoring the possibility of a real anchor on the same page that you actually want to follow. There would need to be a list of possible "replacement" anchor targets, and only matches would be used to update the page, others would be allowed to work normally.
+
+var box = $('content');
+if(!box._bak) box['_bak'] = box.innerHTML;
+function load(address){
+	new Ajax.Updater(box, '_' + address + '.html',{method:'get'});
+}
+if(window.location.hash && window.location.hash.split('#').length > 1)
+ 	load(window.location.hash.split('#').last());
+$$('a').invoke('observe','click',function(evt){
+	evt.stop();
+	if(this.href.split('#').length > 1){
+		load(this.href.split('#').last());
+		window.location.hash = '#' + this.href.split('#').last()
+	}else{
+		box.update(box._bak);
+		window.location.hash = '';
+	}
+});
+
+
+

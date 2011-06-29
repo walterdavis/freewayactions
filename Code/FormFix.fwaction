@@ -1,7 +1,7 @@
 <page-action name="com.wdstudio.formfix" title="FormFix">
-<action-version version="2.1">
+<action-version version="2.2">
 “FormFix” Action
-Walter Davis Studio 2008
+Walter Davis Studio 2008, 2011
 </action-version>
 
 <action-javascript>
@@ -13,29 +13,32 @@ Walter Davis Studio 2008
 		if (!elms)
 			return;
 		for (i in elms){
-			//alert(fwItem);
 			var e = elms[i];
 			if(!e.id || e.id == ''){
-				if(e.type == 'radio'){
-					e['id'] = fwQuote(e.name.toString().slice(1,-1) + '_' + e.value.toString().slice(1,-1));
-				}else{
-					e['id'] = e.name.toString().replace(/\[/g,'_').replace(/\]/g,'');
-				}
-				if(e.toString() == 'select'){
-					var opts = e.fwFindAll("option");
-					for (j in opts){
-						if(opts[j].value == undefined) opts[j].value = fwQuote("");
-						var lab = opts[j].fwFindContent();
-						opts[j].label = fwQuote(lab);
+				if(e.name){
+					if(e.type == 'radio'){
+						e['id'] = fwQuote(e.name.toString().slice(1,-1) + '_' + e.value.toString().slice(1,-1));
+					}else{
+						e['id'] = e.name.toString().replace(/\[/g,'_').replace(/\]/g,'');
+					}
+					if(e.toString() == 'input' && e.type == undefined) {
+						e.type = fwQuote('text');
 					}
 				}
-				if(e.toString() == 'input' && e.type == undefined) {
-					e.type = fwQuote('text');
+			}
+			if(e.toString() == 'select'){
+				var opts = e.fwFindAll("option");
+				for (j in opts){
+					if(!opts[j].value || opts[j].value == undefined){
+						opts[j].value = fwQuote("");
+					}
+					var lab = opts[j].fwFindContent();
+					opts[j].label = fwQuote(lab);
 				}
 			}
 			var d = e.fwFindEnclosing('div');
 			if(d){
-				if(d.id && d.id.toString() == e.id.toString()){
+				if(e.id && d.id && d.id.toString() == e.id.toString()){
 					d.id = fwQuote(d.id.toString().slice(1,-1) + '_wrap');
 				}
 			}
