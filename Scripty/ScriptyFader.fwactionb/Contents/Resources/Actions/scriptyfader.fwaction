@@ -430,7 +430,7 @@
 
 <item-action name="ScriptyFader">
 <action-appliesto non-html32/>
-<action-version version="0.3.3">
+<action-version version="0.3.4">
 ScriptyFader
 Action (c)2011 Walter Lee Davis.
 
@@ -709,7 +709,7 @@ Apply the action to an HTML item to mark the location of a fading group of page 
 
 <item-action name="ScriptyFader Option">
 <action-appliesto layer non-html32/>
-<action-version version="0.3.3">
+<action-version version="0.3.4">
 ScriptyFader Option
 (c)2011 Walter Lee Davis
 
