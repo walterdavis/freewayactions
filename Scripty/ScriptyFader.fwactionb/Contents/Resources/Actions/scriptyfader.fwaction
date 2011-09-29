@@ -430,7 +430,7 @@
 
 <item-action name="ScriptyFader">
 <action-appliesto non-html32/>
-<action-version version="0.3.1">
+<action-version version="0.3.3">
 ScriptyFader
 Action (c)2011 Walter Lee Davis.
 
@@ -441,16 +441,19 @@ Apply the action to an HTML item to mark the location of a fading group of page 
 	var thumbs = $$('.SFthumb');
 	var mains = $$('.SFmain');
 	thumbs.each(function(elm){
-		elm.down('img').setOpacity(0.4);
-		elm.observe('mouseover', function(evt){
-			elm.down('img').morph('opacity:1',{duration:0.3});
-		});
-		elm.observe('mouseout', function(evt){
-			if(!elm.hasClassName('active')) elm.down('img').morph('opacity:0.4',{duration:0.3});
-		});
+		if(elm.down('img')){
+			elm.down('img').setOpacity(0.4);
+			elm.observe('mouseover', function(evt){
+				elm.down('img').morph('opacity:1',{duration:0.3});
+			});
+			elm.observe('mouseout', function(evt){
+				if(!elm.hasClassName('active')) elm.down('img').morph('opacity:0.4',{duration:0.3});
+			});
+		}
 		elm.observe('click',function(evt){
 			evt.stop();
-			elm.addClassName('active').down('img').setStyle('opacity:1');
+			elm.addClassName('active');
+			if(elm.down('img')) elm.down('img').setStyle('opacity:1');
 			var main = $(elm.readAttribute('rel'))
 			if(main.pe) main.pe.stop();
 			if(history && history.pushState){
@@ -521,8 +524,9 @@ Apply the action to an HTML item to mark the location of a fading group of page 
 		var group = elm.readAttribute('rel');
 		var main = $(group);
 		var clone = $('clone_' + group);
-		$$('.' + group).reject(function(el){return el == elm;}).each(function(el){ el.removeClassName('active').down('img').morph('opacity:0.4'); });
-		elm.addClassName('active').down('img').setStyle('opacity:1');
+		$$('.' + group).reject(function(el){return el == elm;}).each(function(el){ el.removeClassName('active'); if(el.down('img')) el.down('img').morph('opacity:0.4',{duration:0.3}); });
+		elm.addClassName('active');
+		elm.select('img').invoke('setStyle', {opacity:1});
 		loadOption(elm.href.split('#').last(),group);
 	}
 	function loadOption(choice,container){
@@ -547,7 +551,8 @@ Apply the action to an HTML item to mark the location of a fading group of page 
 		if(window.location.hash && window.location.hash.length > 1){
 			var initialSelection = thumbs.find(function(elm){ return '#' + elm.href.split('#').last() == window.location.hash; });
 		}else{
-			var initialSelection = thumbs.first().addClassName('active').down('img').setOpacity(0);
+			var initialSelection = thumbs.first().addClassName('active');
+			if(initialSelection.down('img')) initialSelection.down('img').setOpacity(0);
 		}
 		setSelection(initialSelection);
 	});
@@ -611,7 +616,8 @@ Apply the action to an HTML item to mark the location of a fading group of page 
 			fwParameters['partial'].fwSpecify(outFile);
 			var partial = fwParameters['partial'].toString();
 			return partial.substring(1,partial.indexOf('.'));
-		}		
+		}
+		fwParameters['partial'].fwClear();
 		return null;
 	}
 	
@@ -703,7 +709,7 @@ Apply the action to an HTML item to mark the location of a fading group of page 
 
 <item-action name="ScriptyFader Option">
 <action-appliesto layer non-html32/>
-<action-version version="0.3.1">
+<action-version version="0.3.3">
 ScriptyFader Option
 (c)2011 Walter Lee Davis
 
@@ -723,7 +729,8 @@ Apply the action to any layer to designate a ScriptyFader option.
 			fwParameters['partial'].fwSpecify(outFile);
 			var partial = fwParameters['partial'].toString();
 			return partial.substring(1,partial.indexOf('.'));
-		}		
+		}
+		fwParameters['partial'].fwClear();
 		return null;
 	}
 	function removePositioning(target){
@@ -813,7 +820,7 @@ Apply the action to any layer to designate a ScriptyFader option.
 
 <item-action name="ScriptyFader Thumbnail" generates-link>
 <action-appliesto graphic pass-through/>
-<action-version version="0.3.1">
+<action-version version="0.3.2">
 ScriptyFader Thumbnail
 (c)2011 Walter Lee Davis
 
@@ -898,3 +905,96 @@ Apply the action to any graphic to create direct navigation to one of the Script
 	}
 </action-javascript>
 </item-action>
+
+<action name="ScriptyFader Text Link" preview-text="&Text;" generates-link height=12>
+<action-version version="0.1">
+ScriptyFader Text Link
+(c)2011 Walter Lee Davis
+
+Insert the Action in a text container to create direct navigation to one of the ScriptyFader options.
+
+</action-version>
+<action-text name="Text" script default="link text"/>
+<action-itemref name="base" title="Fader" filter="activeBase"/>
+<action-itemref name="targets" title="Option" filter="activeTarget"/>
+<action-javascript>
+	var hasClassName = function(element, className) {
+		className = fwQuote(className,'','"'); //"
+		var elementClassName = (element["class"]) ? fwQuote(element["class"],'','"') : ''; //"
+		return ((elementClassName.length > 0) && (elementClassName == className || new RegExp("\\b" + className + "\\b").test(elementClassName)));
+	};
+	var addClassName = function(element, className) {
+		className = fwQuote(className,'','"'); //"
+		if (!hasClassName(element,className)){
+			var elementClassName = (element["class"]) ? fwQuote(element["class"],'','"') : ''; //"
+			var out = (elementClassName + ' ' + className).strip();
+			return element["class"] = fwQuote(out);
+		}
+	};
+
+	function activeBase(item){
+		var options = fwPage.fwFindAllActions(2,['ScriptyFader']);
+		if(options) {
+			for( i in options){
+				if(item == options[i].fwItem) return true;
+			}
+		}
+		return false;
+	}
+	function activeTarget(item){
+		var options = fwPage.fwFindAllActions(2,['ScriptyFader','ScriptyFader Option']);
+		if(options) {
+			for( i in options){
+				action = options[i];
+				if((action.fwParameters['targets'] && action.fwParameters.targets.fwValue == fwParameters.base.fwValue) || action.fwItem == fwParameters.base.fwValue){
+					if(item == action.fwItem) return true;
+				}else{
+					delete( options[i] );
+				}
+			}
+		}
+		return false;
+	}
+	function fwInterface(){
+		if(fwParameters['base'].fwValue == null){
+			var bases = fwPage.fwFindAllActions(2,['ScriptyFader']);
+			if(bases) {
+				for(i in bases){
+					b = bases[i].fwItem;
+					fwParameters['base'].fwValue = b;
+				}
+			}
+			var options = fwPage.fwFindAllActions(2,['ScriptyFader','ScriptyFader Option']);
+			if(options) {
+				for(i in options){
+					var action = options[i];
+					if((action.fwParameters['targets'] && action.fwParameters.targets.fwValue == fwParameters['base'].fwValue) || action.fwItem == fwParameters['base'].fwValue){
+						c = options[i].fwItem;
+						fwParameters['targets'].fwValue = c;
+					}
+				}
+			}
+		}
+	}
+	function fwAfterEndBody(){
+		var enclosingTag = fwDocument.fwTags.fwFind("",fwItem);
+		if (enclosingTag){
+			var myLink = enclosingTag.fwFindEnclosing("a");
+			if (!myLink)
+				myLink = enclosingTag.fwFind("a", fwItem);
+			if (!myLink)
+			{
+				myLink = enclosingTag.fwAdd("a", true);
+				myLink.href = fwQuote('#' + fwParameters['targets'].fwValue.toString());
+			}
+			else
+				myLink.href = fwQuote('#' + fwParameters['targets'].fwValue.toString());
+			myLink.fwAddRaw(fwEncode(fwParameters.Text, fwPage));
+		}
+		myLink.href = fwQuote('#' + fwParameters['targets'].fwValue.toString());
+		myLink.rel = fwQuote(fwParameters['base'].fwValue.toString() + '_fader');
+		addClassName(myLink,'SFthumb')
+		addClassName(myLink,fwParameters['base'].fwValue.toString() + '_fader')
+	}
+</action-javascript>
+</action>

@@ -322,9 +322,9 @@ function AddFiles(filesString, scriptyLibs /*number or array of numbers*/){
 </library-action>
 
 <item-action name="ScriptyAccordion">
-<action-version version="0.6.8">
+<action-version version="0.7.1">
 ScriptyAccordion Action
-Walter Davis Studio 2008, 2009, 2010
+Walter Davis Studio 2008, 2009, 2010, 2011
 </action-version>
 <action-appliesto non-html32/>
 <action-file name ="prototype1610packer" var/>
@@ -337,7 +337,18 @@ Walter Davis Studio 2008, 2009, 2010
 </action-popup>
 <action-popup name="triggerElm" title="Trigger Elements"/>
 <action-popup name="toggleElm" title="Show/Hide Elements"/>
-<action-checkbox name="show" title="Show the first element open when the page loads" />
+<action-popup name = "show" title = "Show Element open when page loads">
+	<value name = "None" value = "none">
+	<value name = "1" value = "0">
+	<value name = "2" value = "1">
+	<value name = "3" value = "2">
+	<value name = "4" value = "3">
+	<value name = "5" value = "4">
+	<value name = "6" value = "5">
+	<value name = "7" value = "6">
+	<value name = "8" value = "7">
+	<value name = "9" value = "8">
+</action-popup>
 <action-checkbox name="exclusive" title="Show only one element at a time" />
 <action-checkbox name="hz" title="Animate horizontally" default=no />
 <action-markup custom name="hz_support">
@@ -384,6 +395,7 @@ Effect.BlindRight = function(element) {
 </action-markup>
 <action-markup custom name="toggleScript">
 	var box = $('__this__').up();
+	var test_me = '__trigger__';
 	if('__trigger__' == 'img'){
 		var heads = box.select('#__this__ > p > img');
 	}else{
@@ -391,6 +403,7 @@ Effect.BlindRight = function(element) {
 	}
 	if('__trigger__' == 'img'){
 		heads = heads.collect(function(elm){ return elm.up('p'); });
+		test_me = 'p';
 	}
 	if(heads.size() < 1) heads = box.select('#__this__ > __trigger__');
 	var bods = box.select('#__this__ > __toggle__');
@@ -398,11 +411,12 @@ Effect.BlindRight = function(element) {
 	var tog = function(){
 		var params = {duration:0.2,queue:'end'};
 		var me = this;
-		bods.findAll(function(elm){return elm.visible() && elm.previous('__trigger__') !== me}).each(function(elm){Effect.BlindUp(elm,params)});
-		if (this.next('__toggle__') && !this.next('__toggle__').visible()) {
+		if (this.next('__toggle__') && (this.next('__toggle__').previous(test_me) == me) && !this.next('__toggle__').visible()) {
+			bods.findAll(function(elm){return elm.visible() && elm.previous(test_me) !== me}).each(function(elm){Effect.BlindUp(elm,params)});
 			Effect.BlindDown(this.next('__toggle__'),params);
 		}else{
-			if(this.up().next('__toggle__') && ! this.up().next('__toggle__').visible()){
+			if(this.up().next('__toggle__') && (this.up().next('__toggle__').previous(test_me) == me) && ! this.up().next('__toggle__').visible()){
+				bods.findAll(function(elm){return elm.visible() && elm.previous(test_me) !== me}).each(function(elm){Effect.BlindUp(elm,params)});
 				Effect.BlindDown(this.up().next('__toggle__'),params);
 			}
 		}
@@ -414,6 +428,7 @@ Effect.BlindRight = function(element) {
 </action-markup>
 <action-markup custom name="individualScript">
 	var box = $('__this__').up();
+	var test_me = '__trigger__';
 	if('__trigger__' == 'img'){
 		var heads = box.select('#__this__ > p > img');
 	}else{
@@ -421,16 +436,18 @@ Effect.BlindRight = function(element) {
 	}
 	if('__trigger__' == 'img'){
 		heads = heads.collect(function(elm){ return elm.up('p'); });
+		test_me = 'p';
 	}
 	if(heads.size() < 1) heads = box.select('#__this__ > __trigger__');
 	var bods = box.select('#__this__ > __toggle__');
 	bods = bods.findAll(function(elm){return heads.include(elm) == false;});
 	var tog = function(){
 		var params = {duration:0.2};
-		if (this.next('__toggle__')) {
+		var me = this;
+		if (this.next('__toggle__') && (this.next('__toggle__').previous(test_me) == me)) {
 			Effect.toggle(this.next('__toggle__'),'blind',params);
 		}else{
-			if(this.up().next('__toggle__')){
+			if(this.up().next('__toggle__') && (this.up().next('__toggle__').previous(test_me) == me)){
 				Effect.toggle(this.up().next('__toggle__'),'blind',params);
 			}
 		}
@@ -474,6 +491,7 @@ Effect.BlindRight = function(element) {
 	}
 	
 	function fwBeforeEndBody(){
+		var showElement = fwParameters['show'].toString();
 		var theHead = fwDocument.fwTags.fwFind("head");
 		var myself = fwItem.toString();
 		var toggle = fwParameters['toggleElm'].fwValue || toggles[0];
@@ -481,7 +499,7 @@ Effect.BlindRight = function(element) {
 		var event = fwParameters['event'].fwValue;
 		var observerScript = (fwParameters['exclusive'].fwBoolValue) ? fwMarkups['toggleScript'] : fwMarkups['individualScript'];
 		observerScript = observerScript.toString().replace(/__this__/g,myself).replace(/__trigger__/g,trigger).replace(/__toggle__/g,toggle).replace(/__event__/g,event);;
-		observerScript = (fwParameters['show'].fwBoolValue) ? observerScript.toString().replace(/__show__/,'bods.first().show();') : observerScript.toString().replace(/__show__/,'');
+		observerScript = (showElement != "none") ? observerScript.toString().replace(/__show__/,'bods['+showElement+'].show();') : observerScript.toString().replace(/__show__/,'');
 		var scriptTag = theHead.fwAddJavaScript();
 		if (fwParameters['hz'].fwBoolValue){
 			var hz = fwMarkups['hz_support'].toString();

@@ -1,7 +1,7 @@
 <item-action name="com.wdstudio.TemplateHelper" title="TemplateHelper">
-<action-version version="0.4">
+<action-version version="0.5.1">
 “TemplateHelper” Action
-Walter Davis Studio 2007-2009
+Walter Davis Studio 2007-2011
 </action-version>
 <action-file var name="partial" keepwithhtml>
 <action-checkbox title="Make Partial" name = "makepartial" default=no/>
@@ -36,6 +36,7 @@ Walter Davis Studio 2007-2009
 			var partial = fwParameters["partial"].toString();
 			return partial.substring(1,partial.indexOf('.'));
 		}		
+		fwParameters['partial'].fwClear();
 		return null;
 	}
 	function EditCode(param){
@@ -132,7 +133,7 @@ Walter Davis Studio 2007-2009
 				if(container.toString() == '') container = container.fwAddEnclosing("div",true);
 				if(fwParameters['addform'].fwBoolValue && fwParameters['makepartial'].fwBoolValue && container.fwFindEnclosing("form")) {
 					form = container.fwFindEnclosing("form");
-					inner = container.fwFind(['div','table']);
+					inner = container.fwFind(['div','table','']);
 					if(inner && inner.fwFind(['input','select','textarea'])){
 						f = inner.fwAddEnclosing("form",true);
 						f['method'] = (!!form.method) ? fwQuote(form.method) : fwQuote('');
@@ -180,13 +181,13 @@ Walter Davis Studio 2007-2009
 					}
 					fwFolder.partials.push(nameReturned);
 				}
-				container.fwDelete();
 				if(!!form){
 					content = form.fwFindAllContent();
 					dummy = form.fwAddEnclosing("",false);
 					dummy.fwMove(content);
 					form.fwDelete();
 				}
+				container.fwDelete();
 			}
 		}
 	}

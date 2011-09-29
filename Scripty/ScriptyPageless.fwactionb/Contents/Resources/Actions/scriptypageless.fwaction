@@ -612,6 +612,7 @@ Apply the action to an HTML item to mark the location of a fading group of page 
 			var partial = fwParameters['partial'].toString();
 			return partial.substring(1,partial.indexOf('.'));
 		}		
+		fwParameters['partial'].fwClear();
 		return null;
 	}
 	
@@ -724,6 +725,7 @@ Apply the action to any layer to designate a ScriptyPageless option.
 			var partial = fwParameters['partial'].toString();
 			return partial.substring(1,partial.indexOf('.'));
 		}		
+		fwParameters['partial'].fwClear();
 		return null;
 	}
 	function removePositioning(target){

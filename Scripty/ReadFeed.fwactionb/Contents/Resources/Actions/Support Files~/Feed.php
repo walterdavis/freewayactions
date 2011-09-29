@@ -34,6 +34,7 @@ class Feed{
 		
 		$read = '';
 		while ($data = fread($fp, 4096)) {
+			$data = preg_replace('/<\/?atom:/','<',$data);
 			if (!xml_parse($this->xml_parser, $data, feof($fp))) {
 				die(sprintf("XML error: %s at line %d",
 							xml_error_string(xml_get_error_code($this->xml_parser)),
