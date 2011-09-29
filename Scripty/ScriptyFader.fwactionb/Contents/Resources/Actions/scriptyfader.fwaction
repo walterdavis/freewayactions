@@ -481,7 +481,6 @@ Apply the action to an HTML item to mark the location of a fading group of page 
 		if(main.hasClassName('autofade')){
 			var classes = $w(main.readAttribute('class'));
 			main.autofade = parseFloat(classes.find(function(c){ return c.slice(0,5) == 'fade_'; }).slice(5).replace('-','.'));
-			console.log(main.autofade)
 		}
 		if(window.location.hash && window.location.hash.length > 1 && thumbs.pluck('href').map(function(elm){ return '#' + elm.split('#').last()}).include(window.location.hash)){
 			main.initialSelection = thumbs.find(function(elm){ return '#' + elm.href.split('#').last() == window.location.hash; });
@@ -639,10 +638,11 @@ Apply the action to an HTML item to mark the location of a fading group of page 
 			fwPage['SFhead'] = true;
 		}
 	}
-	function fwAfterEndHTML(){
+	function fwAfterEndBody(){
 		var originalHeight, originalWidth
 		var thisItem = fwDocument.fwTags.fwFind("div", fwItem);
 		if (thisItem){
+			if(fwParameters['autofade'].fwValue > 0 && fwParameters['autofade'].fwValue < 1.1) alert('Autofade settings below 1.1 are not recommended.');
 			var spot = thisItem.fwAddEnclosing("div",true);
 			spot.id = fwQuote(thisItem.id.toString().slice(1,-1) + '_fader');
 			clonePosition(spot,thisItem);
