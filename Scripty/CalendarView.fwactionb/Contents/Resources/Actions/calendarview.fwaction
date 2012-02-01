@@ -138,101 +138,98 @@
 		var scriptTag = theTag.fwAdd("script", true);
 		// Get the list of individual scriptyLibs and add to the end of the scripty reference
 		var scriptyLibs = getLibs();
-		if(parseFloat(fwFreewayVersion) >= 5.5)
+		if(parseInt(fwFreewayVersion.replace(/\.?(\w\d)?/g, "")) >= 562){
+			scriptTag.src = fwQuote(path + (file.match("pro") ? "prototype/1.7.0.0/prototype.js" : "scriptaculous/1.9.0/scriptaculous.js"+scriptyLibs));
+		}else if(parseFloat(fwFreewayVersion) >= 5.5){
 			scriptTag.src = fwQuote(path + (file.match("pro") ? "prototype/1.6.1.0/prototype.js" : "scriptaculous/1.8.3/scriptaculous.js"+scriptyLibs));
-		else
+		}else{
 			scriptTag.src = fwQuote(path + (file.match("pro") ? "prototype/1.6.0.2/prototype.js" : "scriptaculous/1.8.1/scriptaculous.js"+scriptyLibs));
+		}
 		scriptTag.type = fwQuote("text/javascript");
 		scriptTag.fwAddRawOpt();
 		theTag.fwAddRawOpt();
 	}
-	
+
 	function AddFiles(filesString, scriptyLibs /*number or array of numbers*/){
 		// Cleanup if arguments are missing
-		if(filesString.constructor == Number || filesString.constructor == Array)
-		{
+		if(filesString.constructor == Number || filesString.constructor == Array)	{
 			scriptyLibs = filesString;
-			filesString = "";
+			fileString = "";
 		}
 		var theHead = fwDocument.fwTags.fwFind("head");
-		var connected = (function(){
-			if(fwShellCommand) {
-				return fwShellCommand('ping -t3 -o ajax.googleapis.com').match("1 packets received");
+		var connected = function(){
+			if(fwShellCommand){
+				return fwShellCommand('ping -c1 -i1 http://ajax.googleapis.com');
 			}else{
 				var osa=new FWOSAInterpreter; 
-				osa.fwWrite('try\n' + 
-				'do shell script "ping -t3 -o ajax.googleapis.com"\n' +
-				'return 1\n' +
-					'on error\n' +
-					'return 0\n' +
-					'end try');
+				osa.fwWrite('do shell script "curl ajax.googleapis.com"'); 
 				osa.fwCompile(); 
 				return osa.fwRun();
 			}
-		})();
+		}
 		var useCustom = filesString && filesString.length > 0;
 		var path = this.fwPathName;
 		var prefix = path.substring(0, path.lastIndexOf(":")) + ':Support Files~:';
-		if(parseFloat(fwFreewayVersion) >= 5.5)
+		if(parseInt(fwFreewayVersion.replace(/\.?(\w\d)?/g, "")) >= 562){
+			var canon = 'prototype1700packer,prototype1700,scriptaculous190packer,scriptaculous190'.split(',');
+		}else if(parseFloat(fwFreewayVersion) >= 5.5){
 			var canon = 'prototype1610packer,prototype1610,scriptaculous183packer,scriptaculous183'.split(',');
-		else
+		}else{
 			var canon = 'prototype1602packer,prototype1602,scriptaculous181packer,scriptaculous181'.split(',');
-	
+		}
 		var files = (useCustom) ? filesString.split(',') : canon;
-	
-		if(scriptyLibs)
-		{
+
+		if(scriptyLibs){
 			// Make the scriptyLibs argument an array if it isn't one already
 			scriptyLibs = scriptyLibs.constructor == Array ? scriptyLibs : [scriptyLibs];
 			// Create or add the libraries used to a page variable
 			if(!fwPage.scriptyLibs)
-				fwPage.scriptyLibs = scriptyLibs;
+			fwPage.scriptyLibs = scriptyLibs;
 			else
-				fwPage.scriptyLibs = fwPage.scriptyLibs.concat(scriptyLibs);
+			fwPage.scriptyLibs = fwPage.scriptyLibs.concat(scriptyLibs);
 		}
-	
+
+		// Make the overall library list object variable if it doesn't exist
 		if(!fwPage.libsList)
-			fwPage.libsList = new Object();
+		fwPage.libsList = new Object();
 
 		for (i in files){
 			var file = files[i];
-			if (file && !fwPage.libsList[file])
-			{
+			if (file && !fwPage.libsList[file]){
 				myFile = new FWFile;
 				myFile.fwOpenRead(prefix + file + '.js');
 				myFile.fwClose();
-				if (fwParameters[file])
-				{
+				if (fwParameters[file]){
 					fwParameters[file].fwSpecify(myFile);
 					var path = fwParameters[file].toString();
 					if(useCustom == true)
-						fwPage.libsList[file] = path;
-				}
-				else
-				{
-					alert (file + '.js was not found in the action bundle');
+					fwPage.libsList[file] = path;
+				}else{
+					fwAlert(ParamString(kFileNotFound, file, ".js"));
 				}
 			}
 		}
 
 		if(lastOrders()){
-			if(parseFloat(fwFreewayVersion) >= 5.5) {
+			if(parseInt(fwFreewayVersion.replace(/\.?(\w\d)?/g, "")) >= 562){
+				if(fwPage.libsList['prototype1700packer'] && fwPage.libsList['prototype1700'])
+					fwPage.libsList['prototype1700packer'] = null;
+				if(fwPage.libsList['scriptaculous190packer'] && fwPage.libsList['scriptaculous190'])
+					fwPage.libsList['scriptaculous190packer'] = null;
+			}else if(parseFloat(fwFreewayVersion) >= 5.5){
 				if(fwPage.libsList['prototype1610packer'] && fwPage.libsList['prototype1610'])
 					fwPage.libsList['prototype1610packer'] = null;
-
 				if(fwPage.libsList['scriptaculous183packer'] && fwPage.libsList['scriptaculous183'])
 					fwPage.libsList['scriptaculous183packer'] = null;
-			} else {
+			}else{
 				if(fwPage.libsList['prototype1602packer'] && fwPage.libsList['prototype1602'])
 					fwPage.libsList['prototype1602packer'] = null;
-
 				if(fwPage.libsList['scriptaculous181packer'] && fwPage.libsList['scriptaculous181'])
 					fwPage.libsList['scriptaculous181packer'] = null;
 			}
-		
+
 			// Clean the list of individual libs
-			if(fwPage.scriptyLibs)
-				cleanLibs();
+			if(fwPage.scriptyLibs) cleanLibs();
 
 			for (i in canon){
 				if (fwPage.libsList[canon[i]]){
@@ -244,8 +241,7 @@
 			for ( i in fwPage.libsList )
 				LinkFileToHead(theHead, fwPage.libsList[i]);
 		}
-	}
-	
+	}	
 	
 	function SetCSSAttribute(tag, attributeName, attributeValue) { 
 		// Sets a "CSS" attribute such as "position:absolute" in a tag value 
@@ -322,7 +318,7 @@
 </library-action>
 
 <item-action name="CalendarView">
-<action-version version="0.4.10">
+<action-version version="0.5">
 CalendarView Action
 Walter Davis Studio 2008 - 2010
 
@@ -336,6 +332,7 @@ This calendar is based very loosely on the Dynarch Calendar in that it was used 
 As such, CalendarView is licensed under the terms of the GNU Lesser General Public License (LGPL). More information on the Dynarch Calendar can be found at: www.dynarch.com/projects/calendar
 </action-version>
 <action-appliesto non-html32/>
+<action-file name ="prototype1700packer" var/>
 <action-file name ="prototype1610packer" var/>
 <action-file name ="prototype1602packer" var/>
 <action-file name ="calendarview" var/>
@@ -353,7 +350,13 @@ As such, CalendarView is licensed under the terms of the GNU Lesser General Publ
 	
 	function fwAfterStartHead()
 	{
-		var filesString = (parseFloat(fwFreewayVersion) >= 5.5) ? 'prototype1610packer,calendarview' : 'prototype1602packer,calendarview';
+		if(parseInt(fwFreewayVersion.replace(/\.?(\w\d)?/g, "")) >= 562){
+			var filesString = 'prototype1700packer,calendarview';
+		}else if(parseFloat(fwFreewayVersion) >= 5.5){
+			var filesString = 'prototype1610packer,calendarview';
+		}else{
+			var filesString = 'prototype1602packer,calendarview';
+		}
 		AddFiles(filesString);
 	}
 	function fwBeforeEndHead(){

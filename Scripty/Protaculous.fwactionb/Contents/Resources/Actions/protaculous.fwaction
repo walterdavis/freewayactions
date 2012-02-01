@@ -165,101 +165,98 @@
 		var scriptTag = theTag.fwAdd("script", true);
 		// Get the list of individual scriptyLibs and add to the end of the scripty reference
 		var scriptyLibs = getLibs();
-		if(parseFloat(fwFreewayVersion) >= 5.5)
+		if(parseInt(fwFreewayVersion.replace(/\.?(\w\d)?/g, "")) >= 562){
+			scriptTag.src = fwQuote(path + (file.match("pro") ? "prototype/1.7.0.0/prototype.js" : "scriptaculous/1.9.0/scriptaculous.js"+scriptyLibs));
+		}else if(parseFloat(fwFreewayVersion) >= 5.5){
 			scriptTag.src = fwQuote(path + (file.match("pro") ? "prototype/1.6.1.0/prototype.js" : "scriptaculous/1.8.3/scriptaculous.js"+scriptyLibs));
-		else
+		}else{
 			scriptTag.src = fwQuote(path + (file.match("pro") ? "prototype/1.6.0.2/prototype.js" : "scriptaculous/1.8.1/scriptaculous.js"+scriptyLibs));
+		}
 		scriptTag.type = fwQuote("text/javascript");
 		scriptTag.fwAddRawOpt();
 		theTag.fwAddRawOpt();
 	}
-	
+
 	function AddFiles(filesString, scriptyLibs /*number or array of numbers*/){
 		// Cleanup if arguments are missing
-		if(filesString.constructor == Number || filesString.constructor == Array)
-		{
+		if(filesString.constructor == Number || filesString.constructor == Array)	{
 			scriptyLibs = filesString;
 			filesString = "";
 		}
 		var theHead = fwDocument.fwTags.fwFind("head");
-		var connected = (function(){
-			if(fwShellCommand) {
-				return fwShellCommand('ping -t3 -o ajax.googleapis.com').match("1 packets received");
+		var connected = function(){
+			if(fwShellCommand){
+				return fwShellCommand('ping -c1 -i1 http://ajax.googleapis.com');
 			}else{
 				var osa=new FWOSAInterpreter; 
-				osa.fwWrite('try\n' + 
-				'do shell script "ping -t3 -o ajax.googleapis.com"\n' +
-				'return 1\n' +
-					'on error\n' +
-					'return 0\n' +
-					'end try');
+				osa.fwWrite('do shell script "curl ajax.googleapis.com"'); 
 				osa.fwCompile(); 
 				return osa.fwRun();
 			}
-		})();
+		}
 		var useCustom = filesString && filesString.length > 0;
 		var path = this.fwPathName;
 		var prefix = path.substring(0, path.lastIndexOf(":")) + ':Support Files~:';
-		if(parseFloat(fwFreewayVersion) >= 5.5)
+		if(parseInt(fwFreewayVersion.replace(/\.?(\w\d)?/g, "")) >= 562){
+			var canon = 'prototype1700packer,prototype1700,scriptaculous190packer,scriptaculous190'.split(',');
+		}else if(parseFloat(fwFreewayVersion) >= 5.5){
 			var canon = 'prototype1610packer,prototype1610,scriptaculous183packer,scriptaculous183'.split(',');
-		else
+		}else{
 			var canon = 'prototype1602packer,prototype1602,scriptaculous181packer,scriptaculous181'.split(',');
-	
+		}
 		var files = (useCustom) ? filesString.split(',') : canon;
-	
-		if(scriptyLibs)
-		{
+
+		if(scriptyLibs){
 			// Make the scriptyLibs argument an array if it isn't one already
 			scriptyLibs = scriptyLibs.constructor == Array ? scriptyLibs : [scriptyLibs];
 			// Create or add the libraries used to a page variable
 			if(!fwPage.scriptyLibs)
-				fwPage.scriptyLibs = scriptyLibs;
+			fwPage.scriptyLibs = scriptyLibs;
 			else
-				fwPage.scriptyLibs = fwPage.scriptyLibs.concat(scriptyLibs);
+			fwPage.scriptyLibs = fwPage.scriptyLibs.concat(scriptyLibs);
 		}
-	
+
+		// Make the overall library list object variable if it doesn't exist
 		if(!fwPage.libsList)
-			fwPage.libsList = new Object();
+		fwPage.libsList = new Object();
 
 		for (i in files){
 			var file = files[i];
-			if (file && !fwPage.libsList[file])
-			{
+			if (file && !fwPage.libsList[file]){
 				myFile = new FWFile;
 				myFile.fwOpenRead(prefix + file + '.js');
 				myFile.fwClose();
-				if (fwParameters[file])
-				{
+				if (fwParameters[file]){
 					fwParameters[file].fwSpecify(myFile);
 					var path = fwParameters[file].toString();
 					if(useCustom == true)
-						fwPage.libsList[file] = path;
-				}
-				else
-				{
-					alert (file + '.js was not found in the action bundle');
+					fwPage.libsList[file] = path;
+				}else{
+					fwAlert('Couldn\'t find ' + file);
 				}
 			}
 		}
 
 		if(lastOrders()){
-			if(parseFloat(fwFreewayVersion) >= 5.5) {
+			if(parseInt(fwFreewayVersion.replace(/\.?(\w\d)?/g, "")) >= 562){
+				if(fwPage.libsList['prototype1700packer'] && fwPage.libsList['prototype1700'])
+					fwPage.libsList['prototype1700packer'] = null;
+				if(fwPage.libsList['scriptaculous190packer'] && fwPage.libsList['scriptaculous190'])
+					fwPage.libsList['scriptaculous190packer'] = null;
+			}else if(parseFloat(fwFreewayVersion) >= 5.5){
 				if(fwPage.libsList['prototype1610packer'] && fwPage.libsList['prototype1610'])
 					fwPage.libsList['prototype1610packer'] = null;
-
 				if(fwPage.libsList['scriptaculous183packer'] && fwPage.libsList['scriptaculous183'])
 					fwPage.libsList['scriptaculous183packer'] = null;
-			} else {
+			}else{
 				if(fwPage.libsList['prototype1602packer'] && fwPage.libsList['prototype1602'])
 					fwPage.libsList['prototype1602packer'] = null;
-
 				if(fwPage.libsList['scriptaculous181packer'] && fwPage.libsList['scriptaculous181'])
 					fwPage.libsList['scriptaculous181packer'] = null;
 			}
-		
+
 			// Clean the list of individual libs
-			if(fwPage.scriptyLibs)
-				cleanLibs();
+			if(fwPage.scriptyLibs) cleanLibs();
 
 			for (i in canon){
 				if (fwPage.libsList[canon[i]]){
@@ -429,10 +426,14 @@
 </library-action>
 
 <page-action name="Protaculous">
-<action-version version="0.6.9">
+<action-version version="0.7">
 Protaculous Action
-Copyright (c) Walter Davis Studio 2007 - 2010
+Copyright (c) Walter Davis Studio 2007 - 2011
 </action-version>
+<action-file name ="prototype1700packer" var/>
+<action-file name ="scriptaculous190packer" var/>
+<action-file name ="prototype1700" var/>
+<action-file name ="scriptaculous190" var/>
 <action-file name ="prototype1610packer" var/>
 <action-file name ="scriptaculous183packer" var/>
 <action-file name ="prototype1610" var/>
@@ -481,7 +482,9 @@ Copyright (c) Walter Davis Studio 2007 - 2010
 		var filesString = '';
 		var scriptyLibs = [];
 		if(fwParameters['lib'].fwValue == 'scriptaculous-packed'){
-			if(parseFloat(fwFreewayVersion) >= 5.5){
+			if(parseInt(fwFreewayVersion.replace(/\.?(\w\d)?/g, "")) >= 562){
+				filesString = 'prototype1700packer,scriptaculous190packer';
+			}else if(parseFloat(fwFreewayVersion) >= 5.5){
 				filesString = 'prototype1610packer,scriptaculous183packer';
 			}else{
 				filesString = 'prototype1602packer,scriptaculous181packer';
@@ -489,14 +492,18 @@ Copyright (c) Walter Davis Studio 2007 - 2010
 			scriptyLibs = [0,1,2,3,4,5];
 		}
 		if(fwParameters['lib'].fwValue == 'prototype-packed'){
-			if(parseFloat(fwFreewayVersion) >= 5.5){
+			if(parseInt(fwFreewayVersion.replace(/\.?(\w\d)?/g, "")) >= 562){
+				filesString = 'prototype1700packer';
+			}else if(parseFloat(fwFreewayVersion) >= 5.5){
 				filesString = 'prototype1610packer';
 			}else{
 				filesString = 'prototype1602packer';
 			}
 		}
 		if(fwParameters['lib'].fwValue == 'scriptaculous'){
-			if(parseFloat(fwFreewayVersion) >= 5.5){
+			if(parseInt(fwFreewayVersion.replace(/\.?(\w\d)?/g, "")) >= 562){
+				filesString = 'prototype1700,scriptaculous190';
+			}else if(parseFloat(fwFreewayVersion) >= 5.5){
 				filesString = 'prototype1610,scriptaculous183';
 			}else{
 				filesString = 'prototype1602,scriptaculous181';
@@ -504,7 +511,9 @@ Copyright (c) Walter Davis Studio 2007 - 2010
 			scriptyLibs = [0,1,2,3,4,5];
 		}
 		if(fwParameters['lib'].fwValue == 'prototype'){
-			if(parseFloat(fwFreewayVersion) >= 5.5){
+			if(parseInt(fwFreewayVersion.replace(/\.?(\w\d)?/g, "")) >= 562){
+				filesString = 'prototype1700';
+			}else if(parseFloat(fwFreewayVersion) >= 5.5){
 				filesString = 'prototype1610';
 			}else{
 				filesString = 'prototype1602';
@@ -521,10 +530,14 @@ Copyright (c) Walter Davis Studio 2007 - 2010
 </page-action>
 
 <action name="Protaculous">
-<action-version version="0.6.9">
+<action-version version="0.7">
 Protaculous Action
 Copyright (c) Walter Davis Studio 2007 - 2010
 </action-version>
+<action-file name ="prototype1700packer" var/>
+<action-file name ="scriptaculous190packer" var/>
+<action-file name ="prototype1700" var/>
+<action-file name ="scriptaculous190" var/>
 <action-file name ="prototype1610packer" var/>
 <action-file name ="scriptaculous183packer" var/>
 <action-file name ="prototype1610" var/>
@@ -572,7 +585,9 @@ Copyright (c) Walter Davis Studio 2007 - 2010
 		var filesString = '';
 		var scriptyLibs = [];
 		if(fwParameters['lib'].fwValue == 'scriptaculous-packed'){
-			if(parseFloat(fwFreewayVersion) >= 5.5){
+			if(parseInt(fwFreewayVersion.replace(/\.?(\w\d)?/g, "")) >= 562){
+				filesString = 'prototype1700packer,scriptaculous190packer';
+			}else if(parseFloat(fwFreewayVersion) >= 5.5){
 				filesString = 'prototype1610packer,scriptaculous183packer';
 			}else{
 				filesString = 'prototype1602packer,scriptaculous181packer';
@@ -580,14 +595,18 @@ Copyright (c) Walter Davis Studio 2007 - 2010
 			scriptyLibs = [0,1,2,3,4,5];
 		}
 		if(fwParameters['lib'].fwValue == 'prototype-packed'){
-			if(parseFloat(fwFreewayVersion) >= 5.5){
+			if(parseInt(fwFreewayVersion.replace(/\.?(\w\d)?/g, "")) >= 562){
+				filesString = 'prototype1700packer';
+			}else if(parseFloat(fwFreewayVersion) >= 5.5){
 				filesString = 'prototype1610packer';
 			}else{
 				filesString = 'prototype1602packer';
 			}
 		}
 		if(fwParameters['lib'].fwValue == 'scriptaculous'){
-			if(parseFloat(fwFreewayVersion) >= 5.5){
+			if(parseInt(fwFreewayVersion.replace(/\.?(\w\d)?/g, "")) >= 562){
+				filesString = 'prototype1700,scriptaculous190';
+			}else if(parseFloat(fwFreewayVersion) >= 5.5){
 				filesString = 'prototype1610,scriptaculous183';
 			}else{
 				filesString = 'prototype1602,scriptaculous181';
@@ -595,7 +614,9 @@ Copyright (c) Walter Davis Studio 2007 - 2010
 			scriptyLibs = [0,1,2,3,4,5];
 		}
 		if(fwParameters['lib'].fwValue == 'prototype'){
-			if(parseFloat(fwFreewayVersion) >= 5.5){
+			if(parseInt(fwFreewayVersion.replace(/\.?(\w\d)?/g, "")) >= 562){
+				var filesString = 'prototype1700';
+			}else if(parseFloat(fwFreewayVersion) >= 5.5){
 				filesString = 'prototype1610';
 			}else{
 				filesString = 'prototype1602';
@@ -612,10 +633,14 @@ Copyright (c) Walter Davis Studio 2007 - 2010
 </action>
 
 <item-action name="Observer">
-<action-version version="0.2.9">
+<action-version version="0.3">
 Observer Action
-Copyright (c) Walter Davis Studio 2008 - 2010
+Copyright (c) Walter Davis Studio 2008 - 2011
 </action-version>
+<action-file name ="prototype1700packer" var/>
+<action-file name ="scriptaculous190packer" var/>
+<action-file name ="prototype1700" var/>
+<action-file name ="scriptaculous190" var/>
 <action-file name ="prototype1610packer" var/>
 <action-file name ="scriptaculous183packer" var/>
 <action-file name ="prototype1610" var/>
@@ -664,7 +689,9 @@ Copyright (c) Walter Davis Studio 2008 - 2010
 		var filesString = '';
 		var scriptyLibs = [];
 		if(fwParameters['lib'].fwValue == 'scriptaculous-packed'){
-			if(parseFloat(fwFreewayVersion) >= 5.5){
+			if(parseInt(fwFreewayVersion.replace(/\.?(\w\d)?/g, "")) >= 562){
+				filesString = 'prototype1700packer,scriptaculous190packer';
+			}else if(parseFloat(fwFreewayVersion) >= 5.5){
 				filesString = 'prototype1610packer,scriptaculous183packer';
 			}else{
 				filesString = 'prototype1602packer,scriptaculous181packer';
@@ -672,14 +699,18 @@ Copyright (c) Walter Davis Studio 2008 - 2010
 			scriptyLibs = [0,1,2,3,4,5];
 		}
 		if(fwParameters['lib'].fwValue == 'prototype-packed'){
-			if(parseFloat(fwFreewayVersion) >= 5.5){
+			if(parseInt(fwFreewayVersion.replace(/\.?(\w\d)?/g, "")) >= 562){
+				filesString = 'prototype1700packer';
+			}else if(parseFloat(fwFreewayVersion) >= 5.5){
 				filesString = 'prototype1610packer';
 			}else{
 				filesString = 'prototype1602packer';
 			}
 		}
 		if(fwParameters['lib'].fwValue == 'scriptaculous'){
-			if(parseFloat(fwFreewayVersion) >= 5.5){
+			if(parseInt(fwFreewayVersion.replace(/\.?(\w\d)?/g, "")) >= 562){
+				filesString = 'prototype1700,scriptaculous190';
+			}else if(parseFloat(fwFreewayVersion) >= 5.5){
 				filesString = 'prototype1610,scriptaculous183';
 			}else{
 				filesString = 'prototype1602,scriptaculous181';
@@ -687,7 +718,9 @@ Copyright (c) Walter Davis Studio 2008 - 2010
 			scriptyLibs = [0,1,2,3,4,5];
 		}
 		if(fwParameters['lib'].fwValue == 'prototype'){
-			if(parseFloat(fwFreewayVersion) >= 5.5){
+			if(parseInt(fwFreewayVersion.replace(/\.?(\w\d)?/g, "")) >= 562){
+				var filesString = 'prototype1700';
+			}else if(parseFloat(fwFreewayVersion) >= 5.5){
 				filesString = 'prototype1610';
 			}else{
 				filesString = 'prototype1602';
@@ -709,9 +742,9 @@ Copyright (c) Walter Davis Studio 2008 - 2010
 
 <item-action name="Carousel">
 <action-appliesto non-html32/>
-<action-version version="1.2.16">
+<action-version version="1.3">
 Carousel
-Action (c)2007-10 Walter Lee Davis, big help from Joe Billings in March 2010.
+Action (c)2007-11 Walter Lee Davis, big help from Joe Billings in March 2010.
 Glider.js (c)2007 Curbly LLC - author Bruno Bornsztein <bruno@missingmethod.com>
 
 Apply the action to a group of HTML items to turn them into a smooth-scrolling carousel.
@@ -753,14 +786,12 @@ Apply the action to a group of HTML items to turn them into a smooth-scrolling c
 	});
 });
 </action-markup>
+<action-file name ="prototype1700packer" var/>
+<action-file name ="scriptaculous190packer" var/>
 <action-file name ="prototype1610packer" var/>
 <action-file name ="scriptaculous183packer" var/>
-<action-file name ="prototype1610" var/>
-<action-file name ="scriptaculous183" var/>
 <action-file name ="prototype1602packer" var/>
 <action-file name ="scriptaculous181packer" var/>
-<action-file name ="prototype1602" var/>
-<action-file name ="scriptaculous181" var/>
 <action-file name ="glider" var/>
 <action-text name="autoglide" title="Auto-Glide Interval">
 <action-text name="duration" title="Effect Duration (seconds)" default="0.5" />
@@ -801,17 +832,14 @@ Apply the action to a group of HTML items to turn them into a smooth-scrolling c
 		theTag.fwAddRawln('');
 	}
 	function fwAfterStartHead(){
-		if(debug) {
-			if(parseFloat(fwFreewayVersion) >= 5.5)
-				AddFiles('prototype1610,scriptaculous183,glider')
-			else
-				AddFiles('prototype1602,scriptaculous181,glider')
-		} else {
-			if(parseFloat(fwFreewayVersion) >= 5.5)
-				AddFiles('prototype1610packer,scriptaculous183packer,glider', [1]);
-			else
-				AddFiles('prototype1602packer,scriptaculous181packer,glider', [1]);
+		if(parseInt(fwFreewayVersion.replace(/\.?(\w\d)?/g, "")) >= 562){
+			var filesString = 'prototype1700packer,scriptaculous190packer,glider';
+		}else if(parseFloat(fwFreewayVersion) >= 5.5){
+			var filesString = 'prototype1610packer,scriptaculous183packer,glider';
+		}else{
+			var filesString = 'prototype1602packer,scriptaculous181packer,glider';
 		}
+		AddFiles(filesString, [1]);
 	}
 	function clonePosition(target,source){
 		pos = ['top','left','bottom','right','z-index','position'];
@@ -899,23 +927,21 @@ Apply the action to a group of HTML items to turn them into a smooth-scrolling c
 
 <item-action name="Carousel Pane">
 <action-appliesto layer non-html32/>
-<action-version version="0.3.10">
+<action-version version="0.4">
 Carousel Pane
-(c)2009 - 2010 Walter Lee Davis
+(c)2009 - 2011 Walter Lee Davis
 
 Apply the action to any layer to designate a Carousel pane.
 
 </action-version>
-<action-itemref name="targets" title="Target" filter="activeTarget"/>
+<action-file name ="prototype1700packer" var/>
+<action-file name ="scriptaculous190packer" var/>
 <action-file name ="prototype1610packer" var/>
 <action-file name ="scriptaculous183packer" var/>
-<action-file name ="prototype1610" var/>
-<action-file name ="scriptaculous183" var/>
 <action-file name ="prototype1602packer" var/>
 <action-file name ="scriptaculous181packer" var/>
-<action-file name ="prototype1602" var/>
-<action-file name ="scriptaculous181" var/>
 <action-file name ="glider" var/>
+<action-itemref name="targets" title="Target" filter="activeTarget"/>
 <action-javascript>
 <action-include name="scriptyHandlerFunctions">
 	function activeTarget(item){
@@ -938,24 +964,21 @@ Apply the action to any layer to designate a Carousel pane.
 			}
 		}
 	}
-	function fwAfterStartHead(){
-		if(debug) {
-			if(parseFloat(fwFreewayVersion) >= 5.5)
-				AddFiles('prototype1610,scriptaculous183,glider')
-			else
-				AddFiles('prototype1602,scriptaculous181,glider')
-		} else {
-			if(parseFloat(fwFreewayVersion) >= 5.5)
-				AddFiles('prototype1610packer,scriptaculous183packer,glider', [1]);
-			else
-				AddFiles('prototype1602packer,scriptaculous181packer,glider', [1]);
-		}
-	}
 	function fwBeforeEndBody(){
 		// Loop through all children and apply the removeFromRelativeLayout flag to them
 		var items = fwItem.fwFindAllItems(true);
 		for(var i in items)
 			items[i].removeFromRelativeLayout = 1;
+	}
+	function fwAfterStartHead(){
+		if(parseInt(fwFreewayVersion.replace(/\.?(\w\d)?/g, "")) >= 562){
+			var filesString = 'prototype1700packer,scriptaculous190packer,glider';
+		}else if(parseFloat(fwFreewayVersion) >= 5.5){
+			var filesString = 'prototype1610packer,scriptaculous183packer,glider';
+		}else{
+			var filesString = 'prototype1602packer,scriptaculous181packer,glider';
+		}
+		AddFiles(filesString, [1]);
 	}
 	
 
@@ -965,13 +988,20 @@ Apply the action to any layer to designate a Carousel pane.
 
 <item-action name="Carousel Button">
 <action-appliesto graphic pass-through/>
-<action-version version="0.9.11">
+<action-version version="1.0">
 Carousel Button
-(c)2007 Walter Lee Davis
+(c)2007-2011 Walter Lee Davis
 
 Apply the action to any linked (or linkable) graphic to create scroll buttons for the Carousel.
 
 </action-version>
+<action-file name ="prototype1700packer" var/>
+<action-file name ="scriptaculous190packer" var/>
+<action-file name ="prototype1610packer" var/>
+<action-file name ="scriptaculous183packer" var/>
+<action-file name ="prototype1602packer" var/>
+<action-file name ="scriptaculous181packer" var/>
+<action-file name ="glider" var/>
 <action-itemref name="targets" title="Target" filter="activeTarget"/>
 <action-popup name="direction" title="Control">
 <value name="previous">
@@ -979,15 +1009,6 @@ Apply the action to any linked (or linkable) graphic to create scroll buttons fo
 <value name="start" title="Start Auto-Glide">
 <value name="stop" title="Stop Auto-Glide">
 </action-popup>
-<action-file name ="prototype1610packer" var/>
-<action-file name ="scriptaculous183packer" var/>
-<action-file name ="prototype1610" var/>
-<action-file name ="scriptaculous183" var/>
-<action-file name ="prototype1602packer" var/>
-<action-file name ="scriptaculous181packer" var/>
-<action-file name ="prototype1602" var/>
-<action-file name ="scriptaculous181" var/>
-<action-file name ="glider" var/>
 <action-javascript>
 <action-include name="scriptyHandlerFunctions">
 	function activeTarget(item){
@@ -1038,40 +1059,35 @@ Apply the action to any linked (or linkable) graphic to create scroll buttons fo
 		}
 	}
 	function fwAfterStartHead(){
-		if(debug) {
-			if(parseFloat(fwFreewayVersion) >= 5.5)
-				AddFiles('prototype1610,scriptaculous183,glider')
-			else
-				AddFiles('prototype1602,scriptaculous181,glider')
-		} else {
-			if(parseFloat(fwFreewayVersion) >= 5.5)
-				AddFiles('prototype1610packer,scriptaculous183packer,glider', [1]);
-			else
-				AddFiles('prototype1602packer,scriptaculous181packer,glider', [1]);
+		if(parseInt(fwFreewayVersion.replace(/\.?(\w\d)?/g, "")) >= 562){
+			var filesString = 'prototype1700packer,scriptaculous190packer,glider';
+		}else if(parseFloat(fwFreewayVersion) >= 5.5){
+			var filesString = 'prototype1610packer,scriptaculous183packer,glider';
+		}else{
+			var filesString = 'prototype1602packer,scriptaculous181packer,glider';
 		}
+		AddFiles(filesString, [1]);
 	}
 </action-javascript>
 </item-action>
 
 <action name="Carousel Text Tab" preview-text="&Text;" generates-link height=12>
-<action-version version="0.2.11">
+<action-version version="0.3">
 Carousel Text Tab
-(c)2009 - 2010 Walter Lee Davis
+(c)2009 - 2011 Walter Lee Davis
 
 Use this Action inline to create direct text navigation links to one of the Carousel options.
 
 </action-version>
-<action-text name="Text" script default="link text"/>
-<action-itemref name="targets" title="Target" filter="activeTarget"/>
+<action-file name ="prototype1700packer" var/>
+<action-file name ="scriptaculous190packer" var/>
 <action-file name ="prototype1610packer" var/>
 <action-file name ="scriptaculous183packer" var/>
-<action-file name ="prototype1610" var/>
-<action-file name ="scriptaculous183" var/>
 <action-file name ="prototype1602packer" var/>
 <action-file name ="scriptaculous181packer" var/>
-<action-file name ="prototype1602" var/>
-<action-file name ="scriptaculous181" var/>
 <action-file name ="glider" var/>
+<action-text name="Text" script default="link text"/>
+<action-itemref name="targets" title="Target" filter="activeTarget"/>
 <action-javascript>
 <action-include name="scriptyHandlerFunctions">
 
@@ -1095,7 +1111,17 @@ Use this Action inline to create direct text navigation links to one of the Caro
 			}
 		}
 	}
-		
+	function fwAfterStartHead(){
+		if(parseInt(fwFreewayVersion.replace(/\.?(\w\d)?/g, "")) >= 562){
+			var filesString = 'prototype1700packer,scriptaculous190packer,glider';
+		}else if(parseFloat(fwFreewayVersion) >= 5.5){
+			var filesString = 'prototype1610packer,scriptaculous183packer,glider';
+		}else{
+			var filesString = 'prototype1602packer,scriptaculous181packer,glider';
+		}
+		AddFiles(filesString, [1]);
+	}
+	
 	function fwAfterEndHTML(){
 		var enclosingTag = fwDocument.fwTags.fwFind("",fwItem);
 		if (enclosingTag){
@@ -1129,41 +1155,26 @@ Use this Action inline to create direct text navigation links to one of the Caro
 			href.id = fwQuote('text_tab_' + fwParameters['targets'].fwValue);
 		}
 	}
-	function fwAfterStartHead(){
-		if(debug) {
-			if(parseFloat(fwFreewayVersion) >= 5.5)
-				AddFiles('prototype1610,scriptaculous183,glider')
-			else
-				AddFiles('prototype1602,scriptaculous181,glider')
-		} else {
-			if(parseFloat(fwFreewayVersion) >= 5.5)
-				AddFiles('prototype1610packer,scriptaculous183packer,glider', [1]);
-			else
-				AddFiles('prototype1602packer,scriptaculous181packer,glider', [1]);
-		}
-	}
 </action-javascript>
 </action>
 
 <item-action name="Carousel Tab" generates-link>
 <action-appliesto graphic pass-through/>
-<action-version version="0.7.9">
+<action-version version="0.8">
 Carousel Tab
-(c)2007 - 2010 Walter Lee Davis
+(c)2007 - 2011 Walter Lee Davis
 
 Apply the action to any graphic to create direct navigation to one of the Carousel options.
 
 </action-version>
-<action-itemref name="targets" title="Target" filter="activeTarget"/>
+<action-file name ="prototype1700packer" var/>
+<action-file name ="scriptaculous190packer" var/>
 <action-file name ="prototype1610packer" var/>
 <action-file name ="scriptaculous183packer" var/>
-<action-file name ="prototype1610" var/>
-<action-file name ="scriptaculous183" var/>
 <action-file name ="prototype1602packer" var/>
 <action-file name ="scriptaculous181packer" var/>
-<action-file name ="prototype1602" var/>
-<action-file name ="scriptaculous181" var/>
 <action-file name ="glider" var/>
+<action-itemref name="targets" title="Target" filter="activeTarget"/>
 <action-javascript>
 <action-include name="scriptyHandlerFunctions">
 
@@ -1187,7 +1198,17 @@ Apply the action to any graphic to create direct navigation to one of the Carous
 			}
 		}
 	}
-		
+	function fwAfterStartHead(){
+		if(parseInt(fwFreewayVersion.replace(/\.?(\w\d)?/g, "")) >= 562){
+			var filesString = 'prototype1700packer,scriptaculous190packer,glider';
+		}else if(parseFloat(fwFreewayVersion) >= 5.5){
+			var filesString = 'prototype1610packer,scriptaculous183packer,glider';
+		}else{
+			var filesString = 'prototype1602packer,scriptaculous181packer,glider';
+		}
+		AddFiles(filesString, [1]);
+	}
+	
 	function fwAfterEndBody(){
 		var thisImg = fwDocument.fwTags.fwFind("img",fwItem);
 		if(thisImg){
@@ -1210,19 +1231,6 @@ Apply the action to any graphic to create direct navigation to one of the Carous
 		var theImg = thisItem.fwFind('img');
 		if(theImg && (!theImg.id)){
 			theImg.id = fwQuote('tab_' + fwParameters['targets'].fwValue);
-		}
-	}
-	function fwAfterStartHead(){
-		if(debug) {
-			if(parseFloat(fwFreewayVersion) >= 5.5)
-				AddFiles('prototype1610,scriptaculous183,glider')
-			else
-				AddFiles('prototype1602,scriptaculous181,glider')
-		} else {
-			if(parseFloat(fwFreewayVersion) >= 5.5)
-				AddFiles('prototype1610packer,scriptaculous183packer,glider', [1]);
-			else
-				AddFiles('prototype1602packer,scriptaculous181packer,glider', [1]);
 		}
 	}
 </action-javascript>

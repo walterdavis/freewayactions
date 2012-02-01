@@ -179,101 +179,98 @@
 		var scriptTag = theTag.fwAdd("script", true);
 		// Get the list of individual scriptyLibs and add to the end of the scripty reference
 		var scriptyLibs = getLibs();
-		if(parseFloat(fwFreewayVersion) >= 5.5)
+		if(parseInt(fwFreewayVersion.replace(/\.?(\w\d)?/g, "")) >= 562){
+			scriptTag.src = fwQuote(path + (file.match("pro") ? "prototype/1.7.0.0/prototype.js" : "scriptaculous/1.9.0/scriptaculous.js"+scriptyLibs));
+		}else if(parseFloat(fwFreewayVersion) >= 5.5){
 			scriptTag.src = fwQuote(path + (file.match("pro") ? "prototype/1.6.1.0/prototype.js" : "scriptaculous/1.8.3/scriptaculous.js"+scriptyLibs));
-		else
+		}else{
 			scriptTag.src = fwQuote(path + (file.match("pro") ? "prototype/1.6.0.2/prototype.js" : "scriptaculous/1.8.1/scriptaculous.js"+scriptyLibs));
+		}
 		scriptTag.type = fwQuote("text/javascript");
 		scriptTag.fwAddRawOpt();
 		theTag.fwAddRawOpt();
 	}
-	
+
 	function AddFiles(filesString, scriptyLibs /*number or array of numbers*/){
 		// Cleanup if arguments are missing
-		if(filesString.constructor == Number || filesString.constructor == Array)
-		{
+		if(filesString.constructor == Number || filesString.constructor == Array)	{
 			scriptyLibs = filesString;
-			filesString = "";
+			fileString = "";
 		}
 		var theHead = fwDocument.fwTags.fwFind("head");
-		var connected = (function(){
-			if(fwShellCommand) {
-				return fwShellCommand('ping -t3 -o ajax.googleapis.com').match("1 packets received");
+		var connected = function(){
+			if(fwShellCommand){
+				return fwShellCommand('ping -c1 -i1 http://ajax.googleapis.com');
 			}else{
 				var osa=new FWOSAInterpreter; 
-				osa.fwWrite('try\n' + 
-				'do shell script "ping -t3 -o ajax.googleapis.com"\n' +
-				'return 1\n' +
-					'on error\n' +
-					'return 0\n' +
-					'end try');
+				osa.fwWrite('do shell script "curl ajax.googleapis.com"'); 
 				osa.fwCompile(); 
 				return osa.fwRun();
 			}
-		})();
+		}
 		var useCustom = filesString && filesString.length > 0;
 		var path = this.fwPathName;
 		var prefix = path.substring(0, path.lastIndexOf(":")) + ':Support Files~:';
-		if(parseFloat(fwFreewayVersion) >= 5.5)
+		if(parseInt(fwFreewayVersion.replace(/\.?(\w\d)?/g, "")) >= 562){
+			var canon = 'prototype1700packer,prototype1700,scriptaculous190packer,scriptaculous190'.split(',');
+		}else if(parseFloat(fwFreewayVersion) >= 5.5){
 			var canon = 'prototype1610packer,prototype1610,scriptaculous183packer,scriptaculous183'.split(',');
-		else
+		}else{
 			var canon = 'prototype1602packer,prototype1602,scriptaculous181packer,scriptaculous181'.split(',');
-	
+		}
 		var files = (useCustom) ? filesString.split(',') : canon;
-	
-		if(scriptyLibs)
-		{
+
+		if(scriptyLibs){
 			// Make the scriptyLibs argument an array if it isn't one already
 			scriptyLibs = scriptyLibs.constructor == Array ? scriptyLibs : [scriptyLibs];
 			// Create or add the libraries used to a page variable
 			if(!fwPage.scriptyLibs)
-				fwPage.scriptyLibs = scriptyLibs;
+			fwPage.scriptyLibs = scriptyLibs;
 			else
-				fwPage.scriptyLibs = fwPage.scriptyLibs.concat(scriptyLibs);
+			fwPage.scriptyLibs = fwPage.scriptyLibs.concat(scriptyLibs);
 		}
-	
+
+		// Make the overall library list object variable if it doesn't exist
 		if(!fwPage.libsList)
-			fwPage.libsList = new Object();
+		fwPage.libsList = new Object();
 
 		for (i in files){
 			var file = files[i];
-			if (file && !fwPage.libsList[file])
-			{
+			if (file && !fwPage.libsList[file]){
 				myFile = new FWFile;
 				myFile.fwOpenRead(prefix + file + '.js');
 				myFile.fwClose();
-				if (fwParameters[file])
-				{
+				if (fwParameters[file]){
 					fwParameters[file].fwSpecify(myFile);
 					var path = fwParameters[file].toString();
 					if(useCustom == true)
-						fwPage.libsList[file] = path;
-				}
-				else
-				{
-					alert (file + '.js was not found in the action bundle');
+					fwPage.libsList[file] = path;
+				}else{
+					fwAlert(ParamString(kFileNotFound, file, ".js"));
 				}
 			}
 		}
 
 		if(lastOrders()){
-			if(parseFloat(fwFreewayVersion) >= 5.5) {
+			if(parseInt(fwFreewayVersion.replace(/\.?(\w\d)?/g, "")) >= 562){
+				if(fwPage.libsList['prototype1700packer'] && fwPage.libsList['prototype1700'])
+				fwPage.libsList['prototype1700packer'] = null;
+				if(fwPage.libsList['scriptaculous190packer'] && fwPage.libsList['scriptaculous190'])
+				fwPage.libsList['scriptaculous190packer'] = null;
+			}else if(parseFloat(fwFreewayVersion) >= 5.5){
 				if(fwPage.libsList['prototype1610packer'] && fwPage.libsList['prototype1610'])
 					fwPage.libsList['prototype1610packer'] = null;
-
 				if(fwPage.libsList['scriptaculous183packer'] && fwPage.libsList['scriptaculous183'])
 					fwPage.libsList['scriptaculous183packer'] = null;
-			} else {
+			}else{
 				if(fwPage.libsList['prototype1602packer'] && fwPage.libsList['prototype1602'])
 					fwPage.libsList['prototype1602packer'] = null;
-
 				if(fwPage.libsList['scriptaculous181packer'] && fwPage.libsList['scriptaculous181'])
 					fwPage.libsList['scriptaculous181packer'] = null;
 			}
-		
+
 			// Clean the list of individual libs
-			if(fwPage.scriptyLibs)
-				cleanLibs();
+			if(fwPage.scriptyLibs) cleanLibs();
 
 			for (i in canon){
 				if (fwPage.libsList[canon[i]]){
@@ -286,7 +283,7 @@
 				LinkFileToHead(theHead, fwPage.libsList[i]);
 		}
 	}
-	
+
 	function SetCSSAttribute(tag, attributeName, attributeValue) { 
 		// Sets a "CSS" attribute such as "position:absolute" in a tag value 
 		// Passing an attribute value of null removes that attribute entirely
@@ -443,15 +440,18 @@
 </library-action>
 
 <item-action name="ScriptyLightbox2">
-<action-version version="0.5.1">
+<action-version version="0.6">
 ScriptyLightbox2 Action
 Copyright (c) Walter Davis Studio 2011
 </action-version>
+<action-file name ="prototype1700packer" var/>
 <action-file name ="prototype1610packer" var/>
 <action-file name ="prototype1602packer" var/>
 <action-file name ="closebox" var/>
 <action-file name ="ajaxload" var/>
+<action-checkbox name="pages" title="Use Page/URL as Target" default="no" />
 <action-file name = "original" title="Original File" />
+<action-url name = "original_page" title="Page/URL" />
 <action-checkbox name="autoplay" title="Auto-Play" default="no" advance="no" />
 <action-number name = "width" title="Width" />
 <action-number name = "height" title="Height" />
@@ -476,6 +476,13 @@ Copyright (c) Walter Davis Studio 2011
 	height:100%;
 	padding:0;
 	margin:0;
+}
+.overlay iframe {
+	border: none;
+	height: 100%;
+	width: 100%;
+	padding: 0;
+	margin: 0;
 }
 #_closer {
 	display: block;
@@ -571,7 +578,14 @@ $$('a.popup').each(function(elm){
 		);
 		$('PageDiv').insert(player);
 		player.setOpacity(0);
-		var extension = elm.href.toString().substr(elm.href.lastIndexOf('.') + 1).toLowerCase();
+		var extension = elm.href.toString().substr(elm.href.lastIndexOf('.') + 1).split(/[\?#]/)[0].toLowerCase();
+		if(geometry && $w('htm html asp php jsp').include(extension)){
+			player.setStyle('width:' + (geometry.width) + 'px; height:' + (geometry.height + 16) + 'px;');
+			var iframe = new Template('<iframe width="#{width}" height="#{height}" border="0" src="#{src}"></iframe>');
+			vars = {'height':(geometry.height), 'width':geometry.width, 'src':elm.href};
+			player.update(iframe.evaluate(vars));
+			window.setTimeout(center_player,1);
+		}
 		if(geometry && $w('mov m4v mp4').include(extension)){
 			player.setStyle('width:' + (geometry.width) + 'px; height:' + (geometry.height + 16) + 'px;');
 			var qt = new Template('<p><object width="#{width}" height="#{height}" classid="clsid:02BF25D5-8C17-4B23-BC80-D3488ABDDC6B" codebase="http://www.apple.com/qtactivex/qtplugin.cab"> <param name="src" value="#{src}"/> <param name="controller" value="true"/> <param name="autoplay" value="#{autoplay}"/> <embed src="#{src}" width="#{width}" height="#{height}" controller="true" scale="tofit" cache="true" autoplay="#{autoplay}" pluginspage="http://www.apple.com/quicktime/download/" /></object></p>');
@@ -633,14 +647,18 @@ document.observe('touchstart',function(evt){
 		if (fwParameters.original.fwHasFile){ 
 			var myFile = fwParameters["original"].fwFileName.toString(); 
 			active = ( myFile.substr(myFile.lastIndexOf('.') + 1).toLowerCase().match(/(mov|m4v|mp4)/) != null ); 
-		} 
+		}
 		fwParameters['autoplay'].fwVisible = active; 
+		fwParameters['original'].fwVisible = ! fwParameters['pages'].fwBoolValue
+		fwParameters['original_page'].fwVisible = !! fwParameters['pages'].fwBoolValue
 	}
 	function fwAfterStartHead()
 	{
 		var filesString = '';
 		var scriptyLibs = [];
-		if(parseFloat(fwFreewayVersion) >= 5.5){
+		if(parseInt(fwFreewayVersion.replace(/\.?(\w\d)?/g, "")) >= 562){
+			filesString = 'prototype1700packer';
+		}else if(parseFloat(fwFreewayVersion) >= 5.5){
 			filesString = 'prototype1610packer';
 		}else{
 			filesString = 'prototype1602packer';
@@ -673,13 +691,14 @@ document.observe('touchstart',function(evt){
 	function fwBeforeEndBody(){
 		var myItem = fwDocument.fwTags.fwFind(fwItem, "img");
 		if(myItem){
-			if(fwParameters.original && fwParameters.original.fwHasFile){
+			if(fwParameters.original && fwParameters.original.fwHasFile || fwParameters.original_page && fwParameters.original_page.fwValue){
 				var link = myItem.fwFindEnclosing('a');
 				var relText = [];
 				if(!link){
 					link = myItem.fwAddEnclosing('a',true);
 				}
-				link['href'] = fwQuote(fwParameters.original.toString());
+				var original = (fwParameters.original.fwHasFile ? fwParameters.original : fwParameters.original_page);
+				link['href'] = fwQuote(original.toString());
 				if(parseInt(fwParameters.width.fwValue,10) > 0 && parseInt(fwParameters.height.fwValue,10) > 0){
 					relText.push( fwParameters.width.fwValue.toString() + 'x' + fwParameters.height.fwValue.toString() );
 				}

@@ -165,114 +165,111 @@
 		var scriptTag = theTag.fwAdd("script", true);
 		// Get the list of individual scriptyLibs and add to the end of the scripty reference
 		var scriptyLibs = getLibs();
-		if(parseFloat(fwFreewayVersion) >= 5.5)
+		if(parseInt(fwFreewayVersion.replace(/\.?(\w\d)?/g, "")) >= 562){
+			scriptTag.src = fwQuote(path + (file.match("pro") ? "prototype/1.7.0.0/prototype.js" : "scriptaculous/1.9.0/scriptaculous.js"+scriptyLibs));
+		}else if(parseFloat(fwFreewayVersion) >= 5.5){
 			scriptTag.src = fwQuote(path + (file.match("pro") ? "prototype/1.6.1.0/prototype.js" : "scriptaculous/1.8.3/scriptaculous.js"+scriptyLibs));
-		else
+		}else{
 			scriptTag.src = fwQuote(path + (file.match("pro") ? "prototype/1.6.0.2/prototype.js" : "scriptaculous/1.8.1/scriptaculous.js"+scriptyLibs));
+		}
 		scriptTag.type = fwQuote("text/javascript");
 		scriptTag.fwAddRawOpt();
 		theTag.fwAddRawOpt();
 	}
-	
-function AddFiles(filesString, scriptyLibs /*number or array of numbers*/){
-	// Cleanup if arguments are missing
-	if(filesString.constructor == Number || filesString.constructor == Array)
-	{
-		scriptyLibs = filesString;
-		filesString = "";
-	}
-	var theHead = fwDocument.fwTags.fwFind("head");
-	var connected = (function(){
-		if(fwShellCommand) {
-			return fwShellCommand('ping -t3 -o ajax.googleapis.com').match("1 packets received");
-		}else{
-			var osa=new FWOSAInterpreter; 
-			osa.fwWrite('try\n' + 
-			'do shell script "ping -t3 -o ajax.googleapis.com"\n' +
-			'return 1\n' +
-				'on error\n' +
-				'return 0\n' +
-				'end try');
-			osa.fwCompile(); 
-			return osa.fwRun();
+
+	function AddFiles(filesString, scriptyLibs /*number or array of numbers*/){
+		// Cleanup if arguments are missing
+		if(filesString.constructor == Number || filesString.constructor == Array)	{
+			scriptyLibs = filesString;
+			fileString = "";
 		}
-	})();
-	var useCustom = filesString && filesString.length > 0;
-	var path = this.fwPathName;
-	var prefix = path.substring(0, path.lastIndexOf(":")) + ':Support Files~:';
-	if(parseFloat(fwFreewayVersion) >= 5.5)
-		var canon = 'prototype1610packer,prototype1610,scriptaculous183packer,scriptaculous183'.split(',');
-	else
-		var canon = 'prototype1602packer,prototype1602,scriptaculous181packer,scriptaculous181'.split(',');
-	
-	var files = (useCustom) ? filesString.split(',') : canon;
-	
-	if(scriptyLibs)
-	{
-		// Make the scriptyLibs argument an array if it isn't one already
-		scriptyLibs = scriptyLibs.constructor == Array ? scriptyLibs : [scriptyLibs];
-		// Create or add the libraries used to a page variable
-		if(!fwPage.scriptyLibs)
+		var theHead = fwDocument.fwTags.fwFind("head");
+		var connected = function(){
+			if(fwShellCommand){
+				return fwShellCommand('ping -c1 -i1 http://ajax.googleapis.com');
+			}else{
+				var osa=new FWOSAInterpreter; 
+				osa.fwWrite('do shell script "curl ajax.googleapis.com"'); 
+				osa.fwCompile(); 
+				return osa.fwRun();
+			}
+		}
+		var useCustom = filesString && filesString.length > 0;
+		var path = this.fwPathName;
+		var prefix = path.substring(0, path.lastIndexOf(":")) + ':Support Files~:';
+		if(parseInt(fwFreewayVersion.replace(/\.?(\w\d)?/g, "")) >= 562){
+			var canon = 'prototype1700packer,prototype1700,scriptaculous190packer,scriptaculous190'.split(',');
+		}else if(parseFloat(fwFreewayVersion) >= 5.5){
+			var canon = 'prototype1610packer,prototype1610,scriptaculous183packer,scriptaculous183'.split(',');
+		}else{
+			var canon = 'prototype1602packer,prototype1602,scriptaculous181packer,scriptaculous181'.split(',');
+		}
+		var files = (useCustom) ? filesString.split(',') : canon;
+
+		if(scriptyLibs){
+			// Make the scriptyLibs argument an array if it isn't one already
+			scriptyLibs = scriptyLibs.constructor == Array ? scriptyLibs : [scriptyLibs];
+			// Create or add the libraries used to a page variable
+			if(!fwPage.scriptyLibs)
 			fwPage.scriptyLibs = scriptyLibs;
-		else
+			else
 			fwPage.scriptyLibs = fwPage.scriptyLibs.concat(scriptyLibs);
-	}
-	
-	if(!fwPage.libsList)
+		}
+
+		// Make the overall library list object variable if it doesn't exist
+		if(!fwPage.libsList)
 		fwPage.libsList = new Object();
 
-	for (i in files){
-		var file = files[i];
-		if (file && !fwPage.libsList[file])
-		{
-			myFile = new FWFile;
-			myFile.fwOpenRead(prefix + file + '.js');
-			myFile.fwClose();
-			if (fwParameters[file])
-			{
-				fwParameters[file].fwSpecify(myFile);
-				var path = fwParameters[file].toString();
-				if(useCustom == true)
+		for (i in files){
+			var file = files[i];
+			if (file && !fwPage.libsList[file]){
+				myFile = new FWFile;
+				myFile.fwOpenRead(prefix + file + '.js');
+				myFile.fwClose();
+				if (fwParameters[file]){
+					fwParameters[file].fwSpecify(myFile);
+					var path = fwParameters[file].toString();
+					if(useCustom == true)
 					fwPage.libsList[file] = path;
+				}else{
+					fwAlert(ParamString(kFileNotFound, file, ".js"));
+				}
 			}
-			else
-			{
-				alert (file + '.js was not found in the action bundle');
+		}
+
+		if(lastOrders()){
+			if(parseInt(fwFreewayVersion.replace(/\.?(\w\d)?/g, "")) >= 562){
+				if(fwPage.libsList['prototype1700packer'] && fwPage.libsList['prototype1700'])
+					fwPage.libsList['prototype1700packer'] = null;
+				if(fwPage.libsList['scriptaculous190packer'] && fwPage.libsList['scriptaculous190'])
+					fwPage.libsList['scriptaculous190packer'] = null;
+			}else if(parseFloat(fwFreewayVersion) >= 5.5){
+				if(fwPage.libsList['prototype1610packer'] && fwPage.libsList['prototype1610'])
+					fwPage.libsList['prototype1610packer'] = null;
+				if(fwPage.libsList['scriptaculous183packer'] && fwPage.libsList['scriptaculous183'])
+					fwPage.libsList['scriptaculous183packer'] = null;
+			}else{
+				if(fwPage.libsList['prototype1602packer'] && fwPage.libsList['prototype1602'])
+					fwPage.libsList['prototype1602packer'] = null;
+				if(fwPage.libsList['scriptaculous181packer'] && fwPage.libsList['scriptaculous181'])
+					fwPage.libsList['scriptaculous181packer'] = null;
 			}
+
+			// Clean the list of individual libs
+			if(fwPage.scriptyLibs) cleanLibs();
+
+			for (i in canon){
+				if (fwPage.libsList[canon[i]]){
+					var file = fwPage.libsList[canon[i]];
+					connected ? LinkRemoteFileToHead(theHead, file) : LinkFileToHead(theHead, file);
+					delete fwPage.libsList[canon[i]];
+				}
+			}
+			for ( i in fwPage.libsList )
+				LinkFileToHead(theHead, fwPage.libsList[i]);
 		}
 	}
-
-	if(lastOrders()){
-		if(parseFloat(fwFreewayVersion) >= 5.5) {
-			if(fwPage.libsList['prototype1610packer'] && fwPage.libsList['prototype1610'])
-				fwPage.libsList['prototype1610packer'] = null;
-
-			if(fwPage.libsList['scriptaculous183packer'] && fwPage.libsList['scriptaculous183'])
-				fwPage.libsList['scriptaculous183packer'] = null;
-		} else {
-			if(fwPage.libsList['prototype1602packer'] && fwPage.libsList['prototype1602'])
-				fwPage.libsList['prototype1602packer'] = null;
-
-			if(fwPage.libsList['scriptaculous181packer'] && fwPage.libsList['scriptaculous181'])
-				fwPage.libsList['scriptaculous181packer'] = null;
-		}
 		
-		// Clean the list of individual libs
-		if(fwPage.scriptyLibs)
-			cleanLibs();
-
-		for (i in canon){
-			if (fwPage.libsList[canon[i]]){
-				var file = fwPage.libsList[canon[i]];
-				connected ? LinkRemoteFileToHead(theHead, file) : LinkFileToHead(theHead, file);
-				delete fwPage.libsList[canon[i]];
-			}
-		}
-		for ( i in fwPage.libsList )
-			LinkFileToHead(theHead, fwPage.libsList[i]);
-	}
-}
-	
 	function SetCSSAttribute(tag, attributeName, attributeValue) { 
 		// Sets a "CSS" attribute such as "position:absolute" in a tag value 
 		// Passing an attribute value of null removes that attribute entirely
@@ -322,11 +319,13 @@ function AddFiles(filesString, scriptyLibs /*number or array of numbers*/){
 </library-action>
 
 <item-action name="ScriptyAccordion">
-<action-version version="0.7.1">
+<action-version version="0.8">
 ScriptyAccordion Action
 Walter Davis Studio 2008, 2009, 2010, 2011
 </action-version>
 <action-appliesto non-html32/>
+<action-file name ="prototype1700packer" var/>
+<action-file name ="scriptaculous190packer" var/>
 <action-file name ="prototype1610packer" var/>
 <action-file name ="scriptaculous183packer" var/>
 <action-file name ="prototype1602packer" var/>
@@ -486,7 +485,13 @@ Effect.BlindRight = function(element) {
 
 	function fwAfterStartHead()
 	{
-		var filesString = (parseFloat(fwFreewayVersion) >= 5.5) ? 'prototype1610packer,scriptaculous183packer' : 'prototype1602packer,scriptaculous181packer';
+		if(parseInt(fwFreewayVersion.replace(/\.?(\w\d)?/g, "")) >= 562){
+			var filesString = 'prototype1700packer,scriptaculous190packer';
+		}else if(parseFloat(fwFreewayVersion) >= 5.5){
+			var filesString = 'prototype1610packer,scriptaculous183packer';
+		}else{
+			var filesString = 'prototype1602packer,scriptaculous181packer';
+		}
 		AddFiles(filesString, [1]);
 	}
 	
