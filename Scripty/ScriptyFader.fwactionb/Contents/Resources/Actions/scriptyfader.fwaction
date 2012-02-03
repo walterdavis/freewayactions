@@ -427,7 +427,7 @@
 
 <item-action name="ScriptyFader">
 <action-appliesto non-html32/>
-<action-version version="0.3.5">
+<action-version version="0.4.1">
 ScriptyFader
 Action (c)2011 Walter Lee Davis.
 
@@ -715,7 +715,7 @@ Apply the action to an HTML item to mark the location of a fading group of page 
 
 <item-action name="ScriptyFader Option">
 <action-appliesto layer non-html32/>
-<action-version version="0.4">
+<action-version version="0.4.1">
 ScriptyFader Option
 (c)2011 Walter Lee Davis
 
@@ -827,7 +827,7 @@ Apply the action to any layer to designate a ScriptyFader option.
 
 <item-action name="ScriptyFader Thumbnail" generates-link>
 <action-appliesto graphic pass-through/>
-<action-version version="0.4">
+<action-version version="0.4.1">
 ScriptyFader Thumbnail
 (c)2011 Walter Lee Davis
 
@@ -914,7 +914,7 @@ Apply the action to any graphic to create direct navigation to one of the Script
 </item-action>
 
 <action name="ScriptyFader Text Link" preview-text="&Text;" generates-link height=12>
-<action-version version="0.4">
+<action-version version="0.4.1">
 ScriptyFader Text Link
 (c)2011 Walter Lee Davis
 
