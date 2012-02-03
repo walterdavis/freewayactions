@@ -27,11 +27,9 @@ Walter Davis Studio 2007-2011
 		textStream = fwEncode(textStream);
 		outFile = new FWFile;
 		if (outFile.fwOpenWrite('_' + myName + '.' + fwParameters['extension'],true,"TEXT","R*ch")){
+			fwParameters['partial'].fwClear();
 			outFile.fwWrite(textStream);
 			outFile.fwClose();
-// 			var path = fwConvertFilePath(outFile.fwPathName).toString().replace(/ /g, "\\ ");
-// 			var command = 'textutil -convert txt -encoding UTF-8 -extension html '+path;
-// 			var result = fwShellCommand(command);
 			fwParameters["partial"].fwSpecify(outFile);
 			var partial = fwParameters["partial"].toString();
 			return partial.substring(1,partial.indexOf('.'));
