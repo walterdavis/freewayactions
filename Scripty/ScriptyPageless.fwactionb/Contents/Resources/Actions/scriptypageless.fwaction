@@ -606,6 +606,7 @@ Apply the action to an HTML item to mark the location of a fading group of page 
 		textStream = fwEncode(textStream);
 		outFile = new FWFile;
 		if (outFile.fwOpenWrite('_' + myName + '.html',true,"TEXT","R*ch")){
+			fwParameters['partial'].fwClear();
 			outFile.fwWrite(textStream);
 			outFile.fwClose();
 			fwParameters['partial'].fwSpecify(outFile);
@@ -719,6 +720,7 @@ Apply the action to any layer to designate a ScriptyPageless option.
 		textStream = fwEncode(textStream);
 		outFile = new FWFile;
 		if (outFile.fwOpenWrite('_' + myName + '.html',true,"TEXT","R*ch")){
+			fwParameters['partial'].fwClear();
 			outFile.fwWrite(textStream);
 			outFile.fwClose();
 			fwParameters['partial'].fwSpecify(outFile);
