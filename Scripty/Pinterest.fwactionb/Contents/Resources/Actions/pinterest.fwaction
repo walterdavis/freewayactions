@@ -257,7 +257,7 @@
 <action-encoding>UTF-8</action-encoding>
 
 <action name="com.wdstudio.pinterest" title="Pinterest" height="20" width="43">
-<action-version version="0.1">
+<action-version version="0.2">
 Pinterest Action (c)2012 Walter Lee Davis.
 
 Insert the Action to create a Pinterest pin-it button.
@@ -313,7 +313,12 @@ Insert the Action to create a Pinterest pin-it button.
 			myLink.fwAddRawOpt();
 		}
 		var thisItem = fwDocument.fwTags.fwFind(fwItem);
-		thisItem.fwAddRaw('<p class="pin-it-btn" title="Pin It on Pinterest">Pin It on Pinterest</p>');
+		var p = thisItem.fwFindEnclosing('p');
+		if(!!p){
+			thisItem.fwAddRaw('<span class="pin-it-btn" title="Pin It on Pinterest">Pin It on Pinterest</span>');
+		}else{
+			thisItem.fwAddRaw('<p class="pin-it-btn" title="Pin It on Pinterest">Pin It on Pinterest</p>');
+		}
 	}
 	function fwDrawItem(){
     var theHTML = '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"/><title>PlaceKitty</title><style type="text/css">body { padding: 0; margin: 0; }</style></head><body><p style="padding:0; margin:0;">' + createProxy() + '</p></body></html>';
