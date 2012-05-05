@@ -1,0 +1,43 @@
+<action-encoding>UTF-8</action-encoding>
+<folder-action name="Favicon">
+<action-version version="0.1">
+Favicon
+Copyright 2012 Walter Lee Davis
+</action-version>
+<action-file name="favicon" title="ICO file" keepwithhtml>
+	<value type=".ico" />
+</action-file>
+<action-javascript>
+function fwBeforeEndHead(){
+	if(fwParameters['favicon'].fwHasFile){
+		var theHead = fwDocument.fwTags.fwFind("head");
+		var link = theHead.fwAdd('link', false);
+		link['rel'] = fwQuote("shortcut icon");
+		link['type'] = fwQuote("image/x-icon");
+		link['href'] = fwQuote(fwParameters['favicon'].toString());
+		theHead.fwAddRawOpt();
+	}
+}
+</action-javascript>
+</folder-action>
+<page-action name="Favicon">
+<action-version version="0.1">
+Favicon
+Copyright 2012 Walter Lee Davis
+</action-version>
+<action-file name="favicon" title="ICO file" keepwithhtml>
+	<value type=".ico" />
+</action-file>
+<action-javascript>
+function fwBeforeEndHead(){
+	if(fwParameters['favicon'].fwHasFile){
+		var theHead = fwDocument.fwTags.fwFind("head");
+		var link = theHead.fwAdd('link', false);
+		link['rel'] = fwQuote("shortcut icon");
+		link['type'] = fwQuote("image/x-icon");
+		link['href'] = fwQuote(fwParameters['favicon'].toString());
+		theHead.fwAddRawOpt();
+	}
+}
+</action-javascript>
+</page-action>
