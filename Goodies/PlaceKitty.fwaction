@@ -1,0 +1,98 @@
+<item-action name="com.wdstudio.placekitty" title="PlaceKitty">
+<action-appliesto html />
+<action-version version="0.1">
+PlaceKitty
+Copyright 2011 Walter Lee Davis
+
+A simple way to decorate your layouts with placeholder kitties. Uses the fabulous
+PlaceKitty service from www.placekitty.com
+</action-version>
+<action-checkbox name="Grayscale">
+<action-javascript>
+  function GetCSSAttribute(tag, attributeName) { 
+    // Gets a "CSS" attribute such as "position:absolute" from a tag value 
+    // returns NULL if the attribute can not be found 
+    if (tag==null) return null; 
+    var tagField = tag['style']; 
+    if (tagField == null) {
+      return null; 
+    }else { 
+      var tagField = tagField.toString(); 
+      var pairs = tagField.slice(1,-1).split(';');
+      for(i in pairs){
+        pairs[i] = pairs[i].replace(/^\s*(\S*(\s+\S+)*)\s*$/, "$1"); //javascript equivalent of trim
+        if(pairs[i].slice(0,pairs[i].indexOf(':')) == attributeName) {
+          return pairs[i].slice(pairs[i].indexOf(':')+1,pairs[i].length);
+        }
+      }
+      return null; 
+    } 
+  }
+  function fwDrawItem(){
+    var theHTML = '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"/><title>PlaceKitty</title><style type="text/css">body { padding: 0; margin: 0; }</style></head><body>' + createImageTag() + '</body></html>';
+    if (theHTML){
+      return new FWImage( theHTML,  // the HTML
+                          null,     // default width (item width)
+                          null,     // default height (item height)
+                          1,      // flags (wait for resources to load)
+                          0.1);   // delay after load (to allow webkit time to render)
+    }
+    return null;
+  }
+  function createImageTag(){
+    var w = this.fwWidth;
+    var h = this.fwHeight;
+    var g = (fwParameters['Grayscale'].fwBoolValue ? 'g/' : '');
+    var ending = (fwPage.fwHTMLDocType.match(/[Ss]trict/) ? ' />' : '>');
+    html = '<p style="margin:0; padding:0; float:left;"><img src="http://placekitten.com/' + g + w + '/' + h + '" width="' + w + '" height="' + h + '" alt="PlaceKitten" style="width:' + w + 'px; height:' + h + 'px; margin:0; float:left;"' + ending + '</p>';
+    //need to fix tag for non-strict doctypes somehow
+    return html;
+  }
+  function fwBeforeEndBody(){
+    var thisItem = fwDocument.fwTags.fwFind(fwItem);
+    thisItem.fwAddRaw(createImageTag());
+  }
+</action-javascript>
+</item-action>
+
+<action name="com.wdstudio.placekitty" title="PlaceKitty">
+<action-version version="0.1">
+PlaceKitty
+Copyright 2011 Walter Lee Davis
+
+A simple way to decorate your layouts with placeholder kitties. Uses the fabulous
+PlaceKitty service from www.placekitty.com
+</action-version>
+<action-checkbox name="Grayscale">
+<action-javascript>
+  function fwDrawItem(){
+    var theHTML = '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"/><title>PlaceKitty</title><style type="text/css">body { padding: 0; margin: 0; }</style></head><body><p style="padding:0; margin:0;">' + createImageTag() + '</p></body></html>';
+    if (theHTML){
+      return new FWImage( theHTML,  // the HTML
+                          null,     // default width (item width)
+                          null,     // default height (item height)
+                          1,        // flags (wait for resources to load)
+                          0.1);     // delay after load (to allow webkit time to render)
+    }
+    return null;
+  }
+  function createImageTag(){
+    var w = this.fwWidth;
+    var h = this.fwHeight;
+    var g = (fwParameters['Grayscale'].fwBoolValue ? 'g/' : '');
+    var ending = (fwPage.fwHTMLDocType.match(/[Ss]trict/) ? ' />' : '>');
+    html = '<img src="http://placekitten.com/' + g + w + '/' + h + '" width="' + w + '" height="' + h + '" alt="PlaceKitten" style="width:' + w + 'px; height:' + h + 'px; margin:0;"' + ending;
+    //need to fix tag for non-strict doctypes somehow
+    return html;
+  }
+  function fwParameterChanged(newParam, oldParam){
+		//alert('Here, kitty, kitty!');
+		fwItem.fwRedraw();
+  }
+  function fwBeforeEndBody(){
+    var thisItem = fwDocument.fwTags.fwFind(fwItem);
+    thisItem.fwAddRaw(createImageTag());
+  }
+</action-javascript>
+</action>
+

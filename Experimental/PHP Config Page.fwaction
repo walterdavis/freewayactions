@@ -1,0 +1,32 @@
+<page-action name = "PHP Config Page">
+<action-version version="0.1">
+“PHP Config Page” Action
+(c) Walter Davis Studio 2011
+
+Removes everything from the current page, and replaces it with the contents of the edit box.
+</action-version>
+<action-checkbox name="Activate" default=yes>
+<action-text var name="config" />
+<action-button name="Config Directives" onclick=EditCode('config'); />
+
+<action-javascript>
+function EditCode(param){
+	//	Borrowed from Source Code Snooper, by Tim Plumb
+	var mycustomcode = fwParameters[param].toString();
+	var myprompt = "Enter your directives. Do not include the PHP delimiters.";
+	var mycustomcodeprompt = fwBigPrompt(myprompt, mycustomcode);
+	if (mycustomcodeprompt != null) { //if the cancel button was not hit
+		if (mycustomcodeprompt != mycustomcode) {//check that the code has changed
+			fwParameters[param].fwValue = mycustomcodeprompt;
+		}
+	}
+}
+function fwAfterEndHTML(){
+	if(fwParameters.Activate.fwBoolValue){
+		var html = fwDocument.fwTags.fwFindAll();
+		for (i in html) html[i].fwDelete();
+		fwDocument.fwWrite("<?php\n" + fwParameters.config.toString() + "\n?>");
+	}
+}
+</action-javascript>
+</page-action>

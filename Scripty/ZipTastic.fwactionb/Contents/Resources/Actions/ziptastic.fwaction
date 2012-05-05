@@ -1,0 +1,376 @@
+<library-action name="scriptyHandlerFunctions">
+<action-javascript>
+	//mandatory -- set this to true in any action that uses the prototype/scriptaculous stack
+	var scripty = true;
+	//set this to true in order to load the un-packed versions of the libraries
+	var debug = false;
+	function in_array(theArray,search_term) {
+		var i = theArray.length;
+		if (i > 0) {
+			do {
+				if (theArray[i] === search_term) {
+					return true;
+				}
+			} while (i--);
+		}
+		return false;
+	}
+	function checkForUpdates(actionId,actionVersion){
+	//example: action-button name="checkUpdates" label="Check for Updates" onClick=checkForUpdates(1,1.4)
+		if(fwLaunchURL) {
+			fwLaunchURL('http://actionsforge.com/actions/' + actionId + '/version/' + actionVersion);
+		}else{
+			var osa=new FWOSAInterpreter; 
+			osa.fwWrite('open location "http://actionsforge.com/actions/' + actionId + '/version/' + actionVersion + '"'); 
+			osa.fwCompile(); 
+			osa.fwRun(); 
+		}
+	}
+	String.prototype.strip = function() {
+		return this.replace(/^\s+/, '').replace(/\s+$/, '');
+	}
+
+	var hasClassName = function(element, className) {
+		className = fwQuote(className,'','"'); //"
+		var elementClassName = (element["class"]) ? fwQuote(element["class"],'','"') : ''; //"
+		return ((elementClassName.length > 0) && (elementClassName == className || new RegExp("\\b" + className + "\\b").test(elementClassName)));
+	};
+
+	var addClassName = function(element, className) {
+		className = fwQuote(className,'','"'); //"
+		if (!hasClassName(element,className)){
+			var elementClassName = (element["class"]) ? fwQuote(element["class"],'','"') : ''; //"
+			var out = (elementClassName + ' ' + className).strip();
+			return element["class"] = fwQuote(out);
+		}
+	};
+
+	var removeClassName = function(element, className) {
+		var className = fwQuote(className,'','"');//"
+		var elementClassName = (element['class']) ? fwQuote(element['class'],'','"') : '';//"
+		elementClassName = elementClassName.replace(
+			new RegExp("(^|\\s+)" + className + "(\\s+|$)"), ' ').strip();
+		return element['class'] = (elementClassName.length > 0) ? fwQuote(elementClassName) : null;
+	};
+	
+	function AddLibraryScript(theTag, theLibraryName)
+	{
+		var scriptTag = theTag.fwAddJavaScript();
+		var theMarkup = fwMarkups[theLibraryName];
+		theMarkup.fwConvertLineEndings = true;
+		scriptTag.fwAddRaw(theMarkup);
+		theTag.fwAddRawln('');
+	}
+
+	function AddEventObserver(theTag, theFunction, theObject, theEvent)
+	{
+		var scriptTag = theTag.fwAddJavaScript();
+		var theMarkup = fwParameters[theFunction].toString();
+		theMarkup.fwConvertLineEndings = true;
+		scriptTag.fwAddRaw('Event.observe(');
+		if(theObject != 'window') theObject = fwQuote(theObject,"'");
+		scriptTag.fwAddRaw(theObject + ', ');
+		scriptTag.fwAddRaw(fwQuote(theEvent,"'") + ', ');
+		scriptTag.fwAddRawln('function(evt){');
+		scriptTag.fwAddRaw(theMarkup);
+		scriptTag.fwAddRawln('');
+		scriptTag.fwAddRawln('});');
+		theTag.fwAddRawln('');
+	}
+
+	function AddObserver(theTag, theFunction, theObject, theEvent)
+	{
+		var scriptTag = theTag.fwAddJavaScript();
+		if(theObject != 'document') theObject = '$(' + fwQuote(theObject,"'") +')';
+		var theMarkup = fwParameters[theFunction].toString();
+		theMarkup.fwConvertLineEndings = true;
+		if(theObject != 'document') scriptTag.fwAddRawln("document.observe('dom:loaded',function(){");
+		scriptTag.fwAddRaw(theObject + '.observe(');
+		scriptTag.fwAddRaw(fwQuote(theEvent,"'") + ', ');
+		scriptTag.fwAddRawln('function(evt){');
+		scriptTag.fwAddRaw(theMarkup);
+		scriptTag.fwAddRawln('');
+		scriptTag.fwAddRawln('});');
+		if(theObject != 'document') scriptTag.fwAddRawln('});');
+		theTag.fwAddRawln('');
+	}
+	function AddMarkup(markupName)
+	{
+		var theTag = fwDocument.fwTags.fwFind("head");
+		if(theTag){
+			var scriptTag = theTag.fwAddJavaScript();
+			var theMarkup = fwMarkups[markupName].toString();
+			theMarkup.fwConvertLineEndings = true;
+			scriptTag.fwAddRaw("document.observe('dom:loaded',function(){");
+			scriptTag.fwAddRaw(theMarkup);
+			scriptTag.fwAddRawln('});');
+			theTag.fwAddRawln('');
+		}
+	}
+
+	function lastOrders(){
+		var actions = fwPage.fwFindAllActions();
+		var scripties = new Array();
+		for (i in actions){
+			if (actions[i].scripty == true) scripties.push(actions[i]);
+		}
+		return this === scripties[scripties.length -1];
+	}
+
+	var gLibraries = ["builder", "effects", "dragdrop", "controls", "slider", "sound"];
+	
+	// Clean up the list of libraries by sorting them in their correct order (according to scripty specs) and removing dupes
+	function cleanLibs()
+	{
+		fwPage.scriptyLibs.sort();
+		// Get rid of duplicates and out of range values
+		var i = 0;
+		while(i < fwPage.scriptyLibs.length)
+			if(fwPage.scriptyLibs[i+1] && fwPage.scriptyLibs[i] == fwPage.scriptyLibs[i+1])
+				fwPage.scriptyLibs.splice(i+1, 1);
+			else if(fwPage.scriptyLibs[i] > gLibraries.length-1 || fwPage.scriptyLibs[i] < 0)
+				fwPage.scriptyLibs.splice(i, 1);
+			else
+				i++;
+	}
+	
+	// Build a string containing the scripty libraries used, or return "" if all are used or none are specified
+	function getLibs()
+	{
+		var scriptyLibs = "";
+		if(fwPage.scriptyLibs)
+		{
+			if(fwPage.scriptyLibs.length == gLibraries.length)
+			{
+				// All scriptyLibs are being used so don't specify any
+			}	
+			else
+			{
+				scriptyLibs += "?load=";
+				for(var i in fwPage.scriptyLibs)
+					scriptyLibs += gLibraries[fwPage.scriptyLibs[i]] + ",";
+				scriptyLibs = scriptyLibs.substring(0, scriptyLibs.length-1);
+			}
+		}
+		return scriptyLibs;
+	}
+
+	function LinkFileToHead(theTag, file){
+		// Get the list of individual scriptyLibs and add it to the end of the scripty reference
+		var scriptyLibs = getLibs();
+		var scriptTag = theTag.fwAdd("script", true);
+		scriptTag.src = fwQuote((!file.match("scriptaculous") ? file : file+scriptyLibs));
+		scriptTag.type = fwQuote("text/javascript");
+		scriptTag.fwAddRawOpt();
+		theTag.fwAddRawOpt();
+	}
+	
+	function LinkRemoteFileToHead(theTag, file){
+		var path = "http://ajax.googleapis.com/ajax/libs/"
+		var scriptTag = theTag.fwAdd("script", true);
+		// Get the list of individual scriptyLibs and add to the end of the scripty reference
+		var scriptyLibs = getLibs();
+		if(parseInt(fwFreewayVersion.replace(/\.?(\w\d)?/g, "")) >= 562){
+			scriptTag.src = fwQuote(path + (file.match("pro") ? "prototype/1.7.0.0/prototype.js" : "scriptaculous/1.9.0/scriptaculous.js"+scriptyLibs));
+		}else if(parseFloat(fwFreewayVersion) >= 5.5){
+			scriptTag.src = fwQuote(path + (file.match("pro") ? "prototype/1.6.1.0/prototype.js" : "scriptaculous/1.8.3/scriptaculous.js"+scriptyLibs));
+		}else{
+			scriptTag.src = fwQuote(path + (file.match("pro") ? "prototype/1.6.0.2/prototype.js" : "scriptaculous/1.8.1/scriptaculous.js"+scriptyLibs));
+		}
+		scriptTag.type = fwQuote("text/javascript");
+		scriptTag.fwAddRawOpt();
+		theTag.fwAddRawOpt();
+	}
+
+	function AddFiles(filesString, scriptyLibs /*number or array of numbers*/){
+		// Cleanup if arguments are missing
+		if(filesString.constructor == Number || filesString.constructor == Array)	{
+			scriptyLibs = filesString;
+			filesString = "";
+		}
+		var theHead = fwDocument.fwTags.fwFind("head");
+		var connected = function(){
+			if(fwShellCommand){
+				return fwShellCommand('ping -c1 -i1 http://ajax.googleapis.com');
+			}else{
+				var osa=new FWOSAInterpreter; 
+				osa.fwWrite('do shell script "curl ajax.googleapis.com"'); 
+				osa.fwCompile(); 
+				return osa.fwRun();
+			}
+		}
+		var useCustom = filesString && filesString.length > 0;
+		var path = this.fwPathName;
+		var prefix = path.substring(0, path.lastIndexOf(":")) + ':Support Files~:';
+		if(parseInt(fwFreewayVersion.replace(/\.?(\w\d)?/g, "")) >= 562){
+			var canon = 'prototype1700packer,prototype1700,scriptaculous190packer,scriptaculous190'.split(',');
+		}else if(parseFloat(fwFreewayVersion) >= 5.5){
+			var canon = 'prototype1610packer,prototype1610,scriptaculous183packer,scriptaculous183'.split(',');
+		}else{
+			var canon = 'prototype1602packer,prototype1602,scriptaculous181packer,scriptaculous181'.split(',');
+		}
+		var files = (useCustom) ? filesString.split(',') : canon;
+
+		if(scriptyLibs){
+			// Make the scriptyLibs argument an array if it isn't one already
+			scriptyLibs = scriptyLibs.constructor == Array ? scriptyLibs : [scriptyLibs];
+			// Create or add the libraries used to a page variable
+			if(!fwPage.scriptyLibs)
+			fwPage.scriptyLibs = scriptyLibs;
+			else
+			fwPage.scriptyLibs = fwPage.scriptyLibs.concat(scriptyLibs);
+		}
+
+		// Make the overall library list object variable if it doesn't exist
+		if(!fwPage.libsList)
+		fwPage.libsList = new Object();
+
+		for (i in files){
+			var file = files[i];
+			if (file && !fwPage.libsList[file]){
+				myFile = new FWFile;
+				myFile.fwOpenRead(prefix + file + '.js');
+				myFile.fwClose();
+				if (fwParameters[file]){
+					fwParameters[file].fwSpecify(myFile);
+					var path = fwParameters[file].toString();
+					if(useCustom == true)
+					fwPage.libsList[file] = path;
+				}else{
+					fwAlert('Couldn\'t find ' + file);
+				}
+			}
+		}
+
+		if(lastOrders()){
+			if(parseInt(fwFreewayVersion.replace(/\.?(\w\d)?/g, "")) >= 562){
+				if(fwPage.libsList['prototype1700packer'] && fwPage.libsList['prototype1700'])
+					fwPage.libsList['prototype1700packer'] = null;
+				if(fwPage.libsList['scriptaculous190packer'] && fwPage.libsList['scriptaculous190'])
+					fwPage.libsList['scriptaculous190packer'] = null;
+			}else if(parseFloat(fwFreewayVersion) >= 5.5){
+				if(fwPage.libsList['prototype1610packer'] && fwPage.libsList['prototype1610'])
+					fwPage.libsList['prototype1610packer'] = null;
+				if(fwPage.libsList['scriptaculous183packer'] && fwPage.libsList['scriptaculous183'])
+					fwPage.libsList['scriptaculous183packer'] = null;
+			}else{
+				if(fwPage.libsList['prototype1602packer'] && fwPage.libsList['prototype1602'])
+					fwPage.libsList['prototype1602packer'] = null;
+				if(fwPage.libsList['scriptaculous181packer'] && fwPage.libsList['scriptaculous181'])
+					fwPage.libsList['scriptaculous181packer'] = null;
+			}
+
+			// Clean the list of individual libs
+			if(fwPage.scriptyLibs) cleanLibs();
+
+			for (i in canon){
+				if (fwPage.libsList[canon[i]]){
+					var file = fwPage.libsList[canon[i]];
+					connected() ? LinkRemoteFileToHead(theHead, file) : LinkFileToHead(theHead, file);
+					delete fwPage.libsList[canon[i]];
+				}
+			}
+			for ( i in fwPage.libsList )
+				LinkFileToHead(theHead, fwPage.libsList[i]);
+		}
+	}
+	function SetCSSAttribute(tag, attributeName, attributeValue) { 
+		// Sets a "CSS" attribute such as "position:absolute" in a tag value 
+		// Passing an attribute value of null removes that attribute entirely
+		if (tag==null) return; 
+		var tagField = tag['style']; 
+		if (tagField == null){
+			tag['style'] = '"'+attributeName+':'+attributeValue+'"'; 
+		}else{
+			var tagField = tagField.toString();
+			var pairs = tagField.slice(1,-1).split(';');
+			var out = new Array();
+			if(attributeValue != null && tagField.indexOf(attributeName) < 0) out.push(attributeName+':'+attributeValue);
+			for(i in pairs){
+				pairs[i] = pairs[i].replace(/^\s*(\S*(\s+\S+)*)\s*$/, "$1"); //javascript equivalent of trim
+				if(pairs[i].slice(0,pairs[i].indexOf(':')) == attributeName) {
+					if(attributeValue != null) out.push(attributeName+':'+attributeValue);
+				}else{
+					out.push(pairs[i]);
+				}
+			}
+			tag['style']= fwQuote(out.join('; ')); 
+		}
+	} 
+	function GetCSSAttribute(tag, attributeName) { 
+		// Gets a "CSS" attribute such as "position:absolute" from a tag value 
+		// returns NULL if the attribute can not be found 
+		if (tag==null) return null; 
+		var tagField = tag['style']; 
+		if (tagField == null) {
+			return null; 
+		}else { 
+			var tagField = tagField.toString(); 
+			var pairs = tagField.slice(1,-1).split(';');
+			for(i in pairs){
+				pairs[i] = pairs[i].replace(/^\s*(\S*(\s+\S+)*)\s*$/, "$1"); //javascript equivalent of trim
+				if(pairs[i].slice(0,pairs[i].indexOf(':')) == attributeName) {
+					return pairs[i].slice(pairs[i].indexOf(':')+1,pairs[i].length);
+				}
+			}
+			return null; 
+		} 
+	}
+	
+
+</action-javascript>
+</library-action>
+
+<page-action name="com.walterdavisstudio.ziptastic" title="ZipTastic">
+<action-version version="0.1.1">
+ZipTastic
+(c)2012 Walter Lee Davis
+
+Apply this Action to the Zip code field in your form to add automatic Zip code lookup through the Ziptastic service.
+
+</action-version>
+
+<action-markup custom name="ziptastic">
+	$$('input.zip').invoke('observe', 'change', function(evt) {
+		new Ajax.Request('http://zip.elevenbasetwo.com',{
+			method: 'get',
+			parameters: {zip:$F(this)}, 
+			onSuccess:function(transport){
+				var data = transport.responseText.evalJSON();
+				$$('.city').invoke('setValue', data.city);
+				$$('.state').invoke('setValue', data.state);
+				$$('.country').invoke('setValue', data.country);
+			}
+		});
+	});
+</action-markup>
+<action-file name ="prototype1700packer" var/>
+<action-file name ="prototype1610packer" var/>
+<action-file name ="prototype1602packer" var/>
+<action-javascript>
+<action-include name="scriptyHandlerFunctions">
+	function fwAfterStartHead(){
+		if(parseInt(fwFreewayVersion.replace(/\.?(\w\d)?/g, "")) >= 562){
+			var filesString = 'prototype1700packer';
+		}else if(parseFloat(fwFreewayVersion) >= 5.5){
+			var filesString = 'prototype1610packer';
+		}else{
+			var filesString = 'prototype1602packer';
+		}
+		AddFiles(filesString,[]);
+	}
+	function fwBeforeEndBody(){
+		var inputs = fwDocument.fwTags.fwFindAll('input');
+		if(!fwPage.ziptastic){
+			fwPage['ziptastic'] = true;
+			AddMarkup('ziptastic');
+		}
+		for (var i = inputs.length - 1; i >= 0; i--){
+			if(inputs[i].name.toString().match(/zip/i)) addClassName(inputs[i], 'zip');
+			if(inputs[i].name.toString().match(/country/i)) addClassName(inputs[i], 'country');
+			if(inputs[i].name.toString().match(/state/i)) addClassName(inputs[i], 'state');
+			if(inputs[i].name.toString().match(/city/i)) addClassName(inputs[i], 'city');
+		};
+	}
+</action-javascript>
+</page-action>
