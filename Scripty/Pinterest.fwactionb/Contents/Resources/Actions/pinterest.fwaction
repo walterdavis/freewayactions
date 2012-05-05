@@ -200,7 +200,7 @@
 			for (i in canon){
 				if (fwPage.libsList[canon[i]]){
 					var file = fwPage.libsList[canon[i]];
-					connected ? LinkRemoteFileToHead(theHead, file) : LinkFileToHead(theHead, file);
+					connected() ? LinkRemoteFileToHead(theHead, file) : LinkFileToHead(theHead, file);
 					delete fwPage.libsList[canon[i]];
 				}
 			}
@@ -257,7 +257,7 @@
 <action-encoding>UTF-8</action-encoding>
 
 <action name="com.wdstudio.pinterest" title="Pinterest" height="20" width="43">
-<action-version version="0.2">
+<action-version version="0.2.1">
 Pinterest Action (c)2012 Walter Lee Davis.
 
 Insert the Action to create a Pinterest pin-it button.
