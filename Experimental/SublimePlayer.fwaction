@@ -1,0 +1,153 @@
+<action-encoding>UTF-8</action-encoding>
+<item-action name="com.wdstudio.sublimeplayer" title="SublimePlayer">
+<action-appliesto xhtmlstrict gif jpeg png pass-through />
+<action-version version="0.1.3">
+SublimePlayer
+Copyright 2012 Walter Lee Davis
+
+A simple way to show HTML5 video. Uses the fabulous
+SublimePlayer service from www.sublimevideo.net
+</action-version>
+<action-text name="api" title="Site Token" />
+<action-checkbox name="sublime_preview" title="Preview Locally" />
+<action-checkbox name="sublime_ssl" title="Secure (SSL)" default="no" />
+<action-file name="mp4" title="MPEG-4 (H.264)">
+	<value type=".mp4" />
+</action-file>
+<action-disclosure name="optional" title="Optional additional formats" default="no" />
+<action-file name="ogg" title="Ogg/Theora">
+	<value type=".ogv" />
+</action-file>
+<action-file name="webm" title="WebM">
+	<value type=".webm" />
+</action-file>
+<action-markup custom name="conditional">
+<!--[if lt IE 9]>
+<script src="http://html5shiv.googlecode.com/svn/trunk/html5.js">
+</script>
+<![endif]-->
+</action-markup>
+<action-javascript>
+String.prototype.strip = function() {
+	return this.replace(/^\s+/, '').replace(/\s+$/, '');
+}
+var hasClassName = function(element, className) {
+	className = fwQuote(className,'','"'); //"
+	var elementClassName = (element["class"]) ? fwQuote(element["class"],'','"') : ''; //"
+	return ((elementClassName.length > 0) && (elementClassName == className || new RegExp("\\b" + className + "\\b").test(elementClassName)));
+};
+
+var addClassName = function(element, className) {
+	className = fwQuote(className,'','"'); //"
+	if (!hasClassName(element,className)){
+		var elementClassName = (element["class"]) ? fwQuote(element["class"],'','"') : ''; //"
+		var out = (elementClassName + ' ' + className).strip();
+		return element["class"] = fwQuote(out);
+	}
+};
+
+function fwInterface(){
+	if (fwParameters['ogg'].fwHasFile || fwParameters['webm'].fwHasFile) fwParameters['optional'].fwBoolValue = true;
+	fwParameters['ogg'].fwVisible = fwParameters['optional'].fwBoolValue;
+	fwParameters['webm'].fwVisible = fwParameters['optional'].fwBoolValue;
+}
+function fwBeforeEndHead(){
+	if(!fwPage.shivved){
+		fwPage['shivved'] = true;
+		var theHead = fwDocument.fwTags.fwFind("head");
+		var theMarkup = fwMarkups['conditional'];
+		theMarkup = theMarkup.toString();
+		theMarkup.fwConvertLineEndings = true;
+		if(ssl()) theMarkup = theMarkup.replace(/http:/,'https:');
+		theHead.fwAddRawln(theMarkup);
+		var doctype = fwDocument.fwTags.fwFind("!DOCTYPE");
+		if(doctype){
+			doctype.fwFindEnclosing('').fwAddRaw('<!DOCTYPE html>', doctype);
+			doctype.fwDelete();
+		}
+	}
+}
+function previewing(){
+	var actions = fwPage.fwFindAllActions(2,'com.wdstudio.sublimeplayer',true);
+	var out = fwParameters['sublime_preview'].fwBoolValue;
+	for (i in actions){
+		if(actions[i].fwParameters['sublime_preview'].fwBoolValue){
+			out = true;
+		}
+	}
+	return out;
+}
+function ssl(){
+	var actions = fwPage.fwFindAllActions(2,'com.wdstudio.sublimeplayer',true);
+	var out = fwParameters['sublime_ssl'].fwBoolValue;
+	for (i in actions){
+		if(actions[i].fwParameters['sublime_ssl'].fwBoolValue){
+			out = true;
+		}
+	}
+	return out;
+}
+function uid(elm){
+	if(elm.alt.toString().slice(1,-1) != ''){
+		return elm.alt.toString().slice(1,-1).replace(/ /g,'_');
+	}
+	return fwItem.toString();
+}
+function fwBeforeEndBody(){
+	var poster = fwDocument.fwTags.fwFind("img",fwItem);
+	if(!!poster){
+		if(!fwPage.sublime && fwParameters['api'].fwValue && ! previewing()){
+			fwPage['sublime'] = true;
+			var theHead = fwDocument.fwTags.fwFind("head");
+			var scriptTag = theHead.fwAdd('script',true);
+			scriptTag.type = fwQuote('text/javascript');
+			scriptTag.charset = fwQuote('utf-8');
+			scriptTag.src = fwQuote((ssl() ? "https://4076.voxcdn.com/js/":"http://cdn.sublimevideo.net/js/") + fwParameters['api'].fwValue + ".js");
+			scriptTag.fwAddRawOpt("");
+			var cssStyles = theHead.fwAddCSSStyles();
+			cssStyles.fwAddRawln("video { display: block; }");
+			theHead.fwAddRawOpt("");
+		}
+		var video = poster.fwAddEnclosing('video',true);
+		video.fwFindEnclosing().fwAddRawOpt("");
+		video.poster = poster.src.toString();
+		video.controls = fwQuote("controls");
+		video.preload = fwQuote("none");
+		video['class'] = fwQuote("sublime");
+		video.width = fwQuote(poster.width);
+		video.height = fwQuote(poster.height);
+		video['data-uid'] = fwQuote(uid(poster));
+		poster.fwDelete();
+		if(fwParameters['mp4'].fwHasFile && !(fwParameters['ogg'].fwHasFile && fwParameters['webm'].fwHasFile)){
+			video.src = fwQuote(fwParameters['mp4'].toString());
+		}else{
+			video.fwAddRawOpt("");
+			video.fwIndent();
+			if(fwParameters['ogg'].fwHasFile){
+				var source = video.fwAdd('source', false);
+				source.type = fwQuote('video/ogg');
+				source.src = fwQuote(fwParameters['ogg'].toString());
+				video.fwAddRawOpt("");
+			}
+			if(fwParameters['webm'].fwHasFile){
+				var source = video.fwAdd('source', false);
+				source.type = fwQuote('video/webm');
+				source.src = fwQuote(fwParameters['webm'].toString());
+				video.fwAddRawOpt("");
+			}
+			if(fwParameters['mp4'].fwHasFile){
+				var source = video.fwAdd('source', false);
+				source.type = fwQuote('video/mp4');
+				source.src = fwQuote(fwParameters['mp4'].toString());
+				video.fwAddRawOpt("");
+			}else{
+				alert('You must select an H.264 MPEG video.')
+			}
+			video.fwOutdent();
+		}
+		var box = video.fwFindEnclosing('div');
+		addClassName(box, 'sublime-player');
+	}
+}
+</action-javascript>
+</item-action>
