@@ -258,7 +258,7 @@
 
 <item-action name="Sticker">
 <action-appliesto non-html32 />
-<action-version version="0.5">
+<action-version version="0.5.1">
 Sticker
 Action (c)2011 Walter Lee Davis.
 
