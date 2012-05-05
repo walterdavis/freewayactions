@@ -261,7 +261,7 @@
 			for (i in canon){
 				if (fwPage.libsList[canon[i]]){
 					var file = fwPage.libsList[canon[i]];
-					connected ? LinkRemoteFileToHead(theHead, file) : LinkFileToHead(theHead, file);
+					connected() ? LinkRemoteFileToHead(theHead, file) : LinkFileToHead(theHead, file);
 					delete fwPage.libsList[canon[i]];
 				}
 			}
@@ -322,6 +322,7 @@
 		}else{
 			width = 0;
 		}
+		
 		var border = GetCSSAttribute(tag,'border');
 		if(border){
 			var b = border.match(/\d+px/);
@@ -334,7 +335,7 @@
 				case 4:
 				case 3:
 					width += parseInt(padding[1],10);
-					width += parseInt(padding[3],10);
+					width += (!!padding[3] ? parseInt(padding[3],10) : parseInt(padding[1],10));
 					break;
 				case 2:
 					width += parseInt(padding[1] * 2,10);
@@ -426,7 +427,7 @@
 </library-action>
 
 <page-action name="Protaculous">
-<action-version version="0.7">
+<action-version version="0.7.1">
 Protaculous Action
 Copyright (c) Walter Davis Studio 2007 - 2011
 </action-version>
@@ -530,7 +531,7 @@ Copyright (c) Walter Davis Studio 2007 - 2011
 </page-action>
 
 <action name="Protaculous">
-<action-version version="0.7">
+<action-version version="0.7.1">
 Protaculous Action
 Copyright (c) Walter Davis Studio 2007 - 2010
 </action-version>
@@ -565,7 +566,7 @@ Copyright (c) Walter Davis Studio 2007 - 2010
 <action-label name="window4" title="});"/>
 
 <action-javascript>
-<action-include name="scriptyHandlerFunctions">
+<action-include name="scriptyHandlerFunctions" />
 	function EditCode(codeName){ //Cut down from Tim Plumb's Source Code Snooper
 		var mycustomcode = fwParameters[codeName].toString();
 		var myprompt = "Add your code here";
@@ -633,7 +634,7 @@ Copyright (c) Walter Davis Studio 2007 - 2010
 </action>
 
 <item-action name="Observer">
-<action-version version="0.3">
+<action-version version="0.3.1">
 Observer Action
 Copyright (c) Walter Davis Studio 2008 - 2011
 </action-version>
@@ -742,7 +743,7 @@ Copyright (c) Walter Davis Studio 2008 - 2011
 
 <item-action name="Carousel">
 <action-appliesto non-html32/>
-<action-version version="1.3">
+<action-version version="1.3.3">
 Carousel
 Action (c)2007-11 Walter Lee Davis, big help from Joe Billings in March 2010.
 Glider.js (c)2007 Curbly LLC - author Bruno Bornsztein <bruno@missingmethod.com>
@@ -927,7 +928,7 @@ Apply the action to a group of HTML items to turn them into a smooth-scrolling c
 
 <item-action name="Carousel Pane">
 <action-appliesto layer non-html32/>
-<action-version version="0.4">
+<action-version version="0.4.1">
 Carousel Pane
 (c)2009 - 2011 Walter Lee Davis
 
@@ -988,7 +989,7 @@ Apply the action to any layer to designate a Carousel pane.
 
 <item-action name="Carousel Button">
 <action-appliesto graphic pass-through/>
-<action-version version="1.0">
+<action-version version="1.0.1">
 Carousel Button
 (c)2007-2011 Walter Lee Davis
 
@@ -1072,7 +1073,7 @@ Apply the action to any linked (or linkable) graphic to create scroll buttons fo
 </item-action>
 
 <action name="Carousel Text Tab" preview-text="&Text;" generates-link height=12>
-<action-version version="0.3">
+<action-version version="0.3.1">
 Carousel Text Tab
 (c)2009 - 2011 Walter Lee Davis
 
@@ -1160,7 +1161,7 @@ Use this Action inline to create direct text navigation links to one of the Caro
 
 <item-action name="Carousel Tab" generates-link>
 <action-appliesto graphic pass-through/>
-<action-version version="0.8">
+<action-version version="0.8.1">
 Carousel Tab
 (c)2007 - 2011 Walter Lee Davis
 

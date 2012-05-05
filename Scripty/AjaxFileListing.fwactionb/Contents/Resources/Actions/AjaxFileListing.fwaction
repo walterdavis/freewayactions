@@ -266,7 +266,7 @@
 			for (i in canon){
 				if (fwPage.libsList[canon[i]]){
 					var file = fwPage.libsList[canon[i]];
-					connected ? LinkRemoteFileToHead(theHead, file) : LinkFileToHead(theHead, file);
+					connected() ? LinkRemoteFileToHead(theHead, file) : LinkFileToHead(theHead, file);
 					delete fwPage.libsList[canon[i]];
 				}
 			}
@@ -346,7 +346,7 @@
 </library-action>
 
 <action name="AjaxFileListing" height="12">
-<action-version version="0.5">
+<action-version version="0.5.1">
 AjaxFileListing Action
 Walter Davis Studio 2008 - 2010
 </action-version>

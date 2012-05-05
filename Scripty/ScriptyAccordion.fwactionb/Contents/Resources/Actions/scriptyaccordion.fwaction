@@ -261,7 +261,7 @@
 			for (i in canon){
 				if (fwPage.libsList[canon[i]]){
 					var file = fwPage.libsList[canon[i]];
-					connected ? LinkRemoteFileToHead(theHead, file) : LinkFileToHead(theHead, file);
+					connected() ? LinkRemoteFileToHead(theHead, file) : LinkFileToHead(theHead, file);
 					delete fwPage.libsList[canon[i]];
 				}
 			}
@@ -319,7 +319,7 @@
 </library-action>
 
 <item-action name="ScriptyAccordion">
-<action-version version="0.8">
+<action-version version="0.8.1">
 ScriptyAccordion Action
 Walter Davis Studio 2008, 2009, 2010, 2011
 </action-version>

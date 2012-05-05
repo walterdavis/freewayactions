@@ -275,7 +275,7 @@
 			for (i in canon){
 				if (fwPage.libsList[canon[i]]){
 					var file = fwPage.libsList[canon[i]];
-					connected ? LinkRemoteFileToHead(theHead, file) : LinkFileToHead(theHead, file);
+					connected() ? LinkRemoteFileToHead(theHead, file) : LinkFileToHead(theHead, file);
 					delete fwPage.libsList[canon[i]];
 				}
 			}
@@ -440,7 +440,7 @@
 </library-action>
 
 <item-action name="ScriptyLightbox2">
-<action-version version="0.6">
+<action-version version="0.7.1">
 ScriptyLightbox2 Action
 Copyright (c) Walter Davis Studio 2011
 </action-version>
@@ -712,3 +712,284 @@ document.observe('touchstart',function(evt){
 	}
 </action-javascript>
 </item-action>
+
+
+
+<action name="ScriptyLightbox2" preview-text="&Text;" generates-link height=12>
+<action-version version="0.7.1">
+ScriptyLightbox2 Action
+Copyright (c) Walter Davis Studio 2011
+</action-version>
+<action-file name ="prototype1700packer" var/>
+<action-file name ="prototype1610packer" var/>
+<action-file name ="prototype1602packer" var/>
+<action-file name ="closebox" var/>
+<action-file name ="ajaxload" var/>
+<action-text name="Text" script default="link text"/>
+<action-checkbox name="pages" title="Use Page/URL as Target" default="no" />
+<action-file name = "original" title="Original File" />
+<action-url name = "original_page" title="Page/URL" />
+<action-checkbox name="autoplay" title="Auto-Play" default="no" advance="no" />
+<action-number name = "width" title="Width" />
+<action-number name = "height" title="Height" />
+<action-markup custom name="overlay_style">.overlay {
+	position: absolute;
+	top: 0;
+	left: 0;
+	z-index: 1000;
+	border: none;
+	-webkit-box-shadow: 0px 2px 20px #000;
+	-moz-box-shadow: 0px 2px 20px #000;
+	box-shadow: 0px 2px 20px #000;
+	-moz-border-radius: 13px;
+	-webkit-border-radius: 13px;
+	border-radius: 13px;
+	padding: 16px;
+	background: #000 url(_ajaxload_) no-repeat center center;
+}
+.overlay p {
+	text-align: center;
+	vertical-align: center;
+	height:100%;
+	padding:0;
+	margin:0;
+}
+.overlay iframe {
+	border: none;
+	height: 100%;
+	width: 100%;
+	padding: 0;
+	margin: 0;
+}
+#_closer {
+	display: block;
+	position: absolute;
+	top: -12px;
+	left: -12px;
+	width: 30px;
+	height: 30px;
+	cursor: pointer;
+	background-image: url(_closebox_);
+}
+img.popup {
+	max-width: 100%;
+	max-height: 100%
+}
+</action-markup>
+<action-markup custom name="overlay">//read the dimensions out of the filename string
+function read_geometry(str){
+	var out = {'width':640,'height':480};
+	if(str.length > 3 && str.include('x')){
+		var parts = str.match(/\d{1,4}x\d{1,4}/);
+		if(parts.length > 0){
+			var dims = parts[0].split(/x/);
+			if(dims[0] && dims[1]){
+				out.width = parseInt(dims[0],10);
+				out.height = parseInt(dims[1],10);
+			}
+		}
+	}
+	return out
+}
+function read_autoplay(str){
+	var out = 'false';
+	if(str.length > 3 && str.include('autoplay')){
+		var parts = str.match(/autoplay:(true|false)/);
+		if(parts.length > 0){
+			return parts[1];
+		}
+	}
+	return out
+}
+Element.addMethods({
+	resizeToOverlay: function(element){
+		var element = $(element);
+		var width = element.getWidth();
+		var height = element.getHeight();
+		var ratio = Math.round((parseInt(width,10) / parseInt(height,10)) * 100) / 100;
+		var screen = document.viewport.getDimensions();
+		var screen_ratio = Math.round((parseInt(screen.width,10) / parseInt(screen.height,10)) * 100) / 100;
+		if(ratio > screen_ratio){
+			//photo is wide format, screen is not so go width-wise first, then set height
+			if (width > (screen.width * .8)){
+				var new_width = (Math.round(screen.width * .8));
+				element.setStyle('width:' + new_width.toString() + 'px; height:' + Math.round(new_width / ratio).toString() + 'px');
+			}
+		}else{
+			//go height-wise first, then set width
+			if(element.getHeight() > (screen.height * .8)){
+				var new_height = (Math.round(screen.height * .8));
+				new_width = Math.round(new_height * ratio);
+				element.setStyle('height:' + new_height.toString() + 'px; width:' + new_width.toString() + 'px');
+			}
+		}
+		element.setStyle('top:' + (Math.floor(screen.height - element.getHeight()) / 2 + document.viewport.getScrollOffsets().top).toString() + 'px; left:' + ((Math.floor(screen.width - element.getWidth()) / 2) - $('PageDiv').positionedOffset().left).toString() + 'px;');
+		element.setOpacity(1);
+	}
+});
+//center the player in the window
+function center_player(){
+	var elm = $('_player');
+	var view = document.viewport.getDimensions();
+	var container = elm.getDimensions();
+	elm.setStyle('top:' + (Math.floor(view.height - container.height) / 2 + document.viewport.getScrollOffsets().top).toString() + 'px; left:' + ((Math.floor(view.width - container.width) / 2) - $('PageDiv').positionedOffset().left).toString() + 'px;');
+	return Element.setOpacity.delay(0.1,elm,1);
+}
+//loop through all of the popup links, if any
+$$('a.popup').each(function(elm){
+	//try to get the dimensions of the movie out of the filename, fall back to 640x480
+	if(elm.rel){
+		var geometry = read_geometry(elm.rel.toString());
+		var autoplay = read_autoplay(elm.rel.toString());
+	}else{
+		var geometry = {'width':640,'height':480};
+		var autoplay = 'false';
+	}
+	elm.observe('click',function(evt){
+		evt.stop();
+		if($('_player')) $('_player').remove();
+		var player = new Element('div',{
+			id:'_player',
+			'class':'overlay'
+			}
+		);
+		$('PageDiv').insert(player);
+		player.setOpacity(0);
+		var extension = elm.href.toString().substr(elm.href.lastIndexOf('.') + 1).split(/[\?#]/)[0].toLowerCase();
+		if(geometry && $w('htm html asp php jsp').include(extension)){
+			player.setStyle('width:' + (geometry.width) + 'px; height:' + (geometry.height + 16) + 'px;');
+			var iframe = new Template('<iframe width="#{width}" height="#{height}" border="0" src="#{src}"></iframe>');
+			vars = {'height':(geometry.height), 'width':geometry.width, 'src':elm.href};
+			player.update(iframe.evaluate(vars));
+			window.setTimeout(center_player,1);
+		}
+		if(geometry && $w('mov m4v mp4').include(extension)){
+			player.setStyle('width:' + (geometry.width) + 'px; height:' + (geometry.height + 16) + 'px;');
+			var qt = new Template('<p><object width="#{width}" height="#{height}" classid="clsid:02BF25D5-8C17-4B23-BC80-D3488ABDDC6B" codebase="http://www.apple.com/qtactivex/qtplugin.cab"> <param name="src" value="#{src}"/> <param name="controller" value="true"/> <param name="autoplay" value="#{autoplay}"/> <embed src="#{src}" width="#{width}" height="#{height}" controller="true" scale="tofit" cache="true" autoplay="#{autoplay}" pluginspage="http://www.apple.com/quicktime/download/" /></object></p>');
+			vars = {'height':(geometry.height + 16), 'width':geometry.width, 'src':elm.href, 'autoplay' : autoplay};
+			player.update(qt.evaluate(vars));
+			window.setTimeout(center_player,1);
+		}
+		if(geometry && extension == 'swf'){
+			player.setStyle('width:' + geometry.width + 'px; height:' + geometry.height + 'px;');
+			var swf = new Template('<p><object classid="clsid:d27cdb6e-ae6d-11cf-96b8-444553540000" codebase="http://fpdownload.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=8,0,0,0" width="#{width}" height="#{height}" align="middle"><param name="allowScriptAccess" value="sameDomain"/><param name="movie" value="#{src}"/><param name="quality" value="high"/><embed src="#{src}" quality="high" width="#{width}" height="#{height}" align="middle" allowScriptAccess="sameDomain" type="application/x-shockwave-flash" pluginspage="http://www.macromedia.com/go/getflashplayer"/></object></p>');
+			vars = {'height':geometry.height, 'width':geometry.width, 'src':elm.href};
+			player.update(swf.evaluate(vars));
+			window.setTimeout(center_player,1);
+		}
+		if($w('jpg jpeg png gif').include(extension)){
+			var img = new Template('<p><img src="#{src}" class="popup" alt="#{src}" /></p>');
+			player.update(img.evaluate({'src':elm.href}));
+			if (!!geometry){
+				player.setStyle('width:' + geometry.width + 'px; height:' + geometry.height + 'px;');
+			}else{
+				if(player.down('img')){
+					geometry = player.down('img').getDimensions();
+					player.setStyle('width:' + geometry.width + 'px; height:' + geometry.height + 'px;');
+				}
+			}
+			Element.resizeToOverlay.delay(0.1,player);
+		}
+		player.insert({top:'<span id="_closer"></span>'});
+	});
+});
+//close the player when the close box is clicked
+document.observe('click',function(evt){
+	var elm;
+	if( evt.findElement('#_closer') ){
+		if($('_player')){
+			$('_player').remove();
+		}
+	}
+});
+//hide the player on stray touch events (iOS only)
+document.observe('touchstart',function(evt){
+	if(evt.findElement('#_player') || evt.findElement('a.popup')){
+		//ignore
+	}else if(evt.findElement('#_closer')){
+		if($('_player')){
+			$('_player').remove();
+		}
+	}else{
+		if($('_player')){
+			$('_player').remove();
+		}
+	}
+});</action-markup>
+<action-javascript>
+<action-include name="scriptyHandlerFunctions">
+	function fwInterface(){
+		fwPage.libsList = new Object();
+		var active = false; 
+		if (fwParameters.original.fwHasFile){ 
+			var myFile = fwParameters["original"].fwFileName.toString(); 
+			active = ( myFile.substr(myFile.lastIndexOf('.') + 1).toLowerCase().match(/(mov|m4v|mp4)/) != null ); 
+		}
+		fwParameters['autoplay'].fwVisible = active; 
+		fwParameters['original'].fwVisible = ! fwParameters['pages'].fwBoolValue
+		fwParameters['original_page'].fwVisible = !! fwParameters['pages'].fwBoolValue
+	}
+	function fwAfterStartHead()
+	{
+		var filesString = '';
+		var scriptyLibs = [];
+		if(parseInt(fwFreewayVersion.replace(/\.?(\w\d)?/g, "")) >= 562){
+			filesString = 'prototype1700packer';
+		}else if(parseFloat(fwFreewayVersion) >= 5.5){
+			filesString = 'prototype1610packer';
+		}else{
+			filesString = 'prototype1602packer';
+		}
+		AddFiles(filesString, [1]);
+	}
+	function fwBeforeEndHead(){
+		if(!fwPage.scriptyLightbox2){
+			var path = this.fwPathName;
+			var prefix = path.substring(0, path.lastIndexOf(":")) + ':Support Files~:';
+			myFile = new FWFile;
+			myFile.fwOpenRead(prefix + 'closebox.png');
+			myFile.fwClose();
+			fwParameters['closebox'].fwSpecify(myFile);
+			var closebox = fwParameters['closebox'].toString();
+			myFile = new FWFile;
+			myFile.fwOpenRead(prefix + 'ajaxload-reverse.gif');
+			myFile.fwClose();
+			fwParameters['ajaxload'].fwSpecify(myFile);
+			var ajaxload = fwParameters['ajaxload'].toString();
+			var myhead = fwDocument.fwTags.fwFind("head");
+			if (myhead){
+				var cssStyles = myhead.fwAddCSSStyles();
+				cssStyles.fwAddRaw(fwMarkups['overlay_style'].toString().replace(/_closebox_/,closebox).replace(/_ajaxload_/,ajaxload));
+			}
+			AddObserver(fwDocument.fwTags.fwFind("head"), fwMarkups['overlay'], 'document','dom:loaded');
+			fwPage['scriptyLightbox2'] = true;
+		}
+	}
+	function fwBeforeEndBody(){
+		var myItem = fwDocument.fwTags.fwFind("",fwItem);
+		if(myItem){
+			if(fwParameters.original && fwParameters.original.fwHasFile || fwParameters.original_page && fwParameters.original_page.fwValue){
+				var relText = [];
+				var link = myItem.fwFindEnclosing('a');
+				if(!link){
+					link = myItem.fwFind("a", fwItem);
+				}
+				if(!link){
+					link = myItem.fwAddEnclosing('a',true);
+				}
+				var original = (fwParameters.original.fwHasFile ? fwParameters.original : fwParameters.original_page);
+				link['href'] = fwQuote(original.toString());
+				if(parseInt(fwParameters.width.fwValue,10) > 0 && parseInt(fwParameters.height.fwValue,10) > 0){
+					relText.push( fwParameters.width.fwValue.toString() + 'x' + fwParameters.height.fwValue.toString() );
+				}
+				if(fwParameters['autoplay'].fwBoolValue){
+					relText.push( 'autoplay:true' );
+				}
+				link['rel'] = fwQuote(relText.join('; '));
+				link.fwAddRaw(fwEncode(fwParameters.Text, fwPage));
+				addClassName(link,'popup');
+			}
+		}
+	}
+</action-javascript>
+</action>

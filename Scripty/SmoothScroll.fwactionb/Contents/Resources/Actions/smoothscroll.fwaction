@@ -259,7 +259,7 @@
 			for (i in canon){
 				if (fwPage.libsList[canon[i]]){
 					var file = fwPage.libsList[canon[i]];
-					connected ? LinkRemoteFileToHead(theHead, file) : LinkFileToHead(theHead, file);
+					connected() ? LinkRemoteFileToHead(theHead, file) : LinkFileToHead(theHead, file);
 					delete fwPage.libsList[canon[i]];
 				}
 			}
@@ -424,7 +424,7 @@
 </library-action>
 
 <page-action name="SmoothScroll">
-<action-version version="0.5">
+<action-version version="0.5.1">
 SmoothScroll Action
 Copyright (c) Walter Davis Studio 2011
 </action-version>

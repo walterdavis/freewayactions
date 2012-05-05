@@ -279,7 +279,7 @@
 			for (i in canon){
 				if (fwPage.libsList[canon[i]]){
 					var file = fwPage.libsList[canon[i]];
-					connected ? LinkRemoteFileToHead(theHead, file) : LinkFileToHead(theHead, file);
+					connected() ? LinkRemoteFileToHead(theHead, file) : LinkFileToHead(theHead, file);
 					delete fwPage.libsList[canon[i]];
 				}
 			}
@@ -441,7 +441,7 @@
 </library-action>
 
 <item-action name="ScriptyLightbox">
-<action-version version="0.4">
+<action-version version="0.4.1">
 ScriptyLightbox Action
 Walter Davis Studio 2009, 2010
 </action-version>
@@ -466,7 +466,7 @@ Walter Davis Studio 2009, 2010
 <action-file name ="prevlabel" var/>
 
 <action-javascript>
-<action-include name="scriptyHandlerFunctions">
+<action-include name="scriptyHandlerFunctions" />
 	var resources = '';
 
 	function fwInterface(){
