@@ -116,7 +116,7 @@ Copyright 2008 Walter Lee Davis
 
 <folder-action name="com.wdstudio.stuntdouble" title="Stunt Double">
 <action-checkbox name="Activate">
-<action-label name="-">
+<action-label name="-"/>
 <action-version version="0.1">
 "Stunt Double" action
 
@@ -139,7 +139,7 @@ function fwAfterEndHTML(){
 </folder-action>
 <page-action name="com.wdstudio.stuntdouble" title="Stunt Double">
 <action-checkbox name="Activate">
-<action-label name="-">
+<action-label name="-"/>
 <action-version version="0.1">
 "Stunt Double" action
 
