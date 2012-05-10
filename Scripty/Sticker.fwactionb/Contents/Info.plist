@@ -11,8 +11,8 @@
 	<key>CFBundleName</key>
 	<string>Sticker</string>
 	<key>CFBundleShortVersionString</key>
-	<string>0.5</string>
+	<string>0.5.2</string>
 	<key>CFBundleVersion</key>
-	<string>0.5.1</string>
+	<string>0.5.2</string>
 </dict>
 </plist>

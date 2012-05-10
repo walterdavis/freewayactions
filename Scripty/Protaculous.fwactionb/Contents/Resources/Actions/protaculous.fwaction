@@ -231,6 +231,7 @@
 					var path = fwParameters[file].toString();
 					if(useCustom == true)
 					fwPage.libsList[file] = path;
+					fwParameters[file].fwClear();
 				}else{
 					fwAlert('Couldn\'t find ' + file);
 				}
@@ -427,7 +428,7 @@
 </library-action>
 
 <page-action name="Protaculous">
-<action-version version="0.7.1">
+<action-version version="0.7.2">
 Protaculous Action
 Copyright (c) Walter Davis Studio 2007 - 2011
 </action-version>
@@ -531,7 +532,7 @@ Copyright (c) Walter Davis Studio 2007 - 2011
 </page-action>
 
 <action name="Protaculous">
-<action-version version="0.7.1">
+<action-version version="0.7.2">
 Protaculous Action
 Copyright (c) Walter Davis Studio 2007 - 2010
 </action-version>
@@ -634,7 +635,7 @@ Copyright (c) Walter Davis Studio 2007 - 2010
 </action>
 
 <item-action name="Observer">
-<action-version version="0.3.1">
+<action-version version="0.3.2">
 Observer Action
 Copyright (c) Walter Davis Studio 2008 - 2011
 </action-version>
@@ -743,7 +744,7 @@ Copyright (c) Walter Davis Studio 2008 - 2011
 
 <item-action name="Carousel">
 <action-appliesto non-html32/>
-<action-version version="1.3.3">
+<action-version version="1.3.4">
 Carousel
 Action (c)2007-11 Walter Lee Davis, big help from Joe Billings in March 2010.
 Glider.js (c)2007 Curbly LLC - author Bruno Bornsztein <bruno@missingmethod.com>
@@ -928,7 +929,7 @@ Apply the action to a group of HTML items to turn them into a smooth-scrolling c
 
 <item-action name="Carousel Pane">
 <action-appliesto layer non-html32/>
-<action-version version="0.4.1">
+<action-version version="1.3.4">
 Carousel Pane
 (c)2009 - 2011 Walter Lee Davis
 
@@ -989,7 +990,7 @@ Apply the action to any layer to designate a Carousel pane.
 
 <item-action name="Carousel Button">
 <action-appliesto graphic pass-through/>
-<action-version version="1.0.1">
+<action-version version="1.3.4">
 Carousel Button
 (c)2007-2011 Walter Lee Davis
 
@@ -1073,7 +1074,7 @@ Apply the action to any linked (or linkable) graphic to create scroll buttons fo
 </item-action>
 
 <action name="Carousel Text Tab" preview-text="&Text;" generates-link height=12>
-<action-version version="0.3.1">
+<action-version version="1.3.4">
 Carousel Text Tab
 (c)2009 - 2011 Walter Lee Davis
 
@@ -1161,7 +1162,7 @@ Use this Action inline to create direct text navigation links to one of the Caro
 
 <item-action name="Carousel Tab" generates-link>
 <action-appliesto graphic pass-through/>
-<action-version version="0.8.1">
+<action-version version="1.3.4">
 Carousel Tab
 (c)2007 - 2011 Walter Lee Davis
 

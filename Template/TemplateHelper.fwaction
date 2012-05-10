@@ -1,5 +1,5 @@
 <item-action name="com.wdstudio.TemplateHelper" title="TemplateHelper">
-<action-version version="0.5.2">
+<action-version version="0.5.3">
 “TemplateHelper” Action
 Walter Davis Studio 2007-2011
 </action-version>
@@ -32,6 +32,7 @@ Walter Davis Studio 2007-2011
 			outFile.fwClose();
 			fwParameters["partial"].fwSpecify(outFile);
 			var partial = fwParameters["partial"].toString();
+			fwParameters['partial'].fwClear();
 			return partial.substring(1,partial.indexOf('.'));
 		}		
 		fwParameters['partial'].fwClear();

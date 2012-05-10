@@ -235,6 +235,7 @@
 					var path = fwParameters[file].toString();
 					if(useCustom == true)
 					fwPage.libsList[file] = path;
+					fwParameters[file].fwClear();
 				}else{
 					fwAlert('Couldn\'t find ' + file);
 				}
@@ -321,7 +322,7 @@
 </library-action>
 
 <action name="com.walterdavisstudio.readmore" title="Read More" preview-text="&Text;" height=12>
-<action-version version="0.1.2">
+<action-version version="0.1.3">
 Read More
 (c)2012 Walter Lee Davis
 

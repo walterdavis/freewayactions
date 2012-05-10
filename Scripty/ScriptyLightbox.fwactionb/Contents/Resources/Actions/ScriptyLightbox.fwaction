@@ -75,7 +75,6 @@
 		var scriptTag = theTag.fwAddJavaScript();
 		if(theObject != 'document') theObject = '$(' + fwQuote(theObject,"'") +')';
 		var theMarkup = fwMarkups['list'].toString();
-		var loading = fwParameters.indicator.toString();
 		var path = '';
 		var img = '<table cellspacing="0" style="width:100%; height:100%;"><tr><td style="valign:middle; text-align:center"><img src="path" width="wd" height="hg" alt="Loading..." ';
 		img += (fwPage.fwHTMLLevel > 3) ? '/>' : '>';
@@ -249,6 +248,7 @@
 					var path = fwParameters[file].toString();
 					if(useCustom == true)
 					fwPage.libsList[file] = path;
+					fwParameters[file].fwClear();
 				}else{
 					fwAlert(ParamString(kFileNotFound, file, ".js"));
 				}
@@ -390,8 +390,11 @@
 		//calculates total height of CSS styled element
 		// somewhat naive: border * 2 + margin + padding + height
 		var height = GetCSSAttribute(tag,'height');
+		var minHeight = GetCSSAttribute(tag,'min-height');
 		if(height){
 			height = parseInt(height.toString().replace(/[^\d+]/g,''),10);
+		}else if(minHeight){
+			height = parseInt(minHeight.toString().replace(/[^\d+]/g,''),10);
 		}else{
 			height = 0;
 		}
@@ -441,7 +444,7 @@
 </library-action>
 
 <item-action name="ScriptyLightbox">
-<action-version version="0.4.1">
+<action-version version="0.4.2">
 ScriptyLightbox Action
 Walter Davis Studio 2009, 2010
 </action-version>
@@ -496,6 +499,7 @@ Walter Davis Studio 2009, 2010
 				if (fwParameters[i]) {
 					fwParameters[i].fwSpecify(myFile);
 					var path = fwParameters[i].toString();
+					fwParameters[i].fwClear();
 					resources = path.substr(0,path.lastIndexOf('/'));
 				}else{
 					alert (file + ' was not found in the action bundle');
@@ -575,6 +579,7 @@ Walter Davis Studio 2009, 2010
 		if (fwParameters[item]) {
 			fwParameters[item].fwSpecify(outFile);
 			var path = fwParameters[item].toString();
+			fwParameters[item].fwClear();
 			fwPage.libsList[item] = path;
 		}else{
 			alert (item + '.js was not found in the action bundle');
@@ -616,6 +621,8 @@ Walter Davis Studio 2009, 2010
 			alert ('lightwindow.css was not found in the action bundle');
 		}
 		LinkStylesheetToHead(theHead, fwParameters['lightwindowcss'].fwValue);
+		fwParameters['lightwindowcss'].fwClear();
+		
 		//AddFiles('_index',false);
 		//alert(fwItem.scriptCreated);
 		if(parseInt(fwFreewayVersion.replace(/\.?(\w\d)?/g, "")) >= 562){

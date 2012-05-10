@@ -231,6 +231,7 @@
 					var path = fwParameters[file].toString();
 					if(useCustom == true)
 					fwPage.libsList[file] = path;
+					fwParameters[file].fwClear();
 				}else{
 					fwAlert(ParamString(kFileNotFound, file, ".js"));
 				}
@@ -427,7 +428,7 @@
 
 <item-action name="ScriptyFader">
 <action-appliesto non-html32/>
-<action-version version="0.4.2">
+<action-version version="0.4.3">
 ScriptyFader
 Action (c)2011 Walter Lee Davis.
 
@@ -617,6 +618,7 @@ Apply the action to an HTML item to mark the location of a fading group of page 
 			outFile.fwClose();
 			fwParameters['partial'].fwSpecify(outFile);
 			var partial = fwParameters['partial'].toString();
+			fwParameters['partial'].fwClear();
 			return partial.substring(1,partial.indexOf('.'));
 		}
 		fwParameters['partial'].fwClear();
@@ -671,6 +673,7 @@ Apply the action to an HTML item to mark the location of a fading group of page 
 				myFile.fwClose();
 				fwParameters['ajaxwait'].fwSpecify(myFile);
 				var ajaxwait = fwParameters['ajaxwait'].toString();
+				fwParameters['ajaxwait'].fwClear();
 			}
 			if(!fwPage.SFspinner){
 				fwPage['SFspinner'] = true;
@@ -697,10 +700,11 @@ Apply the action to an HTML item to mark the location of a fading group of page 
 			if (myHead){
 				var myScript = myHead.fwAddJavaScript();
 				myScript.fwAddRaw("sFoptions.set('" + fwItem + "', [")
-				var filteredOptions = []
+				var filteredOptions = [];
+				filteredOptions.push( fwQuote(fwItem.toString()) );
 				for( i in options){
 					action = options[i];
-					if((action.fwParameters['targets'] && action.fwParameters.targets.fwValue == fwItem) || action.fwItem == fwItem){
+					if((action.fwParameters['targets'] && action.fwParameters.targets.fwValue == fwItem) && action.fwItem != fwItem){
 						filteredOptions.push( fwQuote(options[i].fwItem.toString()) );
 					}
 				}
@@ -714,7 +718,7 @@ Apply the action to an HTML item to mark the location of a fading group of page 
 
 <item-action name="ScriptyFader Option">
 <action-appliesto layer non-html32/>
-<action-version version="0.4.2">
+<action-version version="0.4.3">
 ScriptyFader Option
 (c)2011 Walter Lee Davis
 
@@ -734,6 +738,7 @@ Apply the action to any layer to designate a ScriptyFader option.
 			outFile.fwClose();
 			fwParameters['partial'].fwSpecify(outFile);
 			var partial = fwParameters['partial'].toString();
+			fwParameters['partial'].fwClear();
 			return partial.substring(1,partial.indexOf('.'));
 		}
 		fwParameters['partial'].fwClear();
@@ -826,7 +831,7 @@ Apply the action to any layer to designate a ScriptyFader option.
 
 <item-action name="ScriptyFader Thumbnail" generates-link>
 <action-appliesto graphic pass-through/>
-<action-version version="0.4.2">
+<action-version version="0.4.3">
 ScriptyFader Thumbnail
 (c)2011 Walter Lee Davis
 
@@ -913,7 +918,7 @@ Apply the action to any graphic to create direct navigation to one of the Script
 </item-action>
 
 <action name="ScriptyFader Text Link" preview-text="&Text;" generates-link height=12>
-<action-version version="0.4.2">
+<action-version version="0.4.3">
 ScriptyFader Text Link
 (c)2011 Walter Lee Davis
 

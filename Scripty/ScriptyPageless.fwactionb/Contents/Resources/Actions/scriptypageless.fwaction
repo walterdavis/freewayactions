@@ -234,6 +234,7 @@
 					var path = fwParameters[file].toString();
 					if(useCustom == true)
 						fwPage.libsList[file] = path;
+					fwParameters[file].fwClear();
 				}
 				else
 				{
@@ -430,7 +431,7 @@
 
 <item-action name="ScriptyPageless">
 <action-appliesto non-html32/>
-<action-version version="0.1">
+<action-version version="0.1.1">
 ScriptyPageless
 Action (c)2011 Walter Lee Davis.
 
@@ -611,6 +612,7 @@ Apply the action to an HTML item to mark the location of a fading group of page 
 			outFile.fwClose();
 			fwParameters['partial'].fwSpecify(outFile);
 			var partial = fwParameters['partial'].toString();
+			fwParameters['partial'].fwClear();
 			return partial.substring(1,partial.indexOf('.'));
 		}		
 		fwParameters['partial'].fwClear();
@@ -661,6 +663,7 @@ Apply the action to an HTML item to mark the location of a fading group of page 
 				myFile.fwClose();
 				fwParameters['ajaxwait'].fwSpecify(myFile);
 				var ajaxwait = fwParameters['ajaxwait'].toString();
+				fwParameters['ajaxwait'].fwClear();
 			}
 			if(!fwPage.SFspinner){
 				fwPage['SFspinner'] = true;
@@ -705,7 +708,7 @@ Apply the action to an HTML item to mark the location of a fading group of page 
 
 <item-action name="ScriptyPageless Option">
 <action-appliesto layer non-html32/>
-<action-version version="0.1">
+<action-version version="0.1.1">
 ScriptyPageless Option
 (c)2011 Walter Lee Davis
 
@@ -725,6 +728,7 @@ Apply the action to any layer to designate a ScriptyPageless option.
 			outFile.fwClose();
 			fwParameters['partial'].fwSpecify(outFile);
 			var partial = fwParameters['partial'].toString();
+			fwParameters['partial'].fwClear();
 			return partial.substring(1,partial.indexOf('.'));
 		}		
 		fwParameters['partial'].fwClear();

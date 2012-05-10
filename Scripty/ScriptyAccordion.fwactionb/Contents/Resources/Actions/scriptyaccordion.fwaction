@@ -231,6 +231,7 @@
 					var path = fwParameters[file].toString();
 					if(useCustom == true)
 					fwPage.libsList[file] = path;
+					fwParameters[file].fwClear();
 				}else{
 					fwAlert(ParamString(kFileNotFound, file, ".js"));
 				}
@@ -319,7 +320,7 @@
 </library-action>
 
 <item-action name="ScriptyAccordion">
-<action-version version="0.8.1">
+<action-version version="0.8.2">
 ScriptyAccordion Action
 Walter Davis Studio 2008, 2009, 2010, 2011
 </action-version>

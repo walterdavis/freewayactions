@@ -236,6 +236,7 @@
 					var path = fwParameters[file].toString();
 					if(useCustom == true)
 					fwPage.libsList[file] = path;
+					fwParameters[file].fwClear();
 				}else{
 					fwAlert('Couldn\'t find ' + file);
 				}
@@ -322,7 +323,7 @@
 </library-action>
 
 <page-action name="com.walterdavisstudio.ziptastic" title="ZipTastic">
-<action-version version="0.1.1">
+<action-version version="0.1.2">
 ZipTastic
 (c)2012 Walter Lee Davis
 

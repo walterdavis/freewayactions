@@ -170,6 +170,7 @@
 					var path = fwParameters[file].toString();
 					if(useCustom == true)
 					fwPage.libsList[file] = path;
+					fwParameters[file].fwClear();
 				}else{
 					fwAlert(ParamString(kFileNotFound, file, ".js"));
 				}
@@ -258,7 +259,7 @@
 
 <item-action name="NewsCycle">
 <action-appliesto non-html32 />
-<action-version version="0.4.1">
+<action-version version="0.4.2">
 NewsCycle
 Action (c)2011 Walter Lee Davis.
 

@@ -1,5 +1,5 @@
 <item-action name="ReadFeed">
-<action-version version="0.4.2">
+<action-version version="0.4.3">
 ReadFeed Action
 Walter Davis Studio 2008 - 2011
 </action-version>
@@ -49,6 +49,7 @@ $rss->Read($url);
 					fwParameters[file].fwSpecify(myFile);
 					var path = fwParameters[file].toString();
 					fwPage.phpList[file] = path;
+					fwParameters[file].fwClear();
 				}else{
 					alert (file + ' was not found in the action bundle');
 				}
