@@ -1,0 +1,76 @@
+<item-action name="com.wdstudio.emptyboxhelper" title="EmptyBoxHelper">
+<action-appliesto layer non-html32/>
+<action-version version="0.1">
+CrowBar
+Copyright 2011 Walter Lee Davis
+
+Apply the action to an HTML box to get rid of some annoying Freeway defaults.
+</action-version>
+<action-checkbox name="Activate">
+<action-popup name="overflow" title="Overflow">
+	<value name="hidden" title="Hidden" default/>
+	<value name="visible" title="Visible"/>
+	<value name="scroll" title="Scroll"/>
+	<value name="auto" title="Auto"/>
+</action-popup>
+<action-javascript>
+	function SetCSSAttribute(tag, attributeName, attributeValue) { 
+		// Sets a "CSS" attribute such as "position:absolute" in a tag value 
+		// Passing an attribute value of null removes that attribute entirely
+		if (tag==null) return; 
+		var tagField = tag['style']; 
+		if (tagField == null){
+			tag['style'] = '"'+attributeName+':'+attributeValue+'"'; 
+		}else{
+			var tagField = tagField.toString();
+			var pairs = tagField.slice(1,-1).split(';');
+			var out = new Array();
+			if(attributeValue != null && tagField.indexOf(attributeName) < 0) out.push(attributeName+':'+attributeValue);
+			for(i in pairs){
+				pairs[i] = pairs[i].replace(/^\s*(\S*(\s+\S+)*)\s*$/, "$1"); //javascript equivalent of trim
+				if(pairs[i].slice(0,pairs[i].indexOf(':')) == attributeName) {
+					if(attributeValue != null) out.push(attributeName+':'+attributeValue);
+				}else{
+					out.push(pairs[i]);
+				}
+			}
+			tag['style']= fwQuote(out.join('; ')); 
+		}
+	} 
+	function GetCSSAttribute(tag, attributeName) { 
+		// Gets a "CSS" attribute such as "position:absolute" from a tag value 
+		// returns NULL if the attribute can not be found 
+		if (tag==null) return null; 
+		var tagField = tag['style']; 
+		if (tagField == null) {
+			return null; 
+		}else { 
+			var tagField = tagField.toString(); 
+			var pairs = tagField.slice(1,-1).split(';');
+			for(i in pairs){
+				pairs[i] = pairs[i].replace(/^\s*(\S*(\s+\S+)*)\s*$/, "$1"); //javascript equivalent of trim
+				if(pairs[i].slice(0,pairs[i].indexOf(':')) == attributeName) {
+					return pairs[i].slice(pairs[i].indexOf(':')+1,pairs[i].length);
+				}
+			}
+			return null; 
+		} 
+	}
+	
+	function fwBeforeEndBody(){
+		var activate = fwParameters["Activate"].fwBoolValue;
+		if(activate){
+			thisObj = fwDocument.fwTags.fwFind(fwItem);
+			if (thisObj){
+				alert(thisObj.fwToHTML())
+				restoreBox(thisObj,true);
+			}
+		}
+	}
+	function restoreBox(thisObj){
+		if(GetCSSAttribute(thisObj, 'font-size') == '1px')
+			SetCSSAttribute(thisObj,'font-size', null);
+		SetCSSAttribute(thisObj, 'overflow', fwParameters['overflow'].fwValue);
+	}
+</action-javascript>
+</item-action>
