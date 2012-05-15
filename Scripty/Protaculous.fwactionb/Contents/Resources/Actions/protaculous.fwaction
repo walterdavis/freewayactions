@@ -113,20 +113,21 @@
 	}
 
 	var gLibraries = ["builder", "effects", "dragdrop", "controls", "slider", "sound"];
-	
+	var include = function(arr, obj) {
+		for(var i = -1, j = arr.length; ++i < j;)
+		if(arr[i] === obj) return true;
+		return false;
+	};
 	// Clean up the list of libraries by sorting them in their correct order (according to scripty specs) and removing dupes
-	function cleanLibs()
-	{
-		fwPage.scriptyLibs.sort();
+	function cleanLibs(){
 		// Get rid of duplicates and out of range values
-		var i = 0;
-		while(i < fwPage.scriptyLibs.length)
-			if(fwPage.scriptyLibs[i+1] && fwPage.scriptyLibs[i] == fwPage.scriptyLibs[i+1])
-				fwPage.scriptyLibs.splice(i+1, 1);
-			else if(fwPage.scriptyLibs[i] > gLibraries.length-1 || fwPage.scriptyLibs[i] < 0)
-				fwPage.scriptyLibs.splice(i, 1);
-			else
-				i++;
+		var out = [];
+		for (var i=0; i < fwPage.scriptyLibs.length; i++) {
+			if( ! (include(out, fwPage.scriptyLibs[i])) && (fwPage.scriptyLibs[i] < gLibraries.length) && (fwPage.scriptyLibs[i] >= 0) ){
+				out.push(fwPage.scriptyLibs[i]);
+			}
+		};
+		fwPage.scriptyLibs = out.sort();
 	}
 	
 	// Build a string containing the scripty libraries used, or return "" if all are used or none are specified
@@ -210,10 +211,11 @@
 			// Make the scriptyLibs argument an array if it isn't one already
 			scriptyLibs = scriptyLibs.constructor == Array ? scriptyLibs : [scriptyLibs];
 			// Create or add the libraries used to a page variable
-			if(!fwPage.scriptyLibs)
+			if(!fwPage.scriptyLibs){
 			fwPage.scriptyLibs = scriptyLibs;
-			else
+			}else{
 			fwPage.scriptyLibs = fwPage.scriptyLibs.concat(scriptyLibs);
+			}
 		}
 
 		// Make the overall library list object variable if it doesn't exist
@@ -428,7 +430,7 @@
 </library-action>
 
 <page-action name="Protaculous">
-<action-version version="0.7.2">
+<action-version version="0.7.3">
 Protaculous Action
 Copyright (c) Walter Davis Studio 2007 - 2011
 </action-version>
@@ -532,7 +534,7 @@ Copyright (c) Walter Davis Studio 2007 - 2011
 </page-action>
 
 <action name="Protaculous">
-<action-version version="0.7.2">
+<action-version version="0.7.3">
 Protaculous Action
 Copyright (c) Walter Davis Studio 2007 - 2010
 </action-version>
@@ -635,7 +637,7 @@ Copyright (c) Walter Davis Studio 2007 - 2010
 </action>
 
 <item-action name="Observer">
-<action-version version="0.3.2">
+<action-version version="0.3.3">
 Observer Action
 Copyright (c) Walter Davis Studio 2008 - 2011
 </action-version>
@@ -744,7 +746,7 @@ Copyright (c) Walter Davis Studio 2008 - 2011
 
 <item-action name="Carousel">
 <action-appliesto non-html32/>
-<action-version version="1.3.4">
+<action-version version="1.3.5">
 Carousel
 Action (c)2007-11 Walter Lee Davis, big help from Joe Billings in March 2010.
 Glider.js (c)2007 Curbly LLC - author Bruno Bornsztein <bruno@missingmethod.com>
@@ -929,7 +931,7 @@ Apply the action to a group of HTML items to turn them into a smooth-scrolling c
 
 <item-action name="Carousel Pane">
 <action-appliesto layer non-html32/>
-<action-version version="1.3.4">
+<action-version version="1.3.5">
 Carousel Pane
 (c)2009 - 2011 Walter Lee Davis
 
@@ -990,7 +992,7 @@ Apply the action to any layer to designate a Carousel pane.
 
 <item-action name="Carousel Button">
 <action-appliesto graphic pass-through/>
-<action-version version="1.3.4">
+<action-version version="1.3.5">
 Carousel Button
 (c)2007-2011 Walter Lee Davis
 
@@ -1074,7 +1076,7 @@ Apply the action to any linked (or linkable) graphic to create scroll buttons fo
 </item-action>
 
 <action name="Carousel Text Tab" preview-text="&Text;" generates-link height=12>
-<action-version version="1.3.4">
+<action-version version="1.3.5">
 Carousel Text Tab
 (c)2009 - 2011 Walter Lee Davis
 
@@ -1162,7 +1164,7 @@ Use this Action inline to create direct text navigation links to one of the Caro
 
 <item-action name="Carousel Tab" generates-link>
 <action-appliesto graphic pass-through/>
-<action-version version="1.3.4">
+<action-version version="1.3.5">
 Carousel Tab
 (c)2007 - 2011 Walter Lee Davis
 
