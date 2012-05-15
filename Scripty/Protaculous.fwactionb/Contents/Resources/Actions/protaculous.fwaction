@@ -118,12 +118,13 @@
 		if(arr[i] === obj) return true;
 		return false;
 	};
-	// Clean up the list of libraries by sorting them in their correct order (according to scripty specs) and removing dupes
 	function cleanLibs(){
 		// Get rid of duplicates and out of range values
 		var out = [];
 		for (var i=0; i < fwPage.scriptyLibs.length; i++) {
-			if( ! (include(out, fwPage.scriptyLibs[i])) && (fwPage.scriptyLibs[i] < gLibraries.length) && (fwPage.scriptyLibs[i] >= 0) ){
+			if( ! (include(out, fwPage.scriptyLibs[i])) && 
+			(fwPage.scriptyLibs[i] < gLibraries.length) && 
+			(fwPage.scriptyLibs[i] >= 0) ){
 				out.push(fwPage.scriptyLibs[i]);
 			}
 		};
