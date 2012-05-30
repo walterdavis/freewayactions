@@ -1,8 +1,8 @@
 <item-action name="com.wdstudio.css3shadow" title="CSS3 Shadow">
 <action-appliesto html4 html32css xhtml xhtmlstrict />
-<action-version version="0.2">
+<action-version version="0.3">
 “CSS3 Shadow” Action
-Walter Davis Studio 2009
+Walter Davis Studio 2009, 2012
 
 Apply to an HTML item to give it a drop shadow using pure CSS3.
 </action-version>
@@ -11,30 +11,67 @@ Apply to an HTML item to give it a drop shadow using pure CSS3.
 <action-text name="blur" title="Shadow blur (px)" />
 <action-color name="shadowColor" title="Shadow Color" />
 <action-javascript>
-	function fwAfterEndHTML(){
+  function array_search(array, element){
+  	for(var i = 0; i < array.length; i++){
+  		if(array[i] == element) return true;
+  	}
+  	return false;
+  }
+  if(! "foo".strip ){
+		String.prototype.strip = function() {
+			return this.replace(/^\s+/, '').replace(/\s+$/, '');
+		}
+	}
+	
+  var hasClassName = function(element, className) {
+		className = fwQuote(className,'','"'); //"
+		var elementClassName = (element["class"]) ? fwQuote(element["class"],'','"') : ''; //"
+		return ((elementClassName.length > 0) && (elementClassName == className || new RegExp("\\b" + className + "\\b").test(elementClassName)));
+	};
+
+	var addClassName = function(element, className) {
+		className = fwQuote(className,'','"'); //"
+		if (!hasClassName(element,className)){
+			var elementClassName = (element["class"]) ? fwQuote(element["class"],'','"') : ''; //"
+			var out = (elementClassName + ' ' + className).strip();
+			return element["class"] = fwQuote(out);
+		}
+	};
+
+	var removeClassName = function(element, className) {
+		var className = fwQuote(className,'','"');//"
+		var elementClassName = (element['class']) ? fwQuote(element['class'],'','"') : '';//"
+		elementClassName = elementClassName.replace(
+			new RegExp("(^|\\s+)" + className + "(\\s+|$)"), ' ').strip();
+		return element['class'] = (elementClassName.length > 0) ? fwQuote(elementClassName) : null;
+	};
+	
+	if(!fwPage.shadows) fwPage['shadows'] = [];
+
+	function fwBeforeEndBody(){
 		var blur = parseInt(fwParameters["blur"].fwValue,10);
 		var xOffset = fwParameters["xOffset"].fwValue;
 		var yOffset = fwParameters["yOffset"].fwValue;
 		xOffset = (xOffset < 0 || xOffset > 0) ? parseInt(xOffset,10) : 0;
 		yOffset = (yOffset < 0 || yOffset > 0) ? parseInt(yOffset,10) : 0;
-		var myhead = fwDocument.fwTags.fwFind("head");
 		var shadowColor = fwParameters['shadowColor'].fwValue.fwHex;
 		if(shadowColor != undefined){
+  	  var selector = ['c3s', blur, xOffset, yOffset, shadowColor].join('-');
 			shadowColor = '#' + shadowColor;
+			if(array_search(fwPage.shadows, selector) == false){
+			  fwPage.shadows.push(selector);
+    		var myhead = fwDocument.fwTags.fwFind("head");
+    		if(myhead){
+					var cssStyles = myhead.fwAddCSSStyles();
+					var style = xOffset + 'px ' + yOffset + 'px ' + blur + 'px ' + shadowColor;
+					cssStyles.fwAddRawln("." + selector + " { -webkit-box-shadow: " + style + "; -moz-box-shadow: " + style + "; box-shadow: " + style + " }");
+    		}
+			}
 			var myTags = Array("div","td");
 			var myItem = fwDocument.fwTags.fwFindAll(myTags,fwItem);
 			for (var i in myItem){
 				if (myItem[i] && myItem[i] != null){
-					if(!myItem[i].ID){ 
-						myItem[i].ID = fwQuote(fwItem);
-					}
-					var myID = myItem[i].ID;
-					myID = fwQuote(myID,'','"');//"
-					if (myhead){
-						var cssStyles = myhead.fwAddCSSStyles();
-						var style = xOffset + 'px ' + yOffset + 'px ' + blur + 'px ' + shadowColor;
-						cssStyles.fwAddRawln("#" + myID + " { -webkit-box-shadow: " + style + "; -moz-box-shadow: " + style + " }");
-					}
+					addClassName(myItem[i], selector);
 				}
 			}
 		}
