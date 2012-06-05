@@ -1,8 +1,8 @@
-This is a collection of many of the Actions I've written for Softpress Freeway over the years. 
+#This is a collection of many of the Actions I've written for Softpress Freeway over the years. 
 
 <a href='http://www.pledgie.com/campaigns/9377'><img alt='Click here to lend your support to: freewayactions and make a donation at www.pledgie.com !' src='http://www.pledgie.com/campaigns/9377.png?skin_name=chrome' border='0' /></a>
 
-All of these Actions are Copyright, but available under the terms of the BSD license. 
+All of these Actions are Copyright, but available to use for free under the terms of the BSD license. 
 
 Copyright (c) 1997 - 2012, Walter Lee Davis
 All rights reserved.
