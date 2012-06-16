@@ -1,0 +1,249 @@
+<action-encoding>UTF-8</action-encoding>
+<page-action name="com.wdstudio.html5_page" title="HTML5 Page">
+<action-appliesto xhtmlstrict xhtml />
+<action-version version="0.3">
+HTML5 Page
+Copyright 2012 Walter Lee Davis
+
+Convert your page to HTML5
+</action-version>
+<action-markup custom name="conditional">
+<!--[if lt IE 9]>
+<script src="//html5shiv.googlecode.com/svn/trunk/html5.js">
+</script>
+<![endif]-->
+</action-markup>
+<action-javascript>
+function fwBeforeEndHead(){
+  if(!fwPage.html5){
+    fwPage['html5'] = true;
+    var doctype = fwDocument.fwTags.fwFind("!DOCTYPE");
+    if(doctype){
+      doctype.fwFindEnclosing('').fwAddRaw('<!DOCTYPE html>', doctype);
+      doctype.fwDelete();
+    }
+    var html = fwDocument.fwTags.fwFind("html");
+    if(html){
+      html.xmlns = null;
+    }
+  }
+  if(!fwPage.shivved){
+    fwPage['shivved'] = true;
+    var theHead = fwDocument.fwTags.fwFind("head");
+    var theMarkup = fwMarkups['conditional'];
+    theMarkup = theMarkup.toString();
+    theMarkup.fwConvertLineEndings = true;
+    theHead.fwAddRawln(theMarkup);
+  }
+}
+</action-javascript>
+</page-action>
+<item-action name="com.wdstudio.html5_element" title="HTML5 Element">
+<action-appliesto xhtmlstrict xhtml html />
+<action-version version="0.3">
+HTML5 Element
+Copyright 2012 Walter Lee Davis
+
+Convert your page to HTML5
+</action-version>
+<action-markup custom name="conditional">
+<!--[if lt IE 9]>
+<script src="//html5shiv.googlecode.com/svn/trunk/html5.js">
+</script>
+<![endif]-->
+</action-markup>
+<action-popup name="tag" title="Element">
+<value name="article" />
+<value name="aside" />
+<value name="canvas" />
+<value name="datalist" />
+<value name="details" />
+<value name="figcaption" />
+<value name="figure" />
+<value name="footer" />
+<value name="header" />
+<value name="hgroup" />
+<value name="nav" />
+<value name="output" />
+<value name="section" />
+</action-popup>
+<action-text name="data_attribute" title="data-" />
+<action-text name="data_value" title="=" advance="no" />
+
+<action-javascript>
+function fwBeforeEndHead(){
+  if(!fwPage.html5){
+    fwPage['html5'] = true;
+    var doctype = fwDocument.fwTags.fwFind("!DOCTYPE");
+    if(doctype){
+      doctype.fwFindEnclosing('').fwAddRaw('<!DOCTYPE html>', doctype);
+      doctype.fwDelete();
+    }
+    var html = fwDocument.fwTags.fwFind("html");
+    if(html){
+      html.xmlns = null;
+    }
+  }
+  if(!fwPage.shivved){
+    fwPage['shivved'] = true;
+    var theHead = fwDocument.fwTags.fwFind("head");
+    var theMarkup = fwMarkups['conditional'];
+    theMarkup = theMarkup.toString();
+    theMarkup.fwConvertLineEndings = true;
+    theHead.fwAddRawln(theMarkup);
+  }
+}
+function fwBeforeEndBody(){
+  var element = fwDocument.fwTags.fwFind("div",fwItem);
+  if(!!element){
+    if(fwParameters.tag.fwValue == 'datalist'){
+      element.style = null;
+      element['class'] = null;
+      var options = element.fwFindAll('p');
+      for (var i=0; i < options.length; i++) {
+        var opt = options[i].fwAddEnclosing('option',true);
+        opt.fwAddRaw(options[i].fwFindContent().toString());
+        options[i].fwDelete();
+      };
+    }
+    var wrap = element.fwAddEnclosing(fwParameters['tag'].fwValue,true);
+    wrap.fwFindEnclosing().fwAddRawOpt("");
+    wrap['id'] = element['id'];
+    if(!!element['class']) wrap['class'] = element['class'];
+    if(!!element['style']) wrap['style'] = element['style'];
+    if(fwParameters['tag'].fwValue == 'canvas'){
+      wrap.width = fwQuote(fwItem.fwWidth);
+      wrap.height = fwQuote(fwItem.fwHeight);
+    }
+    if(fwParameters.data_attribute.fwValue && fwParameters.data_value.fwValue){
+      element['data-' + fwParameters.data_attribute.fwValue] = fwQuote(fwParameters.data_value.fwValue);
+    }
+    var content = element.fwFindAllContent();
+    wrap.fwMove(content,element);
+    element.fwDelete();
+  }
+}
+
+</action-javascript>
+</item-action>
+<item-action name="com.wdstudio.html5_input" title="HTML5 Input">
+<action-appliesto xhtmlstrict xhtml text-field />
+<action-version version="0.3">
+HTML5 Input
+Copyright 2012 Walter Lee Davis
+
+Convert a text input into one of the new HTML5 types
+</action-version>
+<action-markup custom name="conditional">
+<!--[if lt IE 9]>
+<script src="//html5shiv.googlecode.com/svn/trunk/html5.js">
+</script>
+<![endif]-->
+</action-markup>
+<action-popup name="type" title="Input Type">
+<value name="color"/>
+<value name="date"/>
+<value name="datetime"/>
+<value name="datetime-local"/>
+<value name="email"/>
+<value name="month"/>
+<value name="number"/>
+<value name="range"/>
+<value name="search"/>
+<value name="tel"/>
+<value name="text" default="yes"/>
+<value name="time"/>
+<value name="url"/>
+<value name="week"/>
+</action-popup>
+<action-number name="min" default=0 real-numbers />
+<action-number name="max" default=100 real-numbers advance="no" />
+<action-text name="placeholder" />
+<action-text name="data_attribute" title="data-" />
+<action-text name="data_value" title="=" advance="no" />
+<action-checkbox name="autofocus" title="Focus on page load" default="no" />
+<action-checkbox name="results" title="Show previous results" />
+<action-checkbox name="autocomplete" title="Do not auto-complete" default="no" />
+<action-checkbox name="autocorrect" title="Do not auto-correct" default="no" />
+<action-checkbox name="datalist" title="Use datalist" default="no" />
+<action-itemref name="data" title="Data Source" filter="filterItems"/>
+
+<action-javascript>
+function showAutofocus(){
+  var actions = fwPage.fwFindAllActions(2,['com.wdstudio.html5_input']);
+  for(i in actions){
+    if(actions[i].fwItem != fwItem && actions[i].fwParameters.autofocus.fwBoolValue) return false;
+  }
+  return true;
+}
+function fwInterface(){
+  fwParameters.results.fwVisible = fwParameters.type.fwValue == 'search';
+  fwParameters.data.fwVisible = fwParameters.datalist.fwBoolValue;
+  fwParameters.min.fwVisible = fwParameters.max.fwVisible = fwParameters.type.fwValue == 'range';
+  fwParameters.autofocus.fwEnable = showAutofocus();
+}
+function filterItems(item){
+  if (!item)
+		return true;
+  if(!!item){
+    var actions = item.fwFindAllActions(2,['com.wdstudio.html5_element']);
+    if(actions.length > 0){
+      for(i in actions){
+        if(actions[i].fwParameters && actions[i].fwParameters.tag && actions[i].fwParameters.tag.fwValue == 'datalist'){
+          return item;
+        }
+      }
+    }
+  }
+  return false;
+}
+
+function fwBeforeEndHead(){
+  if(!fwPage.html5){
+    fwPage['html5'] = true;
+    var doctype = fwDocument.fwTags.fwFind("!DOCTYPE");
+    if(doctype){
+      doctype.fwFindEnclosing('').fwAddRaw('<!DOCTYPE html>', doctype);
+      doctype.fwDelete();
+    }
+    var html = fwDocument.fwTags.fwFind("html");
+    if(html){
+      html.xmlns = null;
+    }
+  }
+  if(!fwPage.shivved){
+    fwPage['shivved'] = true;
+    var theHead = fwDocument.fwTags.fwFind("head");
+    var theMarkup = fwMarkups['conditional'];
+    theMarkup = theMarkup.toString();
+    theMarkup.fwConvertLineEndings = true;
+    theHead.fwAddRawln(theMarkup);
+  }
+}
+function fwBeforeEndBody(){
+  var input = fwDocument.fwTags.fwFind("input",fwItem);
+  if(!!input){
+    if(!input.id) input.id = input.name;
+    input.type = fwQuote(fwParameters.type.fwValue);
+    if(fwParameters.placeholder.fwValue.toString().length > 0) input.placeholder = fwQuote(fwParameters.placeholder.fwValue);
+    if(fwParameters.type.fwValue == 'search'){
+      if(fwParameters.results.fwBoolValue){
+        input.results = fwQuote(5);
+        input.autosave = input.id;
+      }
+    }
+    if(fwParameters.autofocus.fwBoolValue){
+      input.autofocus = fwQuote('autofocus');
+    }
+    if(fwParameters.data_attribute.fwValue && fwParameters.data_value.fwValue){
+      input['data-' + fwParameters.data_attribute.fwValue] = fwQuote(fwParameters.data_value.fwValue);
+    }
+    if(fwParameters.datalist.fwBoolValue){
+      var data = fwParameters['data'].fwValue;
+      input.list = fwQuote(data);
+    }
+  }
+}
+
+</action-javascript>
+</item-action>
