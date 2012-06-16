@@ -428,7 +428,7 @@
 
 <item-action name="ScriptyFader">
 <action-appliesto non-html32/>
-<action-version version="0.4.3">
+<action-version version="0.5.1">
 ScriptyFader
 Action (c)2011 Walter Lee Davis.
 
@@ -440,12 +440,12 @@ Apply the action to an HTML item to mark the location of a fading group of page 
 	var mains = $$('.SFmain');
 	thumbs.each(function(elm){
 		if(elm.down('img')){
-			elm.down('img').setOpacity(0.4);
+			elm.down('img').setOpacity(__faded__);
 			elm.observe('mouseover', function(evt){
 				elm.down('img').morph('opacity:1',{duration:0.3});
 			});
 			elm.observe('mouseout', function(evt){
-				if(!elm.hasClassName('active')) elm.down('img').morph('opacity:0.4',{duration:0.3});
+				if(!elm.hasClassName('active')) elm.down('img').morph('opacity:__faded__',{duration:0.3});
 			});
 		}
 		elm.observe('click',function(evt){
@@ -522,7 +522,7 @@ Apply the action to an HTML item to mark the location of a fading group of page 
 		var group = elm.readAttribute('rel');
 		var main = $(group);
 		var clone = $('clone_' + group);
-		$$('.' + group).reject(function(el){return el == elm;}).each(function(el){ el.removeClassName('active'); if(el.down('img')) el.down('img').morph('opacity:0.4',{duration:0.3}); });
+		$$('.' + group).reject(function(el){return el == elm;}).each(function(el){ el.removeClassName('active'); if(el.down('img')) el.down('img').morph('opacity:__faded__',{duration:0.3}); });
 		elm.addClassName('active');
 		elm.select('img').invoke('setStyle', {opacity:1});
 		loadOption(elm.href.split('#').last(),group);
@@ -566,8 +566,9 @@ Apply the action to an HTML item to mark the location of a fading group of page 
 <action-file name ="scriptaculous181packer" var/>
 <action-file name ="ajaxwait" var/>
 <action-file name ="partial" var keepwithhtml/>
-<action-number name="autofade" title="Auto-Fade Interval" default=0 real-numbers>
+<action-number name="autofade" title="Auto-Fade Interval" default=0 real-numbers />
 <action-checkbox name="spinner" title="Show Spinner" default=yes />
+<action-number name="faded" title="Faded Thumbnail Opacity" default=0.4 real-numbers>
 <action-javascript>
 <action-include name="scriptyHandlerFunctions">
 	function getPosition(item){
@@ -685,7 +686,10 @@ Apply the action to an HTML item to mark the location of a fading group of page 
 					}
 					var myScript = myHead.fwAddJavaScript();
 					var theMarkup = fwMarkups['fader'];
-					theMarkup = theMarkup.toString();
+					var opacity = fwParameters.faded.fwValue;
+					if(opacity < 0) opacity = 0;
+					if(opacity > 1) opacity = 1;
+					theMarkup = theMarkup.toString().replace(/__faded__/g,opacity);
 					theMarkup.fwConvertLineEndings = true;
 					myScript.fwAddRaw(theMarkup);
 					myHead.fwAddRawln('');
@@ -718,7 +722,7 @@ Apply the action to an HTML item to mark the location of a fading group of page 
 
 <item-action name="ScriptyFader Option">
 <action-appliesto layer non-html32/>
-<action-version version="0.4.3">
+<action-version version="0.5.1">
 ScriptyFader Option
 (c)2011 Walter Lee Davis
 
@@ -831,7 +835,7 @@ Apply the action to any layer to designate a ScriptyFader option.
 
 <item-action name="ScriptyFader Thumbnail" generates-link>
 <action-appliesto graphic pass-through/>
-<action-version version="0.4.3">
+<action-version version="0.5.1">
 ScriptyFader Thumbnail
 (c)2011 Walter Lee Davis
 
@@ -918,7 +922,7 @@ Apply the action to any graphic to create direct navigation to one of the Script
 </item-action>
 
 <action name="ScriptyFader Text Link" preview-text="&Text;" generates-link height=12>
-<action-version version="0.4.3">
+<action-version version="0.5.1">
 ScriptyFader Text Link
 (c)2011 Walter Lee Davis
 
