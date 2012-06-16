@@ -1,7 +1,7 @@
 <action-encoding>UTF-8</action-encoding>
 <item-action name="com.wdstudio.sublimeplayer" title="SublimePlayer">
 <action-appliesto xhtmlstrict xhtml gif jpeg png pass-through />
-<action-version version="0.1.4">
+<action-version version="0.1.6">
 SublimePlayer
 Copyright 2012 Walter Lee Davis
 
@@ -52,6 +52,18 @@ function fwInterface(){
 	fwParameters['webm'].fwVisible = fwParameters['optional'].fwBoolValue;
 }
 function fwBeforeEndHead(){
+	if(!fwPage.html5){
+	  fwPage['html5'] = true;
+		var doctype = fwDocument.fwTags.fwFind("!DOCTYPE");
+		if(doctype){
+			doctype.fwFindEnclosing('').fwAddRaw('<!DOCTYPE html>', doctype);
+			doctype.fwDelete();
+		}
+		var html = fwDocument.fwTags.fwFind("html");
+		if(html){
+		  html.xmlns = null;
+		}
+	}
 	if(!fwPage.shivved){
 		fwPage['shivved'] = true;
 		var theHead = fwDocument.fwTags.fwFind("head");
@@ -60,11 +72,6 @@ function fwBeforeEndHead(){
 		theMarkup.fwConvertLineEndings = true;
 		if(ssl()) theMarkup = theMarkup.replace(/http:/,'https:');
 		theHead.fwAddRawln(theMarkup);
-		var doctype = fwDocument.fwTags.fwFind("!DOCTYPE");
-		if(doctype){
-			doctype.fwFindEnclosing('').fwAddRaw('<!DOCTYPE html>', doctype);
-			doctype.fwDelete();
-		}
 	}
 }
 function previewing(){
@@ -118,33 +125,29 @@ function fwBeforeEndBody(){
 		video.height = fwQuote(poster.height);
 		video['data-uid'] = fwQuote(uid(poster));
 		poster.fwDelete();
-		if(fwParameters['mp4'].fwHasFile && !(fwParameters['ogg'].fwHasFile && fwParameters['webm'].fwHasFile)){
-			video.src = fwQuote(fwParameters['mp4'].toString());
-		}else{
+		video.fwAddRawOpt("");
+		video.fwIndent();
+		if(fwParameters['ogg'].fwHasFile){
+			var source = video.fwAdd('source', false);
+			source.type = fwQuote('video/ogg');
+			source.src = fwQuote(fwParameters['ogg'].toString());
 			video.fwAddRawOpt("");
-			video.fwIndent();
-			if(fwParameters['ogg'].fwHasFile){
-				var source = video.fwAdd('source', false);
-				source.type = fwQuote('video/ogg');
-				source.src = fwQuote(fwParameters['ogg'].toString());
-				video.fwAddRawOpt("");
-			}
-			if(fwParameters['webm'].fwHasFile){
-				var source = video.fwAdd('source', false);
-				source.type = fwQuote('video/webm');
-				source.src = fwQuote(fwParameters['webm'].toString());
-				video.fwAddRawOpt("");
-			}
-			if(fwParameters['mp4'].fwHasFile){
-				var source = video.fwAdd('source', false);
-				source.type = fwQuote('video/mp4');
-				source.src = fwQuote(fwParameters['mp4'].toString());
-				video.fwAddRawOpt("");
-			}else{
-				alert('You must select an H.264 MPEG video.')
-			}
-			video.fwOutdent();
 		}
+		if(fwParameters['webm'].fwHasFile){
+			var source = video.fwAdd('source', false);
+			source.type = fwQuote('video/webm');
+			source.src = fwQuote(fwParameters['webm'].toString());
+			video.fwAddRawOpt("");
+		}
+		if(fwParameters['mp4'].fwHasFile){
+			var source = video.fwAdd('source', false);
+			source.type = fwQuote('video/mp4');
+			source.src = fwQuote(fwParameters['mp4'].toString());
+			video.fwAddRawOpt("");
+		}else{
+			alert('You must select an H.264 MPEG video.')
+		}
+		video.fwOutdent();
 		var box = video.fwFindEnclosing('div');
 		addClassName(box, 'sublime-player');
 	}
