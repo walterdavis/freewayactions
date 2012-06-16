@@ -1,5 +1,5 @@
 <item-action name="com.wdstudio.TemplateHelper" title="TemplateHelper">
-<action-version version="0.5.3">
+<action-version version="0.5.4">
 “TemplateHelper” Action
 Walter Davis Studio 2007-2011
 </action-version>
@@ -91,12 +91,12 @@ Walter Davis Studio 2007-2011
 				if(fwItem.toString().match(/^[a-zA-Z]+[_a-zA-Z0-9]*$/)){
 					fwParameters['myName'].fwValue = fwItem.toString();
 				}else{
-					fwAbort('Please enter a valid name for your partial');
+					fwAlert('Please enter a valid name for your partial');
 				}
 			}
 			if(fwParameters['makepartial'].fwBoolValue && fwParameters['myName'].fwValue != ''){
 				if( ! fwParameters['myName'].fwValue.toString().match(/^[a-zA-Z]+[_a-zA-Z0-9]*$/)){
-					fwAbort('Please enter a valid name for your partial');
+					fwAlert('Please enter a valid name for your partial');
 				}
 			}
 		}
