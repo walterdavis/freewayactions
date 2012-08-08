@@ -1,0 +1,49 @@
+<action-encoding>UTF-8</action-encoding>
+<page-action name="com.wdstudio.browser-update" title="BrowserUpdate">
+<action-version version="0.1">
+BrowserUpdate
+Copyright 2012 Walter Lee Davis
+
+Use the Browser Update service to help your less-enlightened visitors find the browser of their needs.
+</action-version>
+<action-markup custom name="fixer">
+<script type="text/javascript" src="http://browser-update.org/update.js">;
+</script>
+</action-markup>
+<action-javascript>
+function fwBeforeEndBody(){
+	if(!fwPage.hasUpdate){
+		fwPage['hasUpdate'] = true;
+		var theBody = fwDocument.fwTags.fwFind("body");
+		var theMarkup = fwMarkups['fixer'];
+		theMarkup = theMarkup.toString();
+		theMarkup.fwConvertLineEndings = true;
+		theBody.fwAddRawln(theMarkup);
+	}
+}
+</action-javascript>
+</page-action>
+<folder-action name="com.wdstudio.browser-update" title="BrowserUpdate">
+<action-version version="0.1">
+BrowserUpdate
+Copyright 2012 Walter Lee Davis
+
+Use the Browser Update service to help your less-enlightened visitors find the browser of their needs.
+</action-version>
+<action-markup custom name="fixer">
+<script type="text/javascript" src="http://browser-update.org/update.js">;
+</script>
+</action-markup>
+<action-javascript>
+function fwBeforeEndBody(){
+	if(!fwPage.hasUpdate){
+		fwPage['hasUpdate'] = true;
+		var theBody = fwDocument.fwTags.fwFind("body");
+		var theMarkup = fwMarkups['fixer'];
+		theMarkup = theMarkup.toString();
+		theMarkup.fwConvertLineEndings = true;
+		theBody.fwAddRawln(theMarkup);
+	}
+}
+</action-javascript>
+</folder-action>
