@@ -1,7 +1,7 @@
 <action-encoding>UTF-8</action-encoding>
 <page-action name="com.wdstudio.html5_page" title="HTML5 Page">
 <action-appliesto xhtmlstrict xhtml />
-<action-version version="0.3">
+<action-version version="0.4">
 HTML5 Page
 Copyright 2012 Walter Lee Davis
 
@@ -22,10 +22,6 @@ function fwBeforeEndHead(){
       doctype.fwFindEnclosing('').fwAddRaw('<!DOCTYPE html>', doctype);
       doctype.fwDelete();
     }
-    var html = fwDocument.fwTags.fwFind("html");
-    if(html){
-      html.xmlns = null;
-    }
   }
   if(!fwPage.shivved){
     fwPage['shivved'] = true;
@@ -40,9 +36,10 @@ function fwBeforeEndHead(){
 </page-action>
 <item-action name="com.wdstudio.html5_element" title="HTML5 Element">
 <action-appliesto xhtmlstrict xhtml html />
-<action-version version="0.3">
+<action-version version="0.4">
 HTML5 Element
 Copyright 2012 Walter Lee Davis
++ Major help from Tim Plumb 2012
 
 Convert your page to HTML5
 </action-version>
@@ -53,19 +50,19 @@ Convert your page to HTML5
 <![endif]-->
 </action-markup>
 <action-popup name="tag" title="Element">
-<value name="article" />
-<value name="aside" />
-<value name="canvas" />
-<value name="datalist" />
-<value name="details" />
-<value name="figcaption" />
-<value name="figure" />
-<value name="footer" />
-<value name="header" />
-<value name="hgroup" />
-<value name="nav" />
-<value name="output" />
-<value name="section" />
+  <value name="article" />
+  <value name="aside" />
+  <value name="canvas" />
+  <value name="datalist" />
+  <value name="details" />
+  <value name="figcaption" />
+  <value name="figure" />
+  <value name="footer" />
+  <value name="header" />
+  <value name="hgroup" />
+  <value name="nav" />
+  <value name="output" />
+  <value name="section" />
 </action-popup>
 <action-text name="data_attribute" title="data-" />
 <action-text name="data_value" title="=" advance="no" />
@@ -101,26 +98,19 @@ function fwBeforeEndBody(){
       element['class'] = null;
       var options = element.fwFindAll('p');
       for (var i=0; i < options.length; i++) {
-        var opt = options[i].fwAddEnclosing('option',true);
-        opt.fwAddRaw(options[i].fwFindContent().toString());
-        options[i].fwDelete();
+        options[i].fwTitle = 'option';
       };
     }
-    var wrap = element.fwAddEnclosing(fwParameters['tag'].fwValue,true);
-    wrap.fwFindEnclosing().fwAddRawOpt("");
-    wrap['id'] = element['id'];
-    if(!!element['class']) wrap['class'] = element['class'];
-    if(!!element['style']) wrap['style'] = element['style'];
-    if(fwParameters['tag'].fwValue == 'canvas'){
-      wrap.width = fwQuote(fwItem.fwWidth);
-      wrap.height = fwQuote(fwItem.fwHeight);
+    element.fwTitle = fwParameters['tag'].fwValue; 
+
+    if(fwParameters['tag'].fwValue == 'canvas'){ 
+      element.width = fwQuote(fwItem.fwWidth); 
+      element.height = fwQuote(fwItem.fwHeight); 
+    } 
+
+    if(fwParameters.data_attribute.fwValue && fwParameters.data_value.fwValue){ 
+      element['data-' + fwParameters.data_attribute.fwValue] = fwQuote(fwParameters.data_value.fwValue); 
     }
-    if(fwParameters.data_attribute.fwValue && fwParameters.data_value.fwValue){
-      element['data-' + fwParameters.data_attribute.fwValue] = fwQuote(fwParameters.data_value.fwValue);
-    }
-    var content = element.fwFindAllContent();
-    wrap.fwMove(content,element);
-    element.fwDelete();
   }
 }
 
@@ -128,7 +118,7 @@ function fwBeforeEndBody(){
 </item-action>
 <item-action name="com.wdstudio.html5_input" title="HTML5 Input">
 <action-appliesto xhtmlstrict xhtml text-field />
-<action-version version="0.3">
+<action-version version="0.4">
 HTML5 Input
 Copyright 2012 Walter Lee Davis
 
@@ -184,7 +174,7 @@ function fwInterface(){
 }
 function filterItems(item){
   if (!item)
-		return true;
+  return true;
   if(!!item){
     var actions = item.fwFindAllActions(2,['com.wdstudio.html5_element']);
     if(actions.length > 0){
