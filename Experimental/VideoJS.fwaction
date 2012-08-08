@@ -1,0 +1,126 @@
+<action-encoding>UTF-8</action-encoding>
+<item-action name="com.wdstudio.videojsr" title="VideoJS">
+<action-appliesto xhtmlstrict xhtml gif jpeg png pass-through />
+<action-version version="0.1">
+VideoJS
+Copyright 2012 Walter Lee Davis
+
+A simple way to show HTML5 video. Uses the VideoJS player from Steve Heffernan and Zencoder Inc.
+
+VideoJS is licensed under the GNU Lesser General Public License, version 3.
+</action-version>
+<action-file name="mp4" title="MPEG-4 (H.264)">
+	<value type=".mp4" />
+</action-file>
+<action-disclosure name="optional" title="Optional additional formats" default="no" />
+<action-file name="ogg" title="Ogg/Theora">
+	<value type=".ogv" />
+</action-file>
+<action-file name="webm" title="WebM">
+	<value type=".webm" />
+</action-file>
+<action-markup custom name="conditional">
+<!--[if lt IE 9]>
+<script src="http://html5shiv.googlecode.com/svn/trunk/html5.js">
+</script>
+<![endif]-->
+</action-markup>
+<action-javascript>
+String.prototype.strip = function() {
+	return this.replace(/^\s+/, '').replace(/\s+$/, '');
+}
+var hasClassName = function(element, className) {
+	className = fwQuote(className,'','"'); //"
+	var elementClassName = (element["class"]) ? fwQuote(element["class"],'','"') : ''; //"
+	return ((elementClassName.length > 0) && (elementClassName == className || new RegExp("\\b" + className + "\\b").test(elementClassName)));
+};
+
+var addClassName = function(element, className) {
+	className = fwQuote(className,'','"'); //"
+	if (!hasClassName(element,className)){
+		var elementClassName = (element["class"]) ? fwQuote(element["class"],'','"') : ''; //"
+		var out = (elementClassName + ' ' + className).strip();
+		return element["class"] = fwQuote(out);
+	}
+};
+
+function fwInterface(){
+	if (fwParameters['ogg'].fwHasFile || fwParameters['webm'].fwHasFile) fwParameters['optional'].fwBoolValue = true;
+	fwParameters['ogg'].fwVisible = fwParameters['optional'].fwBoolValue;
+	fwParameters['webm'].fwVisible = fwParameters['optional'].fwBoolValue;
+}
+function fwBeforeEndHead(){
+	if(!fwPage.html5){
+	  fwPage['html5'] = true;
+		var doctype = fwDocument.fwTags.fwFind("!DOCTYPE");
+		if(doctype){
+			doctype.fwFindEnclosing('').fwAddRaw('<!DOCTYPE html>', doctype);
+			doctype.fwDelete();
+		}
+		var html = fwDocument.fwTags.fwFind("html");
+		if(html){
+		  html.xmlns = null;
+		}
+	}
+	if(!fwPage.shivved){
+		fwPage['shivved'] = true;
+		var theHead = fwDocument.fwTags.fwFind("head");
+		var theMarkup = fwMarkups['conditional'];
+		theMarkup = theMarkup.toString();
+		theMarkup.fwConvertLineEndings = true;
+		theHead.fwAddRawln(theMarkup);
+	}
+}
+function fwBeforeEndBody(){
+	var poster = fwDocument.fwTags.fwFind("img",fwItem);
+	if(!!poster){
+		if(!fwPage.videojs){
+			fwPage['videojs'] = true;
+			var theHead = fwDocument.fwTags.fwFind("head");
+			var cssLink = theHead.fwAdd('link',false);
+			cssLink['rel'] = fwQuote('stylesheet');
+			cssLink['href'] = fwQuote('http://vjs.zencdn.net/c/video-js.css');
+			theHead.fwAddRawOpt("");
+			var scriptTag = theHead.fwAdd('script',true);
+			scriptTag.type = fwQuote('text/javascript');
+			scriptTag.charset = fwQuote('utf-8');
+			scriptTag.src = fwQuote("http://vjs.zencdn.net/c/video.js");
+			scriptTag.fwAddRawOpt("");
+		}
+		var video = poster.fwAddEnclosing('video',true);
+		video.fwFindEnclosing().fwAddRawOpt("");
+		video.poster = poster.src.toString();
+		video.controls = fwQuote("controls");
+		video.preload = fwQuote("none");
+		video['class'] = fwQuote("video-js vjs-default-skin");
+		video.width = fwQuote(poster.width);
+		video.height = fwQuote(poster.height);
+		video['data-setup'] = fwQuote('{}');
+		poster.fwDelete();
+		video.fwAddRawOpt("");
+		video.fwIndent();
+		if(fwParameters['ogg'].fwHasFile){
+			var source = video.fwAdd('source', false);
+			source.type = fwQuote('video/ogg');
+			source.src = fwQuote(fwParameters['ogg'].toString());
+			video.fwAddRawOpt("");
+		}
+		if(fwParameters['webm'].fwHasFile){
+			var source = video.fwAdd('source', false);
+			source.type = fwQuote('video/webm');
+			source.src = fwQuote(fwParameters['webm'].toString());
+			video.fwAddRawOpt("");
+		}
+		if(fwParameters['mp4'].fwHasFile){
+			var source = video.fwAdd('source', false);
+			source.type = fwQuote('video/mp4');
+			source.src = fwQuote(fwParameters['mp4'].toString());
+			video.fwAddRawOpt("");
+		}else{
+			alert('You must select an H.264 MPEG video.')
+		}
+		video.fwOutdent();
+	}
+}
+</action-javascript>
+</item-action>
