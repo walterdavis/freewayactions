@@ -290,11 +290,13 @@ Apply the Action to your page to cause all images to "lazy-load", making the pag
 <action-checkbox name="spin" title="Use loading spinner" default="no" />
 <action-markup custom name="lazy">if(typeof Element.store == 'undefined'){
   Element.addMethods({
-    'store': function(elm, k, v){
-      elm[k] = v;
+    store: function(e, k, v){
+      e._prototypeStorage = e._prototypeStorage || {};
+      e._prototypeStorage[k] = v;
     },
-    'retrieve': function(elm, k){
-      return (elm[k]);
+    retrieve: function(e, k){
+      e._prototypeStorage = e._prototypeStorage || {};
+      return (e._prototypeStorage[k]);
     }
   });
 }
