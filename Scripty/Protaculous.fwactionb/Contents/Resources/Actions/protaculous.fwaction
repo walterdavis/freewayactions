@@ -186,16 +186,16 @@
 			filesString = "";
 		}
 		var theHead = fwDocument.fwTags.fwFind("head");
-		var connected = function(){
-			if(fwShellCommand){
-				return fwShellCommand('ping -c1 -i1 http://ajax.googleapis.com');
-			}else{
-				var osa=new FWOSAInterpreter; 
-				osa.fwWrite('do shell script "curl ajax.googleapis.com"'); 
-				osa.fwCompile(); 
-				return osa.fwRun();
-			}
-		}
+    var connected = function(){
+      if(fwShellCommand){
+        return fwShellCommand('ping -c1 -i1 http://ajax.googleapis.com');
+      }else{
+        var osa=new FWOSAInterpreter; 
+        osa.fwWrite('do shell script "curl ajax.googleapis.com"'); 
+        osa.fwCompile(); 
+        return osa.fwRun();
+      }
+    }
 		var useCustom = filesString && filesString.length > 0;
 		var path = this.fwPathName;
 		var prefix = path.substring(0, path.lastIndexOf(":")) + ':Support Files~:';
@@ -747,7 +747,7 @@ Copyright (c) Walter Davis Studio 2008 - 2011
 
 <item-action name="Carousel">
 <action-appliesto non-html32/>
-<action-version version="1.3.5">
+<action-version version="1.3.6">
 Carousel
 Action (c)2007-11 Walter Lee Davis, big help from Joe Billings in March 2010.
 Glider.js (c)2007 Curbly LLC - author Bruno Bornsztein <bruno@missingmethod.com>
@@ -862,7 +862,7 @@ Apply the action to a group of HTML items to turn them into a smooth-scrolling c
 		
 	}
 	function removePositioning(target){
-		pos = ['top','left','bottom','right','z-index'];
+		pos = ['top','left','bottom','right','z-index', 'margin'];
 		for(var i = 0; i < pos.length; i++){
 			if(GetCSSAttribute(target,pos[i])){
 				SetCSSAttribute(target,pos[i],null);
@@ -890,7 +890,7 @@ Apply the action to a group of HTML items to turn them into a smooth-scrolling c
 			inner.id = thisItem.id;
 			inner.style = thisItem.style;
 			SetCSSAttribute(thisItem,'border',null);
-			SetCSSAttribute(thisItem,'margin',null);
+			//SetCSSAttribute(thisItem,'margin',null);
 			SetCSSAttribute(thisItem,'padding',null);
 			SetCSSAttribute(thisItem,'height',originalHeight);
 			SetCSSAttribute(thisItem,'width',originalWidth);
@@ -932,7 +932,7 @@ Apply the action to a group of HTML items to turn them into a smooth-scrolling c
 
 <item-action name="Carousel Pane">
 <action-appliesto layer non-html32/>
-<action-version version="1.3.5">
+<action-version version="1.3.6">
 Carousel Pane
 (c)2009 - 2011 Walter Lee Davis
 
@@ -993,7 +993,7 @@ Apply the action to any layer to designate a Carousel pane.
 
 <item-action name="Carousel Button">
 <action-appliesto graphic pass-through/>
-<action-version version="1.3.5">
+<action-version version="1.3.6">
 Carousel Button
 (c)2007-2011 Walter Lee Davis
 
@@ -1077,7 +1077,7 @@ Apply the action to any linked (or linkable) graphic to create scroll buttons fo
 </item-action>
 
 <action name="Carousel Text Tab" preview-text="&Text;" generates-link height=12>
-<action-version version="1.3.5">
+<action-version version="1.3.6">
 Carousel Text Tab
 (c)2009 - 2011 Walter Lee Davis
 
@@ -1165,7 +1165,7 @@ Use this Action inline to create direct text navigation links to one of the Caro
 
 <item-action name="Carousel Tab" generates-link>
 <action-appliesto graphic pass-through/>
-<action-version version="1.3.5">
+<action-version version="1.3.6">
 Carousel Tab
 (c)2007 - 2011 Walter Lee Davis
 
