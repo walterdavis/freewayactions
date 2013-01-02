@@ -1,0 +1,56 @@
+<page-action name="com.wdstudio.breakpoint" title="BreakPoint">
+<action-version version="0.2">
+BreakPoint
+Copyright 2012 Walter Lee Davis
+
+Redirect the current page based on the screen width of the browser.
+</action-version>
+<action-label name="instructions" title="Enter a maximum screen width for each page version." />
+<action-number name="width_1" title="Width" default=320 real-numbers />
+<action-url name="url_1" title="   URL" advance="no" />
+<action-label name="instructions2" title="Enter additional versions in ascending size order (optional)." />
+<action-number name="width_2" title="Width" default=480 real-numbers />
+<action-url name="url_2" title="   URL" advance="no" />
+<action-number name="width_3" title="Width" default=600 real-numbers />
+<action-url name="url_3" title="   URL" advance="no" />
+<action-number name="width_4" title="Width" default=768 real-numbers />
+<action-url name="url_4" title="   URL" advance="no" />
+<action-number name="width_5" title="Width" default=1024 real-numbers />
+<action-url name="url_5" title="   URL" advance="no" />
+<action-javascript>
+
+function fwInterface(){
+  fwParameters['instructions2'].fwVisible = fwParameters['url_2'].fwVisible = fwParameters['width_2'].fwVisible = (fwParameters['url_1'].fwValue.toString().length > 2)
+  fwParameters['url_3'].fwVisible = fwParameters['width_3'].fwVisible = (fwParameters['url_2'].fwValue.toString().length > 2)
+  fwParameters['url_4'].fwVisible = fwParameters['width_4'].fwVisible = (fwParameters['url_3'].fwValue.toString().length > 2)
+  fwParameters['url_5'].fwVisible = fwParameters['width_5'].fwVisible = (fwParameters['url_4'].fwValue.toString().length > 2)
+}
+function fwParametersChanged(){
+  fwInterface();
+}
+function fwAfterStartHead(){
+  var head = fwDocument.fwTags.fwFind("head");
+  if(!!head){
+    var script = head.fwAddJavaScript();
+    script.fwAddRawOpt('(function(){');
+    script.fwIndent()
+    for (var i=1; i < 6; i++) {
+      var key = 'width_' + i.toString();
+      var val = 'url_' + i.toString();
+      if(fwParameters[val].fwValue.toString().length > 2){
+        if(fwParameters[val].fwValue.fwPage){
+          var path = fwParameters[val].fwValue.fwPage.fwHttpPath(fwPage);
+        }else{
+          var path = fwParameters[val].fwValue.toString();
+        }
+        script.fwAddRawOpt('if(screen.width && screen.width <= ' + fwParameters[key].fwValue.toString() + ') return document.location = "' + path + '";');
+      }
+    };
+    script.fwOutdent();
+    script.fwAddRawOpt('})();');
+    head.fwAddRawOpt();
+  }
+}
+
+</action-javascript>
+</page-action>

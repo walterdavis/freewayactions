@@ -1,0 +1,129 @@
+<action-encoding>UTF-8</action-encoding>
+<item-action name="com.wdstudio.flickrshow" title="FlickrShow">
+<action-appliesto html />
+<action-version version="0.1.1">
+FlickrShow Action
+Copyright 2012 Walter Lee Davis
+
+Create a Flickr slideshow.
+</action-version>
+<action-checkbox name="autoplay" title="Auto-play" default=yes />
+<action-checkbox name="hide_buttons" title="Hide Buttons" />
+<action-number name="interval" title="Delay" default=3 real-numbers />
+<action-number name="page" title="Page" default=1 real-numbers />
+<action-number name="per_page" title="Per Page" default=10 real-numbers />
+<action-label name="license" title="  License: " />
+<action-checkbox name="license_1" title="1 " default=no advance=no />
+<action-checkbox name="license_2" title="2 " default=no advance=no />
+<action-checkbox name="license_3" title="3 " default=no advance=no />
+<action-checkbox name="license_4" title="4 " default=no advance=no />
+<action-checkbox name="license_5" title="5 " default=no advance=no />
+<action-checkbox name="license_6" title="6 " default=no advance=no />
+<action-checkbox name="license_7" title="7 " default=no advance=no />
+<action-popup name="key" title="Show">
+<value name="user" title="Photos by User" default=yes/>
+<value name="person" title="Photos of Person"/>
+<value name="random" title="Random"/>
+<value name="gallery" title="Gallery"/>
+<value name="group" title="Group"/>
+<value name="set" title="Set"/>
+</action-popup>
+<action-text name="val" title=" " advance=no />
+<action-text name="tags" title="Tags" />
+<action-label name="tag" title="(comma-separated)" advance=no />
+
+<action-javascript>
+function fwInterface(){
+  fwParameters['tags'].fwVisible = fwParameters['tag'].fwVisible = fwParameters['key'].fwValue.toString() == 'user';
+  fwParameters['val'].fwVisible = fwParameters['key'].fwValue.toString() != 'random';
+}
+function fwBeforeEndBody(){
+  if(!fwPage.flickrShow){
+    var theHead = fwDocument.fwTags.fwFind("head");
+    theHead.fwAddRawOpt('<script src="http://www.flickrshow.co.uk/static/scripts/flickrshow-7.2.min.js"></script>');
+    var body = fwDocument.fwTags.fwFind("body");
+    fwPage['flickrShow'] = body.fwAddJavaScript();
+    body.fwAddRawln('');
+  }
+  var elm = fwDocument.fwTags.fwFind(fwItem);
+  if(!!elm){
+    restoreBox(elm);
+    var id = elm.id.toString().slice(1,-1);
+    var script = fwPage.flickrShow;
+    var opts = [], licenses = [];
+    for (var i=1; i < 8; i++) {
+      var key = 'license_' + i.toString();
+      if(fwParameters[key].fwBoolValue) licenses.push(i);
+    };
+    script.fwAddRawln('var ' + id + ' = new flickrshow(\'' + id + '\', {');
+    script.fwIndent();
+    opts.push('license:\'' + licenses.join(',') + '\'');
+    opts.push('autoplay:' + (fwParameters['autoplay'].fwBoolValue? 'true' : 'false'));
+    opts.push('hide_buttons:' + (fwParameters['hide_buttons'].fwBoolValue? 'true' : 'false'));
+    opts.push('interval:' + (fwParameters['interval'].fwValue * 1000).toString());
+    opts.push('page:' + fwParameters['page'].fwValue.toString());
+    opts.push('per_page:' + fwParameters['per_page'].fwValue.toString());
+    if(fwParameters['tags'].fwVisible){
+      opts.push('tags:\'' + fwParameters['tags'].fwValue.toString() + '\'');
+    }
+    if(fwParameters['key'].fwValue.toString() != 'random'){
+      opts.push(fwParameters['key'].fwValue.toString() + ':\'' + fwParameters['val'].fwValue.toString() + '\'');
+    }
+    script.fwAddRawln(opts.join(",\n\t"));
+    script.fwOutdent();
+    script.fwAddRawln('});');
+  }
+}
+function SetCSSAttribute(tag, attributeName, attributeValue) { 
+  // Sets a "CSS" attribute such as "position:absolute" in a tag value 
+  // Passing an attribute value of null removes that attribute entirely
+  if (tag==null) return; 
+  var tagField = tag['style']; 
+  if (tagField == null){
+    tag['style'] = '"'+attributeName+':'+attributeValue+'"'; 
+  }else{
+    var tagField = tagField.toString();
+    var pairs = tagField.slice(1,-1).split(';');
+    var out = new Array();
+    if(attributeValue != null && tagField.indexOf(attributeName) < 0) out.push(attributeName+':'+attributeValue);
+    for(i in pairs){
+      pairs[i] = pairs[i].replace(/^\s*(\S*(\s+\S+)*)\s*$/, "$1"); //javascript equivalent of trim
+      if(pairs[i].slice(0,pairs[i].indexOf(':')) == attributeName) {
+        if(attributeValue != null) out.push(attributeName+':'+attributeValue);
+      }else{
+        out.push(pairs[i]);
+      }
+    }
+    tag['style']= fwQuote(out.join('; ')); 
+  }
+} 
+function GetCSSAttribute(tag, attributeName) { 
+  // Gets a "CSS" attribute such as "position:absolute" from a tag value 
+  // returns NULL if the attribute can not be found 
+  if (tag==null) return null; 
+  var tagField = tag['style']; 
+  if (tagField == null) {
+    return null; 
+  }else { 
+    var tagField = tagField.toString(); 
+    var pairs = tagField.slice(1,-1).split(';');
+    for(i in pairs){
+      pairs[i] = pairs[i].replace(/^\s*(\S*(\s+\S+)*)\s*$/, "$1"); //javascript equivalent of trim
+      if(pairs[i].slice(0,pairs[i].indexOf(':')) == attributeName) {
+        return pairs[i].slice(pairs[i].indexOf(':')+1,pairs[i].length);
+      }
+    }
+    return null; 
+  } 
+}
+
+function restoreBox(thisObj){
+  if(GetCSSAttribute(thisObj, 'font-size') == '1px')
+    SetCSSAttribute(thisObj,'font-size', null);
+  if(!thisObj.id){
+    fwAbort('“' + fwItem + '” does not have an ID. Apply the Flickrshow Action to a layered or inline (CSS) HTML box.')
+  }
+}
+
+</action-javascript>
+</item-action>

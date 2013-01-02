@@ -1,0 +1,20 @@
+<action-encoding>UTF-8</action-encoding>
+<page-action name="com.wdstudio.cleanurls" title="CleanURLs">
+<action-version version="0.1">
+CleanURLs
+Copyright 2012 Walter Lee Davis
+
+Strip off index.html from URLs.
+</action-version>
+<action-javascript>
+function fwAfterEndHTML(){
+  var links = fwDocument.fwTags.fwFindAll('a');
+  for(i in links){
+    if(links[i].href.toString().match(/index\.(html|php)/i)){
+      links[i].href = links[i].href.toString().replace(/index\.(html|php)/i,'');
+      if(links[i].href.toString() == '""') links[i].href = '"/"';
+    }
+  }
+}
+</action-javascript>
+</page-action>

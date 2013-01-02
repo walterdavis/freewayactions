@@ -1,8 +1,8 @@
 <item-action name="com.wdstudio.css3columns" title="CSS3 Columns">
 <action-appliesto html4 html32css xhtml xhtmlstrict />
-<action-version version="0.2">
+<action-version version="0.3">
 “CSS3 Columns” Action
-Walter Davis Studio 2009
+Walter Davis Studio 2009, 2012
 
 Apply to an HTML item to give it a multiple columns using pure CSS3.
 </action-version>
@@ -68,14 +68,14 @@ Apply to an HTML item to give it a multiple columns using pure CSS3.
 		}else{
 			columnRuleColor = '';
 		}
-		var myTags = Array("div","td");
-		var myItem = fwDocument.fwTags.fwFindAll(myTags,fwItem);
-		for (var i in myItem){
-			if (myItem[i] && myItem[i] != null){
-				if(!myItem[i].ID){ 
-					myItem[i].ID = fwQuote(fwItem);
+		var myItem = fwDocument.fwTags.fwFind(fwItem);
+		if(myItem == '') myItem = myItem.fwFindEnclosing();
+		//for (var i in myItem){
+			if (myItem && myItem != null){
+				if(!myItem.ID){ 
+					myItem.ID = fwQuote(fwItem);
 				}
-				var myID = myItem[i].ID;
+				var myID = myItem.ID;
 				myID = fwQuote(myID,'','"');//"
 				if (myhead){
 					var cssStyles = myhead.fwAddCSSStyles();
@@ -86,7 +86,7 @@ Apply to an HTML item to give it a multiple columns using pure CSS3.
 					cssStyles.fwAddRawln("#" + myID + " { " + count + gap + rule + width + " }");
 				}
 			}
-		}
+		//}
 	}
 
 </action-javascript>

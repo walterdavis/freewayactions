@@ -259,7 +259,7 @@
 
 <item-action name="NewsCycle">
 <action-appliesto non-html32 />
-<action-version version="0.4.2">
+<action-version version="0.5">
 NewsCycle
 Action (c)2011 Walter Lee Davis.
 
@@ -272,7 +272,7 @@ Apply the action to an HTML item and choose another HTML item containing your ne
 	var effectSpeed = __duration__;
 	var tag = newsSource.firstDescendant().tagName.toLowerCase();
 	tag = ($w('ol ul').include(tag)) ? 'li' : tag;
-	var data = newsSource.hide().select(tag).pluck('innerHTML');
+	var data = newsSource.hide().select('>' + tag).pluck('innerHTML');
 	var news = newsDisplay.down(tag).update(data.first());
 	var index = 0;
 	var newsCycle = function(){

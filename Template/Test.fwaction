@@ -1,0 +1,15 @@
+<action name="com.wdstudio.test" title="Test" height="12">
+<action-version version="0.1">
+Test
+</action-version>
+<action-checkbox name="Activate">
+<action-javascript>
+function fwBeforeEndBody(){
+  var activate = fwParameters["Activate"].fwBoolValue;
+  if(activate){
+    var thisItem = fwDocument.fwTags.fwFind(fwItem);
+    if(thisItem && thisItem.fwFindEnclosing('p')) thisItem.fwFindEnclosing('p').fwTitle = 'div';
+  }
+}
+</action-javascript>
+</action>

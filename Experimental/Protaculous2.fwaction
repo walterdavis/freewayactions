@@ -1,0 +1,410 @@
+<action-encoding>UTF-8</action-encoding>
+<library-action name="functions">
+<action-javascript>
+/**
+ * Write a script to an external file.
+ * name: common name of script (domloaded, windowload, custom)
+ * fileParameter: the action-file that holds this file
+ * content: string or array of strings containing the content
+ * returns URL to generated file, for linking purposes
+ */
+var createExternalScript = function(name, fileParameter, content){
+  if(!content.join){
+    content = [content];
+  }
+  var myFile = new FWFile();
+  if(fwParameters[fileParameter].fwHasFile){
+    myFile.fwOpenWrite(fwParameters[fileParameter].fwValue, true, 'TEXT');
+  }else{
+    var path = fwPage.fwHttpPath();
+    path = path.replace(/\//g, '_').split('.');
+    var filename = path.pop();
+    path = path.join('.') + '_' + name + '.js';
+    myFile.fwOpenWrite(path, true, 'TEXT');
+  }
+  for (var i=0; i < content.length; i++) {
+    myFile.fwWrite(content[i] + "\n");
+  };
+  myFile.fwClose();
+  fwParameters[fileParameter].fwSpecify(myFile);
+  var filePath = fwParameters[fileParameter].toString();
+  fwParameters[fileParameter].fwClear();
+  return filePath;
+}
+
+/**
+  * Create a CDN link to a JavaScript library. 
+  * name: common filename for the library (prototype, scriptaculous, jquery)
+  * path: (optional) fully-qualified URL to the CDN-hosted file
+  * (path is not needed if you are linking to prototype or scriptaculous)
+  * WARNING! changes any existing link in the page to the library to the 
+  * one specified in path or defaults
+  * returns reference to the script
+  */
+var findOrCreateScriptLink = function(name, path){
+  var head = fwDocument.fwTags.fwFind('head');
+  var script = pageHasLinkToScript(name), load = '';
+  var libs = {
+    'prototype': 'http://ajax.googleapis.com/ajax/libs/prototype/1.7/prototype.js',
+    'scriptaculous': 'http://ajax.googleapis.com/ajax/libs/scriptaculous/1.9/scriptaculous.js'
+  };
+  if(!libs[name]){
+    if(!!path){
+      libs[name] = path;
+    }else{
+      fwAbort('Please provide a URL for “' + name + '”. Publishing cannot continue.');
+    }
+  }
+  if(!script){
+    script = head.fwAdd('script', true);
+    script.fwAddRawOpt('');
+    head.fwAddRawOpt('');
+  }
+  //catch any load variables from scriptaculous
+  if(name == 'scriptaculous' && script.src && script.src.toString().match(/\?load=/)){
+    load = script.src.toString().match(/(\?load=.+?)"/)[1]; //"
+  }
+  //overwrite the path to the script to make it current
+  script.src = fwQuote(libs[name] + load);
+  script.type = fwQuote('text/javascript');
+  script.charset = fwQuote('utf-8');
+  return script;
+}
+
+var pageHasLinkToScript = function(name){
+  var script = false;
+  var scripts = fwDocument.fwTags.fwFindAll('script');
+  for(i in scripts){
+    if(scripts[i].src && scripts[i].src.toString().match(new RegExp(name + '.js'))){
+      script = scripts[i];
+    }
+  }
+  return script;
+}
+/**
+ * Find a script tag on the page by its ID, or create one if missing.
+ * name: ID of the script
+ * returns script reference
+ */
+var findOrCreateScript = function(name){
+  var head = fwDocument.fwTags.fwFind('head');
+  var script = pageHasNamedScript(name);
+  if(!script){
+    script = head.fwAdd('script', true);
+    script.id = fwQuote(name);
+    script.type = fwQuote('text/javascript');
+    if(fwMarkups[name]) script.fwAddRawln(fwMarkups[name]);
+    head.fwAddRawOpt('');
+  }
+  return script;
+}
+
+var pageHasNamedScript = function(name){
+  var scripts = fwDocument.fwTags.fwFindAll('script');
+  var script = false;
+  for(i in scripts){
+    if(scripts[i].id && scripts[i].id.toString().match(new RegExp(name))){
+      script = scripts[i];
+    }
+  }
+  return script;
+}
+
+/**
+ * Append code to a given script tag.
+ * elm: reference to script tag
+ * content: string or array of strings
+ * If the script tag includes an anonymous function, content is added
+ * _inside_ that function. Otherwise it is added after any other content.
+ * returns reference to script tag
+ */
+var addToScript = function(elm, content){
+  var txt = elm.fwToHTML().toString();
+  var closer = false;
+  if(txt.match(/\}\);[\r\n]+<\/script>/)){
+    txt = txt.split(/[\r\n]+/);
+    txt.shift();
+    txt.pop();
+    txt.pop();
+    closer = true;
+  }else if(txt.match(/<\/script>/)){
+    txt = txt.split(/[\r\n]+/);
+    txt.shift();
+    txt.pop();
+  }
+  if(!content.join){
+    content = content.split(/[\r\n]+/);
+  }
+  var contents = elm.fwFindAllContent();
+  for(i in contents){
+    contents[i].fwDelete();
+  }
+  elm.fwAddRawln();
+  if(txt.length){
+    for(i in txt){
+      elm.fwAddRawln(txt[i]);
+    }
+  }
+  if(content.length){
+    elm.fwIndent();
+    for(i in content){
+      elm.fwAddRawln(content[i]);
+    }
+    elm.fwOutdent();
+  }
+  if(closer) elm.fwAddRawln("});");
+  return elm;
+}
+/**
+ * Wrapper to simplify function call
+ * returns nothing
+ */
+var addPrototype = function(){
+  findOrCreateScriptLink('prototype');
+}
+
+/**
+ * Add scriptaculous to the page, and load any modules needed if fewer than all.
+ * modules: comma-separated string or array of scriptaculous modules
+ * returns nothing
+ */
+
+var addScriptaculous = function(modules){
+  var scriptaculousLibs = ["builder", "effects", "dragdrop", "controls", "slider", "sound"];
+  var load = [];
+  if(modules.join){
+    modules = modules.join();
+  }
+  var script = findOrCreateScriptLink('scriptaculous');
+  if(script.src.toString().match(/\?load=/)){
+    modules += script.src.toString().split(/\?load=/)[1];
+  }
+  for (var i=0; i < scriptaculousLibs.length; i++) {
+    var re = new RegExp(scriptaculousLibs[i]);
+    if(modules.match(re))
+    load.push(scriptaculousLibs[i]);
+  };
+  if(load.length > 0 && load.length < 6){
+    load = '?load=' + load.join(',');
+    script.src = script.src.toString().replace(/\?load=[^"]+/, '').replace(/"$/, load + '"'); //"
+  }
+}
+function posixToMac(path){
+  return path.replace(/\//g, ':');
+}
+function rootRelativePath(){
+  var posixPath = fwPage.fwHttpPath(null, true);
+  return posixToMac(posixPath);
+}
+
+/**
+ * Edit text stored in a fwParameter
+ * Adapted from Source Code Snooper by Tim Plumb
+ * codeName: name of the fwParameter
+ * returns nothing
+ */
+function EditCode(codeName){
+  var mycustomcode = fwParameters[codeName].toString();
+  var myprompt = "Add your code here";
+  var mycustomcodeprompt = fwBigPrompt(myprompt, mycustomcode);
+  if (mycustomcodeprompt != null) {
+    if (mycustomcodeprompt != mycustomcode) {
+      fwParameters[codeName].fwValue = mycustomcodeprompt;
+    }
+  }
+}
+
+</action-javascript>
+</library-action>
+<page-action name="com.wdstudio.protaculous_2" title="Protaculous 2">
+<action-version version="1.0.1">
+Protaculous 2
+Copyright 2012 Walter Lee Davis
+
+Link Prototype and Scriptaculous to your page.
+</action-version>
+
+<action-markup name="domloaded">
+document.observe('dom:loaded', function(evt){
+});
+</action-markup>
+
+<action-markup name="windowload">
+Event.observe(window, 'load', function(evt){
+});
+</action-markup>
+
+<action-label name="prototype" title="Prototype is added by default" />
+
+<action-checkbox name="scriptaculous" title="Add Scriptaculous libraries" default="no" />
+<action-checkbox name="builder" title="Builder" default="no" />
+<action-checkbox name="effects" title="Effects" default="yes" />
+<action-checkbox name="dragdrop" title="Drag-Drop" default="no" />
+<action-checkbox name="controls" title="Controls" default="no" />
+<action-checkbox name="slider" title="Slider" default="no" />
+<action-checkbox name="sound" title="Sound" default="no" />
+<action-label name="-" />
+
+<action-disclosure name="external" title="Additional JavaScript libraries:" default="no" />
+
+<action-text name="ext_1_name" title="Name" width="80" />
+<action-text name="ext_1_path" title="   CDN URI" width="118" advance="no" />
+<action-file name="ext_1_file" var />
+<action-button name="ext_1_clear" title="x" advance="no" width="25" onclick="clearParam(1)" />
+
+<action-text name="ext_2_name" title="Name" width="80" />
+<action-text name="ext_2_path" title="   CDN URI" width="118" advance="no" />
+<action-file name="ext_2_file" var />
+<action-button name="ext_2_clear" title="x" advance="no" width="25" onclick="clearParam(2)" />
+
+<action-text name="ext_3_name" title="Name" width="80" />
+<action-text name="ext_3_path" title="   CDN URI" width="118" advance="no" />
+<action-file name="ext_3_file" var />
+<action-button name="ext_3_clear" title="x" advance="no" width="25" onclick="clearParam(3)" />
+
+<action-text name="ext_4_name" title="Name" width="80" />
+<action-text name="ext_4_path" title="   CDN URI" width="118" advance="no" />
+<action-file name="ext_4_file" var />
+<action-button name="ext_4_clear" title="x" advance="no" width="25" onclick="clearParam(4)" />
+
+<action-text name="ext_5_name" title="Name" width="80" />
+<action-text name="ext_5_path" title="   CDN URI" width="118" advance="no" />
+<action-file name="ext_5_file" var />
+<action-button name="ext_5_clear" title="x" advance="no" width="25" onclick="clearParam(5)" />
+
+<action-text name="ext_6_name" title="Name" width="80" />
+<action-text name="ext_6_path" title="   CDN URI" width="118" advance="no" />
+<action-file name="ext_6_file" var />
+<action-button name="ext_6_clear" title="x" advance="no" width="25" onclick="clearParam(6)" />
+
+<action-text name="ext_7_name" title="Name" width="80" />
+<action-text name="ext_7_path" title="   CDN URI" width="118" advance="no" />
+<action-file name="ext_7_file" var />
+<action-button name="ext_7_clear" title="x" advance="no" width="25" onclick="clearParam(7)" />
+
+<action-text name="ext_8_name" title="Name" width="80" />
+<action-text name="ext_8_path" title="   CDN URI" width="118" advance="no" />
+<action-file name="ext_8_file" var />
+<action-button name="ext_8_clear" title="x" advance="no" width="25" onclick="clearParam(8)" />
+
+<action-text name="ext_9_name" title="Name" width="80" />
+<action-text name="ext_9_path" title="   CDN URI" width="118" advance="no" />
+<action-file name="ext_9_file" var />
+<action-button name="ext_9_clear" title="x" advance="no" width="25" onclick="clearParam(9)" />
+
+<action-text name="ext_10_name" title="Name" width="80" />
+<action-text name="ext_10_path" title="   CDN URI" width="118" advance="no" />
+<action-file name="ext_10_file" var />
+<action-button name="ext_10_clear" title="x" advance="no" width="25" onclick="clearParam(10)" />
+
+<action-label name="--" />
+<action-text var name="domloaded" default="">
+<action-text var name="windowload" default="">
+<action-text var name="custom" default="">
+
+<action-label name="label1" title="This observer runs when the DOM is loaded:" />
+<action-button width="150" name="function1" title="DOM Loaded Observer" onclick="EditCode('domloaded')";>
+<action-file name="domloaded_external_file" var />
+
+<action-label name="---" />
+<action-label name="label2" title="This observer runs when all content is visible in the browser:" />
+<action-button width="150" name="function2" title="Window Load Observer" onclick="EditCode('windowload')";>
+<action-file name="windowload_external_file" var />
+
+<action-label name="----" />
+<action-label name="label3" title="Add your own observer code:" />
+<action-button width="150" name="function3" title="Custom Observer" onclick="EditCode('custom')";>
+<action-file name="custom_external_file" var />
+
+<action-label name="-----" />
+<action-checkbox name="external_observers" title="Use external script files" default="no" />
+
+<action-javascript>
+<action-include name="functions">
+
+/**
+ * clear the relevant external script name and URL when a clear button is pressed
+ */
+function clearParam(num){
+  var name = 'ext_' + num.toString() + '_name';
+  var path = 'ext_' + num.toString() + '_path';
+  fwParameters[name].fwValue = fwParameters[path].fwValue = '';
+}
+
+function fwAfterEndHTML(){
+  //we always add Prototype, no reason to make it conditional
+  addPrototype();
+  //add scriptaculous libs
+  var libs = [];
+  var scriptaculousLibs = ["builder", "effects", "dragdrop", "controls", "slider", "sound"];
+  for (var i = scriptaculousLibs.length - 1; i >= 0; i--){
+    if(fwParameters[scriptaculousLibs[i]].fwBoolValue) libs.push(scriptaculousLibs[i]);
+  };
+  if((libs.length > 0 && fwParameters['scriptaculous'].fwBoolValue) || pageHasLinkToScript('scriptaculous'))
+    addScriptaculous(libs);
+  //add any custom external scripts
+  if(fwParameters['external'].fwBoolValue){
+    for (var i=1; i < 11; i++) {
+      var name = 'ext_' + i.toString() + '_name';
+      var path = 'ext_' + i.toString() + '_path';
+      if(fwParameters[name].fwValue){
+        if(fwParameters[path].fwValue.toString().toLowerCase().split('.').pop() != 'js') fwAbort('Please link “' + fwParameters[name] + '” to a JavaScript file');
+        findOrCreateScriptLink(fwParameters[name].fwValue, fwParameters[path].fwValue);
+        //add jQuery#noconflict if needed
+        if(fwParameters[name].fwValue.toString().match('jquery')){
+          addToScript(findOrCreateScript('noconflict'), '$.noConflict();');
+        }
+      }
+    }
+  }
+  //add dom:loaded listener
+  if(fwParameters['domloaded'].fwValue){
+    if(fwParameters['external_observers'].fwBoolValue){
+      var path = createExternalScript('domloaded', 'domloaded_external_file', ['document.observe(\'dom:loaded\', function(evt){', fwParameters['domloaded'].fwValue, '});']);
+      findOrCreateScriptLink('domloaded', path);
+    }else{
+      addToScript(findOrCreateScript('domloaded'), fwParameters['domloaded'].fwValue);
+    }
+  }
+  //add window.load listener
+  if(fwParameters['windowload'].fwValue){
+    if(fwParameters['external_observers'].fwBoolValue){
+      var path = createExternalScript('windowload', 'windowload_external_file', ['Event.observe(window, \'load\', function(evt){', fwParameters['domloaded'].fwValue, '});']);
+      findOrCreateScriptLink('windowload', path);
+    }else{
+      addToScript(findOrCreateScript('windowload'), fwParameters['windowload'].fwValue);
+    }
+  }
+  //add custom listenr
+  if(fwParameters['custom'].fwValue){
+    if(fwParameters['external_observers'].fwBoolValue){
+      var path = createExternalScript('p2_custom', 'custom_external_file', fwParameters['custom'].fwValue);
+      findOrCreateScriptLink('p2_custom', path);
+    }else{
+      addToScript(findOrCreateScript('p2_custom'), fwParameters['custom'].fwValue);
+    }
+  }
+}
+
+function fwInterface(){
+  //scriptaculous library checkboxen
+  var scriptaculousLibs = ["builder", "effects", "dragdrop", "controls", "slider", "sound"];
+  for (var i = scriptaculousLibs.length - 1; i >= 0; i--){
+    fwParameters[scriptaculousLibs[i]].fwVisible = fwParameters['scriptaculous'].fwBoolValue;
+  };
+  //external libraries progressive disclosure
+  for (var i=1; i < 11; i++) {
+    var name = 'ext_' + i.toString() + '_name';
+    var path = 'ext_' + i.toString() + '_path';
+    var clear = 'ext_' + i.toString() + '_clear';
+    var prev = 'ext_' + (i - 1).toString() + '_name'
+    fwParameters[name].fwVisible = fwParameters[path].fwVisible = fwParameters[clear].fwVisible = (i > 1) ? (fwParameters['external'].fwBoolValue && fwParameters[prev].fwValue.toString().length > 1) : fwParameters['external'].fwBoolValue;
+  };
+}
+
+function fwParameterChanged(){
+  //make the interface visibility "live" to parameter changes
+  fwInterface();
+}
+</action-javascript>
+</page-action>

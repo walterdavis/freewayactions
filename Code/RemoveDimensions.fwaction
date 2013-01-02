@@ -1,7 +1,7 @@
 <item-action name="RemoveDimensions">
-<action-version version="0.3">
+<action-version version="0.4.2">
 RemoveDimensions
-(c)2004, 2008 Walter Lee Davis
+(c)2004, 2008, 2012 Walter Lee Davis
 
 Apply the action to an HTML object to remove the height or width properties.
 
@@ -13,92 +13,95 @@ If applied to a table, height or width properties will be removed from the enclo
 <action-checkbox name="width" />
 <action-checkbox name="w100" title="Force 100% Width" default="no" advance="no" />
 <action-javascript>
-	function GetCSSAttribute(tag, attributeName) { 
-		// Gets a "CSS" attribute such as "position:absolute" from a tag value 
-		// returns NULL if the attribute can not be found 
-		if (tag==null) return null; 
-		var tagField = tag['style']; 
-		if (tagField == null) {
-			return null; 
-		}else { 
-			var tagField = tagField.toString(); 
-			var pairs = tagField.slice(1,-1).split(';');
-			for(i in pairs){
-				pairs[i] = pairs[i].replace(/^\s*(\S*(\s+\S+)*)\s*$/, "$1"); //javascript equivalent of trim
-				if(pairs[i].slice(0,pairs[i].indexOf(':')) == attributeName) {
-					return pairs[i].slice(pairs[i].indexOf(':')+1,pairs[i].length);
-				}
-			}
-			return null; 
-		} 
-	}
-	function SetCSSAttribute(tag, attributeName, attributeValue) { 
-		// Sets a "CSS" attribute such as "position:absolute" in a tag value 
-		// Passing an attribute value of null removes that attribute entirely
-		if (tag==null) return; 
-		var tagField = tag['style']; 
-		if (tagField == null){
-			tag['style'] = '"'+attributeName+':'+attributeValue+'"'; 
-		}else{
-			var tagField = tagField.toString();
-			var pairs = tagField.slice(1,-1).split(';');
-			var out = new Array();
-			if(attributeValue != null && tagField.indexOf(attributeName) < 0) out.push(attributeName+':'+attributeValue);
-			for(i in pairs){
-				pairs[i] = pairs[i].replace(/^\s*(\S*(\s+\S+)*)\s*$/, "$1"); //javascript equivalent of trim
-				if(pairs[i].slice(0,pairs[i].indexOf(':')) == attributeName) {
-					if(attributeValue != null) out.push(attributeName+':'+attributeValue);
-				}else{
-					out.push(pairs[i]);
-				}
-			}
-			tag['style']= fwQuote(out.join('; ')); 
-		}
-	}
-	function fwInterface(){
-		fwParameters.w100.fwVisible = fwParameters.width.fwBoolValue;
-		fwParameters.h100.fwVisible = fwParameters.height.fwBoolValue;
-	}
-	function fwAfterEndBody(){
-		var thisItem = fwDocument.fwTags.fwFind("", fwItem);
-		if (thisItem){
-		//alert(thisItem);
-			var myHeight=fwParameters["height"].fwBoolValue;
-			var forceHeight = (fwParameters["h100"].fwBoolValue && fwParameters["height"].fwBoolValue);
-			var myWidth=fwParameters["width"].fwBoolValue;
-			var forceWidth = (fwParameters["w100"].fwBoolValue && fwParameters["width"].fwBoolValue);
-			if (myHeight || myWidth){
-				for (var i in thisItem){
-					if (thisItem[i]){
-						if (myHeight) {
-							thisItem[i].HEIGHT = null;
-							SetCSSAttribute(thisItem[i],'height',null);
-							if(forceHeight){
-								thisItem[i].HEIGHT = '100%';
-								SetCSSAttribute(thisItem[i],'height','100%');
-							}
-						}
-						if (myWidth) {
-							thisItem[i].WIDTH = null;
-							SetCSSAttribute(thisItem[i],'width',null);
-							if(forceWidth){
-								thisItem[i].WIDTH = '100%';
-								SetCSSAttribute(thisItem[i],'width','100%');
-								//alert(thisItem[i]);
-							}
-						}
-						var children = thisItem.fwFindAll('td');
-						for(j=0; j < children.length; j++){
-							if(children[j]){
-								if (myHeight) SetCSSAttribute(children[j],'height',null);
-								if (myWidth) SetCSSAttribute(children[j],'width',null);
-							}
-						}
-					}
-				}
-				//alert (enclosingTag);
-			}
-		}
-	}
+function GetCSSAttribute(tag, attributeName) { 
+  // Gets a "CSS" attribute such as "position:absolute" from a tag value 
+  // returns NULL if the attribute can not be found 
+  if (tag==null) return null; 
+  var tagField = tag['style']; 
+  if (tagField == null) {
+    return null; 
+  }else { 
+    var tagField = tagField.toString(); 
+    var pairs = tagField.slice(1,-1).split(';');
+    for(i in pairs){
+      pairs[i] = pairs[i].replace(/^\s*(\S*(\s+\S+)*)\s*$/, "$1"); //javascript equivalent of trim
+      if(pairs[i].slice(0,pairs[i].indexOf(':')) == attributeName) {
+        return pairs[i].slice(pairs[i].indexOf(':')+1,pairs[i].length);
+      }
+    }
+    return null; 
+  } 
+}
+function SetCSSAttribute(tag, attributeName, attributeValue) { 
+  // Sets a "CSS" attribute such as "position:absolute" in a tag value 
+  // Passing an attribute value of null removes that attribute entirely
+  if (tag==null) return; 
+  var tagField = tag['style']; 
+  if (tagField == null){
+    tag['style'] = '"'+attributeName+':'+attributeValue+'"'; 
+  }else{
+    var tagField = tagField.toString();
+    var pairs = tagField.slice(1,-1).split(';');
+    var out = new Array();
+    if(attributeValue != null && tagField.indexOf(attributeName) < 0) out.push(attributeName+':'+attributeValue);
+    for(i in pairs){
+      pairs[i] = pairs[i].replace(/^\s*(\S*(\s+\S+)*)\s*$/, "$1"); //javascript equivalent of trim
+      if(pairs[i].slice(0,pairs[i].indexOf(':')) == attributeName) {
+        if(attributeValue != null) out.push(attributeName+':'+attributeValue);
+      }else{
+        out.push(pairs[i]);
+      }
+    }
+    tag['style']= fwQuote(out.join('; ')); 
+  }
+}
+function fwInterface(){
+  fwParameters.w100.fwVisible = fwParameters.width.fwBoolValue;
+  fwParameters.h100.fwVisible = fwParameters.height.fwBoolValue;
+}
+function fwAfterEndBody(){
+  var thisItem = fwDocument.fwTags.fwFind(fwItem);
+  if (thisItem){
+    var myHeight=fwParameters["height"].fwBoolValue;
+    var forceHeight = (fwParameters["h100"].fwBoolValue && fwParameters["height"].fwBoolValue);
+    var myWidth=fwParameters["width"].fwBoolValue;
+    var forceWidth = (fwParameters["w100"].fwBoolValue && fwParameters["width"].fwBoolValue);
+    if (myHeight || myWidth){
+      if (myHeight) {
+        thisItem.HEIGHT = null;
+        SetCSSAttribute(thisItem,'height',null);
+        if(forceHeight){
+          var table = thisItem.fwFind('table');
+          if(table){
+            if(table.HEIGHT) table.HEIGHT = '100%';
+            SetCSSAttribute(table,'height','100%');
+          }
+          if(thisItem.HEIGHT) thisItem.HEIGHT = '100%';
+          SetCSSAttribute(thisItem,'height','100%');
+        }
+      }
+      if (myWidth) {
+        thisItem.WIDTH = null;
+        SetCSSAttribute(thisItem,'width',null);
+        if(forceWidth){
+          var table = thisItem.fwFind('table');
+          if(table){
+            SetCSSAttribute(table,'width','100%');
+          }
+          if(thisItem.WIDTH) thisItem.WIDTH = '100%';
+          SetCSSAttribute(thisItem,'width','100%');
+          //alert(thisItem[i]);
+        }
+      }
+      var children = thisItem.fwFindAll(['td','th']);
+      for(j=0; j < children.length; j++){
+        if(children[j]){
+          if (myHeight && children[j].style) SetCSSAttribute(children[j],'height',null);
+          if (myWidth && children[j].style) SetCSSAttribute(children[j],'width',null);
+        }
+      }
+    }
+  }
+}
 </action-javascript>
 </item-action>

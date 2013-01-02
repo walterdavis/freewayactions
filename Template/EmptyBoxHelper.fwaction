@@ -1,6 +1,6 @@
 <item-action name="com.wdstudio.emptyboxhelper" title="EmptyBoxHelper">
 <action-appliesto layer non-html32/>
-<action-version version="0.1">
+<action-version version="0.2">
 CrowBar
 Copyright 2011 Walter Lee Davis
 
@@ -62,7 +62,6 @@ Apply the action to an HTML box to get rid of some annoying Freeway defaults.
 		if(activate){
 			thisObj = fwDocument.fwTags.fwFind(fwItem);
 			if (thisObj){
-				alert(thisObj.fwToHTML())
 				restoreBox(thisObj,true);
 			}
 		}

@@ -185,6 +185,7 @@
 		}
 		var theHead = fwDocument.fwTags.fwFind("head");
 		var connected = function(){
+		  return true;
 			if(fwShellCommand){
 				return fwShellCommand('ping -c1 -i1 http://ajax.googleapis.com');
 			}else{
@@ -428,7 +429,7 @@
 
 <item-action name="ScriptyFader">
 <action-appliesto non-html32/>
-<action-version version="0.5.1">
+<action-version version="0.5.2">
 ScriptyFader
 Action (c)2011 Walter Lee Davis.
 
@@ -471,7 +472,7 @@ Apply the action to an HTML item to mark the location of a fading group of page 
 		if($$('a[rel~="' + main.id + '"]').length > 0){
 			main['initialSelection'] = $$('a[rel~="' + main.id + '"]').first();
 			main.initialSelection.addClassName('active')
-			main.initialSelection.down('img').setOpacity(1);
+			main.initialSelection.down('img').setOpacity(0.9999997);
 		}else{
 			main['initialSelection'] = sFoptions.get(main.id.slice(0,-6)).first();
 		}
@@ -538,7 +539,7 @@ Apply the action to an HTML item to mark the location of a fading group of page 
 					queue: { position: 'start', scope: container, limit: 2 },
 					afterFinish: function(){
 						main.update(clone.innerHTML);
-						main.setOpacity(1).show().removeClassName('loadingIndicator');
+						main.setOpacity(0.9999997).show().removeClassName('loadingIndicator');
 						clone.hide().update();
 					}
 				});

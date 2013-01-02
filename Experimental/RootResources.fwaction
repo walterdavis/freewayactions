@@ -1,0 +1,24 @@
+<action-encoding>UTF-8</action-encoding>
+<page-action name="com.wdstudio.root_resources" title="RootResources">
+<action-version version="0.1">
+RootResources
+Copyright 2012 Walter Lee Davis
+
+Make Root-relative Resources
+HIGHLY EXPERIMENTAL, LIKELY TO DO NOTHING GOOD TO YOUR PAGES!
+</action-version>
+<action-javascript>
+function fwAfterEndHTML(){
+  var allTags = fwDocument.fwTags.fwFindAllContent();
+  var t = '';
+  for (i in allTags) {
+    t += allTags[i].fwToHTML().replace(/(\/*?Resources\/)/g, "/$1").replace(/"\/*?css\//, "\"/$1");
+  }
+  var dummy = allTags[0].fwAddEnclosing("", false);
+  for (i in allTags) {
+    allTags[i].fwDelete();
+  }
+  dummy.fwAddRaw(t);
+}
+</action-javascript>
+</page-action>

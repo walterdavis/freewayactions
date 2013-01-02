@@ -322,7 +322,7 @@
 </library-action>
 
 <action name="com.walterdavisstudio.readmore" title="Read More" preview-text="&Text;" height=12>
-<action-version version="0.1.3">
+<action-version version="0.1.5">
 Read More
 (c)2012 Walter Lee Davis
 
@@ -330,9 +330,9 @@ Use this Action inline to create popup "read more" content from overflowed text.
 
 </action-version>
 <action-markup custom name="readmore">
-	var overlay = new Element('div',{style:'position:fixed;top:0; bottom:0; left:0; right:0;background-color: #666; filter: progid:DXImageTransform.Microsoft.gradient(startColorstr=#b2000000,endColorstr=#b2000000); zoom:1; background-color: rgba(0,0,0,0.7); z-index:1000; display:none; overflow: auto;'});
+	var overlay = new Element('div',{id: '_more_overlay', style:'position:fixed;top:0; bottom:0; left:0; right:0;background-color: #666; filter: progid:DXImageTransform.Microsoft.gradient(startColorstr=#b2000000,endColorstr=#b2000000); zoom:1; background-color: rgba(0,0,0,0.7); z-index:1000; display:none; overflow: auto;'});
 	$('PageDiv').insert({after: overlay});
-	var moreBox = new Element('div',{style:'position:relative; margin: 40px auto; width: 400px; padding: 2em; -webkit-border-radius:13px; -moz-border-radius:13px; border-radius:13px; background-color: #fff;'});
+	var moreBox = new Element('div',{id: '_morebox', style:'position:relative; margin: 40px auto; width: 400px; padding: 2em; -webkit-border-radius:13px; -moz-border-radius:13px; border-radius:13px; background-color: #fff;'});
 	overlay.insert(moreBox);
 	overlay.observe('click',function(evt){
 		this.hide();

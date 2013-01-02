@@ -1,0 +1,102 @@
+<action-encoding>UTF-8</action-encoding>
+<page-action name="com.wdstudio.css3_hyphenation_page" title="CSS3-Hyphenation">
+<action-version version="0.1">
+CSS3 Page
+Copyright 2012 Walter Lee Davis
+
+Use CSS3 hyphenation in all paragraphs on your page
+</action-version>
+<action-markup custom name="hyphenate"><style type="text/css">
+  p {
+    -webkit-hyphens: auto;
+    -moz-hyphens: auto;
+    -ms-hyphens: auto;
+    -o-hyphens: auto;
+    hyphens: auto;
+  }
+</style>
+</action-markup>
+<action-javascript>
+function fwBeforeEndHead(){
+  if(!fwPage.hyphenate){
+    fwPage['hyphenate'] = true;
+    var html = fwDocument.fwTags.fwFind("html");
+    if(html){
+      if(!html.lang){
+        html['lang'] = fwQuote('en');
+      }
+    }
+    var theHead = fwDocument.fwTags.fwFind("head");
+    var theMarkup = fwMarkups['hyphenate'];
+    theMarkup = theMarkup.toString();
+    theMarkup.fwConvertLineEndings = true;
+    theHead.fwAddRawln(theMarkup);
+  }
+}
+</action-javascript>
+</page-action>
+<item-action name="com.wdstudio.css3_hyphenate_element" title="CSS3-Hyphenate Element">
+<action-version version="0.1">
+CSS3-Hyphenate Element
+Copyright 2012 Walter Lee Davis
+
+Use CSS3 Hypenation on a single element of the page.
+</action-version>
+<action-markup custom name="phyphenate"><style type="text/css">
+  p.hyphenate {
+    -webkit-hyphens: auto;
+    -moz-hyphens: auto;
+    -ms-hyphens: auto;
+    -o-hyphens: auto;
+    hyphens: auto;
+  }
+</style>
+</action-markup>
+<action-javascript>
+String.prototype.strip = function() {
+  return this.replace(/^\s+/, '').replace(/\s+$/, '');
+}
+
+var hasClassName = function(element, className) {
+  className = fwQuote(className,'','"'); //"
+  var elementClassName = (element["class"]) ? fwQuote(element["class"],'','"') : ''; //"
+  return ((elementClassName.length > 0) && (elementClassName == className || new RegExp("\\b" + className + "\\b").test(elementClassName)));
+};
+
+var addClassName = function(element, className) {
+  className = fwQuote(className,'','"'); //"
+  if (!hasClassName(element,className)){
+    var elementClassName = (element["class"]) ? fwQuote(element["class"],'','"') : ''; //"
+    var out = (elementClassName + ' ' + className).strip();
+    return element["class"] = fwQuote(out);
+  }
+};
+
+function fwBeforeEndHead(){
+  if(!fwPage.phyphenate){
+    fwPage['phyphenate'] = true;
+    var html = fwDocument.fwTags.fwFind("html");
+    if(html){
+      if(!html.lang){
+        html['lang'] = fwQuote('en');
+      }
+    }
+    var theHead = fwDocument.fwTags.fwFind("head");
+    var theMarkup = fwMarkups['phyphenate'];
+    theMarkup = theMarkup.toString();
+    theMarkup.fwConvertLineEndings = true;
+    theHead.fwAddRawln(theMarkup);
+  }
+}
+function fwBeforeEndBody(){
+  var element = fwDocument.fwTags.fwFind(fwItem);
+  if(!!element){
+    var children = element.fwFindAll('p');
+    for(i in children){
+      addClassName(children[i], 'hyphenate');
+    }
+  }
+}
+
+</action-javascript>
+</item-action>

@@ -1,0 +1,270 @@
+<action name="Link to File with Target" height=12 title="Link to File with Target" >
+<action-version version="2.5">
+'Link to File with Target' Action
+Softpress Systems Limited 1999, 2000
+Walter Lee Davis 2012
+</action-version>
+
+<action-file name="File" required>
+</action-file>
+<action-text name="Name" default="Download"  required/>
+<action-text name="Target" default="_self"  required/>
+<action-javascript>
+
+	var kParagraphStyles = new Array("p","a","span","b","i","u","blink","strike","font");
+	var kStylesWithLinks = new Array("a","span","b","i","u","blink","strike","font");
+	var kStyles = new Array("span","b","i","u","blink","strike","font");
+	
+	function SplitBefore(outerTag)
+	{
+		var contentTag = outerTag.fwFind("", fwItem);
+		var leftContents = contentTag.fwEnclosing.fwFindAllContent();
+		if (leftContents[0] == contentTag)
+			return null;
+
+		// copy the outter tag so we have two copies of what we want
+		// then we can just delete the bits we don't want
+
+		var rightTag = outerTag.fwEnclosing.fwAdd(outerTag, outerTag);
+		var rightContentTag = rightTag.fwFind("", fwItem);
+		var rightContents = rightContentTag.fwEnclosing.fwFindAllContent();
+
+		// delete any contents to the left of the inline in the right-most tag
+		for (i = 0 ; i < leftContents.length ; i++)
+		{
+			if (rightContents[i]==rightContentTag)
+				break;
+			rightContents[i].fwDelete();
+		}
+
+		// delete any contents to the left of the inline on the left-most tag
+		for (; i < leftContents.length ; i++)
+			leftContents[i].fwDelete();
+
+		// and delete any styling to the right of the inline on the leftmost tag
+		var outerStyleTag = FindOutermostTag(contentTag, kStyles);
+		if (outerStyleTag != contentTag)
+		{
+			var contents = outerStyleTag.fwEnclosing.fwFindAllContent();
+			for (i = contents.length -1 ; i >=0 ; i--)
+			{
+				if (contents[i]==outerStyleTag)
+					break;
+				contents[i].fwDelete();
+			}
+		}
+
+		return rightTag;
+	}
+
+	function SplitAfter(outerTag)
+	{
+		var contentTag = outerTag.fwFind("", fwItem);
+		if (contentTag == null)
+			return;
+		var leftContents = contentTag.fwEnclosing.fwFindAllContent();
+		if (leftContents[leftContents.length-1] == contentTag)
+			return null;
+
+		var rightTag = outerTag.fwEnclosing.fwAdd(outerTag, outerTag);
+		var rightContentTag = rightTag.fwFind("", fwItem);
+		var rightContents = rightContentTag.fwEnclosing.fwFindAllContent();
+
+		for (i = 0 ; i < leftContents.length ; i++)
+		{
+			rightContents[i].fwDelete();
+			if (rightContents[i]==rightContentTag)
+			{
+				i++;
+				break;
+			}
+		}
+
+		for (; i < leftContents.length ; i++)
+			leftContents[i].fwDelete();
+
+		// and delete any styling to the right of the inline on the leftmost tag
+		var outerStyleTag = FindOutermostTag(contentTag, kStyles);
+		if (outerStyleTag)
+		{
+			var contents = outerStyleTag.fwEnclosing.fwFindAllContent();
+			for (i = contents.length -1 ; i >=0 ; i--)
+			{
+				if (contents[i] == outerStyleTag)
+					break;
+
+				contents[i].fwDelete();
+			}
+		}
+
+		return rightTag;
+	}
+
+	function RemoveLink(theTag)
+	{
+		if (!theTag.fwEnclosing)
+			return;
+			
+		var link = (theTag.toString().toLowerCase()=="a" ? theTag : theTag.fwFind("a"));
+		if (link)
+		{
+			// get the contents of the link (everything inside the link)
+			contents = link.fwFindAllContent();
+			
+			// move it after the link
+			link.fwEnclosing.fwMove(contents, link);
+			
+			// delete the link
+			link.fwDelete();
+		}
+	}
+	
+	function HasContent(tag)
+	{
+		var tagContents = tag.fwFindAllContent();
+		for (var i in tagContents)
+		{
+			var content = tagContents[i].fwToHTML(2,1);
+			if (content!="" && content !="\r")
+				return true;
+		}
+		
+		return false;
+	}
+	
+	function RemoveEmptyTags(tag, candidates)
+	{
+		var innermost = FindInnermostTag(tag, candidates);
+		if (!HasContent(innermost))
+			tag.fwDelete();
+	}
+	
+	function FindOutermostTag(tag, candidates)
+	{
+		while (true)
+		{
+			var foundTag = tag.fwFindEnclosing(candidates);
+			if (!foundTag)
+				return tag;
+			tag = foundTag;
+		}
+	}
+
+	function FindPreviousInnermostTag(tag, candidates, markerTag)
+	{
+		var prevElem = tag;
+		var tagList = tag.fwFindAll(candidates);
+		markerTag = tag.fwFind(candidates, markerTag);
+		for (var i in tagList)
+		{
+			if (tagList[i] == markerTag)
+				return prevElem;
+			prevElem = tagList[i];
+		}
+		return prevElem;
+	}
+	
+	function FindInnermostTag(tag, candidates, afterTag)
+	{
+		var foundTag = (afterTag) ? tag.fwFind(candidates, afterTag) : tag.fwFind(candidates);
+		if (!foundTag)
+			return tag;
+		tag = foundTag;
+			
+		while (true)
+		{
+			var foundTag = tag.fwFind(candidates);
+			if (!foundTag)
+				return tag;
+			tag = foundTag;
+		}
+	}
+
+	function FixInlineActionStyling(tag, removeLink)
+	{
+		// test to see if we are able to support these new features
+		if (this.fwActionType==null || tag==null)
+			return tag;
+
+		var next = tag.fwNext;
+		if (next == null || !next.fwIsRaw)
+		{
+			// find the outermost text formatting the contains the inline
+			var	outerFormatting = FindOutermostTag(tag, kStylesWithLinks);
+			
+			// if the inline is not within any character formatting then we will
+			// try and move it into the next formatting that we can
+			if (outerFormatting == tag)
+			{
+				// find the first formatting after the "tag"
+				var innerFormatting = FindInnermostTag(outerFormatting.fwEnclosing, kParagraphStyles, tag);
+				
+				// if there is formatting then move the inline there
+				if (innerFormatting != outerFormatting.fwEnclosing)
+					innerFormatting.fwMove(tag, innerFormatting);
+				else
+				{
+					var previous = tag.fwPrevious;
+					if (previous == null || !previous.fwIsRaw)
+					{
+						innerFormatting = FindPreviousInnermostTag(outerFormatting.fwEnclosing, kParagraphStyles, tag);
+						if (innerFormatting != outerFormatting.fwEnclosing)
+							innerFormatting.fwMove(tag);
+					}
+				}
+			}
+		}
+
+		if (removeLink)
+		{
+			// if we do not want any link on the inline then check to
+			// see if there is a link applied
+			link = tag.fwFindEnclosing("a");
+			if (link != null)
+			{
+				// if there is a link applied across us then we will have to split
+				// the style run between the link and replicate it in the inline
+				var remainder = SplitBefore(link);
+				if (remainder == null)
+					remainder = link;
+				else
+				{
+					// this can result in a set of tags with no content
+					// being generated - we look for those and filter them 
+					RemoveEmptyTags(link, kParagraphStyles);
+				}
+
+				SplitAfter(remainder);
+				
+				// now remove the link from the tag
+				RemoveLink(remainder);
+			}
+			tag = fwDocument.fwTags.fwFind("",fwItem);
+		}
+		return tag;
+	}
+	
+	function fwBeforeEndBody()
+	{
+		var tag=fwDocument.fwTags.fwFind("",fwItem);
+		if (tag)
+		{
+			var hasFile = fwParameters["File"].fwHasFile;
+			
+			tag = FixInlineActionStyling(tag, hasFile);
+
+			// if it is a link field we will apply the link
+			if (hasFile)
+			{
+				tag = tag.fwAdd("a", true);
+				tag.href = '"'+fwParameters["File"]+'"';
+				tag.target = fwQuote(fwParameters['Target'].fwValue)
+			}
+			
+			// add the name (encoded)
+			tag.fwAddRaw(fwEncode(fwParameters["Name"], fwPage));
+		}
+	}
+	
+</action-javascript>
+</action>
