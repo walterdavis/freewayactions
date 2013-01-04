@@ -1,0 +1,209 @@
+<action-encoding>UTF-8</action-encoding>
+<library-action name="functions">
+<action-javascript>
+
+/**
+  * Create a CDN link to a JavaScript library. 
+  * name: common filename for the library (prototype, scriptaculous, jquery)
+  * path: (optional) fully-qualified URL to the CDN-hosted file
+  * (path is not needed if you are linking to prototype or scriptaculous)
+  * WARNING! changes any existing link in the page to the library to the 
+  * one specified in path or defaults
+  * returns reference to the script
+  */
+var findOrCreateScriptLink = function(name, path){
+  var head = fwDocument.fwTags.fwFind('head');
+  var script = pageHasLinkToScript(name), load = '';
+  var libs = {
+    'prototype': 'http://ajax.googleapis.com/ajax/libs/prototype/1.7/prototype.js',
+    'scriptaculous': 'http://ajax.googleapis.com/ajax/libs/scriptaculous/1.9/scriptaculous.js'
+  };
+  if(!libs[name]){
+    if(!!path){
+      libs[name] = path;
+    }else{
+      fwAbort('Please provide a URL for “' + name + '”. Publishing cannot continue.');
+    }
+  }
+  if(!script){
+    script = head.fwAdd('script', true);
+    script.fwAddRawOpt('');
+    head.fwAddRawOpt('');
+  }
+  //catch any load variables from scriptaculous
+  if(name == 'scriptaculous' && script.src && script.src.toString().match(/\?load=/)){
+    load = script.src.toString().match(/(\?load=.+?)"/)[1]; //"
+  }
+  //overwrite the path to the script to make it current
+  script.src = fwQuote(libs[name] + load);
+  script.type = fwQuote('text/javascript');
+  script.charset = fwQuote('utf-8');
+  return script;
+}
+
+var pageHasLinkToScript = function(name){
+  var script = false;
+  var scripts = fwDocument.fwTags.fwFindAll('script');
+  for(i in scripts){
+    if(scripts[i].src && scripts[i].src.toString().match(new RegExp(name + '.js'))){
+      script = scripts[i];
+    }
+  }
+  return script;
+}
+
+var findOrCreateStyleLink = function(name, path){
+  var head = fwDocument.fwTags.fwFind('head');
+  var style, styles = head.fwFindAll('link', 'rel', 'stylesheet'), re = new RegExp('/' + name + '.css$');
+  for(i in styles){
+    if(styles[i].href && styles[i].href.toString().match(re)){
+      style = styles[i];
+    }
+  }
+  if(!style){
+    style = head.fwAdd('link', false);
+    head.fwAddRawOpt('');
+  }
+  style.href = fwQuote(path);
+  style.rel = fwQuote('stylesheet');
+  style.type = fwQuote('text/css');
+  style.charset = fwQuote('utf-8');
+  return style;
+}
+
+/**
+ * Wrapper to simplify function call
+ * returns nothing
+ */
+var addPrototype = function(){
+  findOrCreateScriptLink('prototype');
+}
+
+function SetCSSAttribute(tag, attributeName, attributeValue) { 
+	// Sets a "CSS" attribute such as "position:absolute" in a tag value 
+	// Passing an attribute value of null removes that attribute entirely
+	if (tag==null) return; 
+	var tagField = tag['style']; 
+	if (tagField == null){
+		tag['style'] = '"'+attributeName+':'+attributeValue+'"'; 
+	}else{
+		var tagField = tagField.toString();
+		var pairs = tagField.slice(1,-1).split(';');
+		var out = new Array();
+		if(attributeValue != null && tagField.indexOf(attributeName) < 0) out.push(attributeName+':'+attributeValue);
+		for(i in pairs){
+			pairs[i] = pairs[i].replace(/^\s*(\S*(\s+\S+)*)\s*$/, "$1"); //javascript equivalent of trim
+			if(pairs[i].slice(0,pairs[i].indexOf(':')) == attributeName) {
+				if(attributeValue != null) out.push(attributeName+':'+attributeValue);
+			}else{
+				out.push(pairs[i]);
+			}
+		}
+		tag['style']= fwQuote(out.join('; ')); 
+	}
+} 
+function GetCSSAttribute(tag, attributeName) { 
+	// Gets a "CSS" attribute such as "position:absolute" from a tag value 
+	// returns NULL if the attribute can not be found 
+	if (tag==null) return null; 
+	var tagField = tag['style']; 
+	if (tagField == null) {
+		return null; 
+	}else { 
+		var tagField = tagField.toString(); 
+		var pairs = tagField.slice(1,-1).split(';');
+		for(i in pairs){
+			pairs[i] = pairs[i].replace(/^\s*(\S*(\s+\S+)*)\s*$/, "$1"); //javascript equivalent of trim
+			if(pairs[i].slice(0,pairs[i].indexOf(':')) == attributeName) {
+				return pairs[i].slice(pairs[i].indexOf(':')+1,pairs[i].length);
+			}
+		}
+		return null; 
+	} 
+} 
+
+if(!'test'.strip) String.prototype.strip = function() {
+	return this.replace(/^\s+/, '').replace(/\s+$/, '');
+};
+
+var hasClassName = function(element, className) {
+	className = fwQuote(className,'','"'); //"
+	var elementClassName = (element["class"]) ? fwQuote(element["class"],'','"') : ''; //"
+	return ((elementClassName.length > 0) && (elementClassName == className || new RegExp("\\b" + className + "\\b").test(elementClassName)));
+};
+
+var addClassName = function(element, className) {
+	className = fwQuote(className,'','"'); //"
+	if (!hasClassName(element,className)){
+		var elementClassName = (element["class"]) ? fwQuote(element["class"],'','"') : ''; //"
+		var out = (elementClassName + ' ' + className).strip();
+		return element["class"] = fwQuote(out);
+	}
+};
+
+var removeClassName = function(element, className) {
+	var className = fwQuote(className,'','"');//"
+	var elementClassName = (element['class']) ? fwQuote(element['class'],'','"') : '';//"
+	elementClassName = elementClassName.replace(
+		new RegExp("(^|\\s+)" + className + "(\\s+|$)"), ' ').strip();
+	return element['class'] = (elementClassName.length > 0) ? fwQuote(elementClassName) : null;
+};
+
+</action-javascript>
+</library-action>
+<item-action name="com.wdstudio.feed2js" title="Feed2js">
+<action-version version="0.1">
+Feed2js
+Copyright 2013 Walter Lee Davis
+
+Present a synopsis of an RSS feed on your Web page
+</action-version>
+
+<action-text name="src" title="RSS feed URL" default="http://" />
+<action-number name="num" title="Number of stories" default="0" />
+<action-label name="num_explanation" title="0 = unlimited" advance="no" />
+<action-number name="tz" title="Time zone" default="0" />
+<action-label name="tz_explanation" title="0 = UCT" advance="no" />
+<action-checkbox name="desc" title="Show description" default="yes" />
+<action-checkbox name="date" title="Show date" default="yes" />
+<action-checkbox name="utf" title="Unicode" default="yes" />
+<action-file name="feed2js" var keepwithhtml />
+
+<action-javascript>
+<action-include name="functions">
+
+function fwBeforeEndHead(){
+  addPrototype();
+  findOrCreateScriptLink('feed2js', 'http://cdn.freewaypro.com/feed2js/0.1.1/feed2js.js');
+  findOrCreateStyleLink('feed2js', 'http://cdn.freewaypro.com/feed2js/0.1.1/feed2js.css');
+	var path = this.fwPathName;
+	var prefix = path.substring(0, path.lastIndexOf(":")) + ':Support Files~:';
+  var myFile = new FWFile();
+	myFile.fwOpenRead(prefix + 'feed2js.php');
+  myFile.fwClose();
+  fwParameters['feed2js'].fwSpecify(myFile);
+  var filePath = fwParameters['feed2js'].toString();
+  fwParameters['feed2js'].fwClear();
+}
+function fwBeforeEndBody(){
+  var box = fwDocument.fwTags.fwFind('div', fwItem);
+  if(box){
+    addClassName(box, 'feed2js')
+    box['data-src'] = fwQuote(fwParameters['src'].fwValue);
+    box['data-num'] = fwQuote(fwParameters['num'].fwValue);
+    box['data-desc'] = fwQuote(fwParameters['desc'].fwBoolValue ? 'y' : '0');
+    box['data-date'] = fwQuote(fwParameters['date'].fwBoolValue ? 'y' : 'n');
+    box['data-tz'] = fwQuote(fwParameters['tz'].fwValue);
+    box['data-utf'] = fwQuote(fwParameters['utf'].fwBoolValue ? 'y' : 'n');
+    if(!box['style']){
+      box.style = fwQuote('font-size: inherit; height: auto;');
+    }else{
+      if(GetCSSAttribute(box, 'font-size') == '1px'){
+        SetCSSAttribute(box, 'font-size', null);
+      }
+      SetCSSAttribute(box, 'height', 'auto');
+    }
+  }  
+}
+</action-javascript>
+</item-action>
