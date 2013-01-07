@@ -1,0 +1,455 @@
+<action-encoding>UTF-8</action-encoding>
+<library-action name="functions">
+<action-javascript>
+
+/**
+  * Create a CDN link to a JavaScript library. 
+  * name: common filename for the library (prototype, scriptaculous, jquery)
+  * path: (optional) fully-qualified URL to the CDN-hosted file
+  * (path is not needed if you are linking to prototype or scriptaculous)
+  * WARNING! changes any existing link in the page to the library to the 
+  * one specified in path or defaults
+  * returns reference to the script
+  */
+var findOrCreateScriptLink = function(name, path){
+  var head = fwDocument.fwTags.fwFind('head');
+  var script = pageHasLinkToScript(name), load = '';
+  var libs = {
+    'prototype': 'http://ajax.googleapis.com/ajax/libs/prototype/1.7/prototype.js',
+    'scriptaculous': 'http://ajax.googleapis.com/ajax/libs/scriptaculous/1.9/scriptaculous.js'
+  };
+  if(!libs[name]){
+    if(!!path){
+      libs[name] = path;
+    }else{
+      fwAbort('Please provide a URL for “' + name + '”. Publishing cannot continue.');
+    }
+  }
+  if(!script){
+    script = head.fwAdd('script', true);
+    script.fwAddRawOpt('');
+    head.fwAddRawOpt('');
+  }
+  //catch any load variables from scriptaculous
+  if(name == 'scriptaculous' && script.src && script.src.toString().match(/\?load=/)){
+    load = script.src.toString().match(/(\?load=.+?)"/)[1]; //"
+  }
+  //overwrite the path to the script to make it current
+  script.src = fwQuote(libs[name] + load);
+  script.type = fwQuote('text/javascript');
+  script.charset = fwQuote('utf-8');
+  return script;
+}
+
+var pageHasLinkToScript = function(name){
+  var script = false;
+  var scripts = fwDocument.fwTags.fwFindAll('script');
+  for(i in scripts){
+    if(scripts[i].src && scripts[i].src.toString().match(new RegExp(name + '.js'))){
+      script = scripts[i];
+    }
+  }
+  return script;
+}
+
+var findOrCreateStyleLink = function(name, path){
+  var head = fwDocument.fwTags.fwFind('head');
+  var style, styles = head.fwFindAll('link', 'rel', 'stylesheet'), re = new RegExp('/' + name + '.css$');
+  for(i in styles){
+    if(styles[i].href && styles[i].href.toString().match(re)){
+      style = styles[i];
+    }
+  }
+  if(!style){
+    style = head.fwAdd('link', false);
+    head.fwAddRawOpt('');
+  }
+  style.href = fwQuote(path);
+  style.rel = fwQuote('stylesheet');
+  style.type = fwQuote('text/css');
+  style.charset = fwQuote('utf-8');
+  return style;
+}
+
+/**
+ * Wrapper to simplify function call
+ * returns nothing
+ */
+var addPrototype = function(){
+  findOrCreateScriptLink('prototype');
+}
+
+/**
+ * Add scriptaculous to the page, and load any modules needed if fewer than all.
+ * modules: comma-separated string or array of scriptaculous modules
+ * returns nothing
+ */
+
+var addScriptaculous = function(modules){
+  var scriptaculousLibs = ["builder", "effects", "dragdrop", "controls", "slider", "sound"];
+  var load = [];
+  if(modules.join){
+    modules = modules.join();
+  }
+  var script = findOrCreateScriptLink('scriptaculous');
+  if(script.src.toString().match(/\?load=/)){
+    modules += script.src.toString().split(/\?load=/)[1];
+  }
+  for (var i=0; i < scriptaculousLibs.length; i++) {
+    var re = new RegExp(scriptaculousLibs[i]);
+    if(modules.match(re))
+    load.push(scriptaculousLibs[i]);
+  };
+  if(load.length > 0 && load.length < 6){
+    load = '?load=' + load.join(',');
+    script.src = script.src.toString().replace(/\?load=[^"]+/, '').replace(/"$/, load + '"'); //"
+  }
+}
+
+
+if(!'test'.strip) String.prototype.strip = function() {
+	return this.replace(/^\s+/, '').replace(/\s+$/, '');
+};
+
+var hasClassName = function(element, className) {
+	className = fwQuote(className,'','"'); //"
+	var elementClassName = (element["class"]) ? fwQuote(element["class"],'','"') : ''; //"
+	return ((elementClassName.length > 0) && (elementClassName == className || new RegExp("\\b" + className + "\\b").test(elementClassName)));
+};
+
+var addClassName = function(element, className) {
+	className = fwQuote(className,'','"'); //"
+	if (!hasClassName(element,className)){
+		var elementClassName = (element["class"]) ? fwQuote(element["class"],'','"') : ''; //"
+		var out = (elementClassName + ' ' + className).strip();
+		return element["class"] = fwQuote(out);
+	}
+};
+
+var removeClassName = function(element, className) {
+	var className = fwQuote(className,'','"');//"
+	var elementClassName = (element['class']) ? fwQuote(element['class'],'','"') : '';//"
+	elementClassName = elementClassName.replace(
+		new RegExp("(^|\\s+)" + className + "(\\s+|$)"), ' ').strip();
+	return element['class'] = (elementClassName.length > 0) ? fwQuote(elementClassName) : null;
+};
+
+</action-javascript>
+</library-action>
+<item-action name="com.wdstudio.carousel2" title="Carousel 2">
+<action-version version="0.1.1">
+Carousel 2
+Copyright 2013 Walter Lee Davis
+
+Create a carousel effect on your page.
+</action-version>
+
+<action-popup name="direction" title="Direction">
+<value name="horizontal" title="Horizontal" default="yes" />
+<value name="vertical" title="Vertical" />
+</action-popup>
+<action-number name="duration" title="Effect duration" default="0.4" />
+<action-label name="duration_explanation" title=" (seconds)" advance="no" />
+<action-checkbox name="infinite" title="Wrap around" default="no" />
+<action-checkbox name="autoglide" title="Play automatically" default="no" />
+<action-number name="interval" title="Interval" default="2" />
+<action-label name="interval_explanation" title=" (seconds)" advance="no" />
+<action-checkbox name="borders" title="Move pane borders to outside" default="no" />
+
+<action-javascript>
+<action-include name="functions">
+
+function fwInterface(){
+  fwParameters['interval'].fwVisible = fwParameters['interval_explanation'].fwVisible = fwParameters['autoglide'].fwBoolValue
+}
+function fwParameterChanged(){
+  fwInterface();
+}
+function fwAfterEndHTML(){
+  addPrototype();
+  addScriptaculous('effects');
+  findOrCreateScriptLink('carousel2', 'http://cdn.freewaypro.com/carousel2/0.1.2/carousel2.js');
+  var box = fwDocument.fwTags.fwFind('div', fwItem);
+  if(box){
+    addClassName(box, 'carousel_master')
+    if(fwParameters['autoglide'].fwBoolValue) box['data-auto'] = fwQuote(fwParameters['interval'].fwValue);
+    box['data-duration'] = fwQuote(fwParameters['duration'].fwValue);
+    if(fwParameters['borders'].fwBoolValue) box['data-borders'] = fwQuote('true');
+    if(fwParameters['direction'].fwValue == 'vertical') addClassName(box, 'vertical');
+    if(fwParameters['infinite'].fwBoolValue) addClassName(box, 'infinite');
+  }  
+}
+</action-javascript>
+</item-action>
+<item-action name="com.wdstudio.carousel2_pane" title="Carousel 2 Pane">
+<action-version version="0.1.1">
+Carousel 2 Pane
+Copyright 2013 Walter Lee Davis
+
+Designate a pane to be added to a specific Carousel effect.
+</action-version>
+
+<action-itemref name="targets" title="Target" filter="activeTarget"/>
+
+<action-javascript>
+<action-include name="functions">
+
+function activeTarget(item){
+	var carousels = fwPage.fwFindAllActions(2,'com.wdstudio.carousel2');
+	if(carousels) {
+		for( i in carousels){
+			if(item == carousels[i].fwItem) return true;
+		}
+	}
+	return false;
+}
+function fwInterface(){
+	if(fwParameters['targets'].fwValue == null){
+		var carousels = fwPage.fwFindAllActions(2,'com.wdstudio.carousel2');
+		if(carousels) {
+			for(i in carousels){
+				c = carousels[i].fwItem;
+				fwParameters['targets'].fwValue = c;
+			}
+		}
+	}
+}
+function fwParameterChanged(){
+  fwInterface();
+}
+function fwAfterEndHTML(){
+  addPrototype();
+  addScriptaculous('effects');
+  findOrCreateScriptLink('carousel2', 'http://cdn.freewaypro.com/carousel2/0.1.2/carousel2.js');
+  var box = fwDocument.fwTags.fwFind('div', fwItem);
+  if(box){
+    addClassName(box, 'carousel_pane')
+    addClassName(box, fwParameters['targets'].fwValue);
+  }  
+}
+
+</action-javascript>
+</item-action>
+<item-action name="com.wdstudio.carousel2_button" title="Carousel 2 Button" generates-link>
+<action-appliesto graphic pass-through/>
+<action-version version="0.1.1">
+Carousel 2 Button
+Copyright 2013 Walter Lee Davis
+
+Create a navigation button to move a carousel one way or the other.
+</action-version>
+
+<action-itemref name="targets" title="Target" filter="activeTarget"/>
+<action-popup name="direction" title="Action">
+<value name="previous" default="yes"/>
+<value name="next"/>
+</action-popup>
+
+<action-javascript>
+<action-include name="functions">
+
+function activeTarget(item){
+  var carousels = fwPage.fwFindAllActions(2,'com.wdstudio.carousel2');
+  if(carousels) {
+    for( i in carousels){
+      if(item == carousels[i].fwItem) return true;
+    }
+  }
+  return false;
+}
+function fwInterface(){
+  if(fwParameters['targets'].fwValue == null){
+    var carousels = fwPage.fwFindAllActions(2,'com.wdstudio.carousel2');
+    if(carousels) {
+      for(i in carousels){
+        c = carousels[i].fwItem;
+        fwParameters['targets'].fwValue = c;
+      }
+    }
+  }
+}
+function fwParameterChanged(){
+  fwInterface();
+}
+function fwAfterEndHTML(){
+  addPrototype();
+  addScriptaculous('effects');
+  findOrCreateScriptLink('carousel2', 'http://cdn.freewaypro.com/carousel2/0.1.2/carousel2.js');
+  var box = fwDocument.fwTags.fwFind('img', fwItem);
+  if(box){
+    var link = box.fwFindEnclosing('a');
+    if(!link) link = box.fwAddEnclosing('a', true);
+    link.href = fwQuote('#');
+    addClassName(link, fwParameters['direction'].fwValue);
+    addClassName(link, fwParameters['targets'].fwValue);
+  }  
+}
+
+</action-javascript>
+</item-action>
+<item-action name="com.wdstudio.carousel2_tab" title="Carousel 2 Tab" generates-link>
+<action-appliesto graphic pass-through/>
+<action-version version="0.1.1">
+Carousel 2 Tab
+Copyright 2013 Walter Lee Davis
+
+Create a navigation button to move a carousel to show a particular pane.
+</action-version>
+
+<action-itemref name="targets" title="Target" filter="activeTarget"/>
+
+<action-javascript>
+<action-include name="functions">
+
+function activeTarget(item){
+  var carousels = fwPage.fwFindAllActions(2,['com.wdstudio.carousel2', 'com.wdstudio.carousel2_pane']);
+  if(carousels) {
+    for( i in carousels){
+      if(item == carousels[i].fwItem) return true;
+    }
+  }
+  return false;
+}
+function fwInterface(){
+  if(fwParameters['targets'].fwValue == null){
+    var carousels = fwPage.fwFindAllActions(2,['com.wdstudio.carousel2', 'com.wdstudio.carousel2_pane']);
+    if(carousels) {
+      for(i in carousels){
+        c = carousels[i].fwItem;
+        fwParameters['targets'].fwValue = c;
+      }
+    }
+  }
+}
+function fwParameterChanged(){
+  fwInterface();
+}
+function fwAfterEndHTML(){
+  addPrototype();
+  addScriptaculous('effects');
+  findOrCreateScriptLink('carousel2', 'http://cdn.freewaypro.com/carousel2/0.1.2/carousel2.js');
+  var box = fwDocument.fwTags.fwFind('img',fwItem);
+  if(box){
+    var link = box.fwFindEnclosing('a');
+    if(!link) link = box.fwAddEnclosing('a', true);
+    link.href = fwQuote('#' + fwParameters['targets'].fwValue);
+  }  
+}
+
+</action-javascript>
+</item-action>
+<action name="com.wdstudio.carousel2_text_button" title="Carousel 2 Text Button" preview-text="&link_text;" generates-link height=12>
+<action-version version="0.1.1">
+Carousel 2 Text Button
+Copyright 2013 Walter Lee Davis
+
+Create a text navigation link to move a carousel one way or the other.
+</action-version>
+
+<action-text name="link_text" title="Link text" script default="link text"/>
+<action-itemref name="targets" title="Target" filter="activeTarget"/>
+<action-popup name="direction" title="Action">
+<value name="previous" default="yes"/>
+<value name="next"/>
+</action-popup>
+
+<action-javascript>
+<action-include name="functions">
+
+function activeTarget(item){
+  var carousels = fwPage.fwFindAllActions(2,'com.wdstudio.carousel2');
+  if(carousels) {
+    for( i in carousels){
+      if(item == carousels[i].fwItem) return true;
+    }
+  }
+  return false;
+}
+function fwInterface(){
+  if(fwParameters['targets'].fwValue == null){
+    var carousels = fwPage.fwFindAllActions(2,'com.wdstudio.carousel2');
+    if(carousels) {
+      for(i in carousels){
+        c = carousels[i].fwItem;
+        fwParameters['targets'].fwValue = c;
+      }
+    }
+  }
+}
+function fwParameterChanged(){
+  fwInterface();
+}
+function fwAfterEndHTML(){
+  addPrototype();
+  addScriptaculous('effects');
+  findOrCreateScriptLink('carousel2', 'http://cdn.freewaypro.com/carousel2/0.1.2/carousel2.js');
+  var enclosingTag = fwDocument.fwTags.fwFind("",fwItem);
+  if (enclosingTag){
+    var link = enclosingTag.fwFindEnclosing("a");
+    if (!link) link = enclosingTag.fwFind("a", fwItem);
+    if (!link){
+      link = enclosingTag.fwAdd("a", true);
+    }
+    link.href = fwQuote('#');
+    link.fwAddRaw(fwEncode(fwParameters.link_text, fwPage));
+    addClassName(link, fwParameters['direction'].fwValue);
+    addClassName(link, fwParameters['targets'].fwValue);
+  }
+}
+
+</action-javascript>
+</action>
+<action name="com.wdstudio.carousel2_text_tab" title="Carousel 2 Text Tab" preview-text="&link_text;" generates-link height=12>
+<action-version version="0.1.1">
+Carousel 2 Text Tab
+Copyright 2013 Walter Lee Davis
+
+Create a text link navigation to move a carousel to show a particular pane.
+</action-version>
+
+<action-text name="link_text" title="Link text" script default="link text"/>
+<action-itemref name="targets" title="Target" filter="activeTarget"/>
+
+<action-javascript>
+<action-include name="functions">
+function activeTarget(item){
+  var carousels = fwPage.fwFindAllActions(2,['com.wdstudio.carousel2', 'com.wdstudio.carousel2_pane']);
+  if(carousels) {
+    for( i in carousels){
+      if(item == carousels[i].fwItem) return true;
+    }
+  }
+  return false;
+}
+function fwInterface(){
+  if(fwParameters['targets'].fwValue == null){
+    var carousels = fwPage.fwFindAllActions(2,['com.wdstudio.carousel2', 'com.wdstudio.carousel2_pane']);
+    if(carousels) {
+      for(i in carousels){
+        c = carousels[i].fwItem;
+        fwParameters['targets'].fwValue = c;
+      }
+    }
+  }
+}
+function fwParameterChanged(){
+  fwInterface();
+}
+function fwAfterEndHTML(){
+  addPrototype();
+  addScriptaculous('effects');
+  findOrCreateScriptLink('carousel2', 'http://cdn.freewaypro.com/carousel2/0.1.2/carousel2.js');
+  var enclosingTag = fwDocument.fwTags.fwFind("",fwItem);
+  if (enclosingTag){
+    var link = enclosingTag.fwFindEnclosing("a");
+    if (!link) link = enclosingTag.fwFind("a", fwItem);
+    if (!link){
+      link = enclosingTag.fwAdd("a", true);
+    }
+    link.href = fwQuote('#' + fwParameters['targets'].fwValue);
+    link.fwAddRaw(fwEncode(fwParameters.link_text, fwPage));
+  }
+}
+
+</action-javascript>
+</action>
