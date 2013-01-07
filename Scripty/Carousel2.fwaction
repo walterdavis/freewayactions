@@ -137,7 +137,7 @@ var removeClassName = function(element, className) {
 </action-javascript>
 </library-action>
 <item-action name="com.wdstudio.carousel2" title="Carousel 2">
-<action-version version="0.1.1">
+<action-version version="0.1.2">
 Carousel 2
 Copyright 2013 Walter Lee Davis
 
@@ -182,7 +182,7 @@ function fwAfterEndHTML(){
 </action-javascript>
 </item-action>
 <item-action name="com.wdstudio.carousel2_pane" title="Carousel 2 Pane">
-<action-version version="0.1.1">
+<action-version version="0.1.2">
 Carousel 2 Pane
 Copyright 2013 Walter Lee Davis
 
@@ -232,7 +232,7 @@ function fwAfterEndHTML(){
 </item-action>
 <item-action name="com.wdstudio.carousel2_button" title="Carousel 2 Button" generates-link>
 <action-appliesto graphic pass-through/>
-<action-version version="0.1.1">
+<action-version version="0.1.2">
 Carousel 2 Button
 Copyright 2013 Walter Lee Davis
 
@@ -289,7 +289,7 @@ function fwAfterEndHTML(){
 </item-action>
 <item-action name="com.wdstudio.carousel2_tab" title="Carousel 2 Tab" generates-link>
 <action-appliesto graphic pass-through/>
-<action-version version="0.1.1">
+<action-version version="0.1.2">
 Carousel 2 Tab
 Copyright 2013 Walter Lee Davis
 
@@ -338,8 +338,8 @@ function fwAfterEndHTML(){
 
 </action-javascript>
 </item-action>
-<action name="com.wdstudio.carousel2_text_button" title="Carousel 2 Text Button" preview-text="&link_text;" generates-link height=12>
-<action-version version="0.1.1">
+<action name="com.wdstudio.carousel2_text_button" title="Carousel 2 Text Button" preview-text="&link_text;" generates-link height=12 width=100>
+<action-version version="0.1.2">
 Carousel 2 Text Button
 Copyright 2013 Walter Lee Davis
 
@@ -399,8 +399,8 @@ function fwAfterEndHTML(){
 
 </action-javascript>
 </action>
-<action name="com.wdstudio.carousel2_text_tab" title="Carousel 2 Text Tab" preview-text="&link_text;" generates-link height=12>
-<action-version version="0.1.1">
+<action name="com.wdstudio.carousel2_text_tab" title="Carousel 2 Text Tab" preview-text="&link_text;" generates-link height=12 width=100>
+<action-version version="0.1.2">
 Carousel 2 Text Tab
 Copyright 2013 Walter Lee Davis
 
