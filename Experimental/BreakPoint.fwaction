@@ -1,5 +1,5 @@
 <page-action name="com.wdstudio.breakpoint" title="BreakPoint">
-<action-version version="0.2">
+<action-version version="0.2.1">
 BreakPoint
 Copyright 2012 Walter Lee Davis
 
@@ -31,7 +31,9 @@ function fwParametersChanged(){
 function fwAfterStartHead(){
   var head = fwDocument.fwTags.fwFind("head");
   if(!!head){
-    var script = head.fwAddJavaScript();
+    var script = head.fwAdd('script', true);
+    script.type = fwQuote('javascript');
+    script.fwAddRawOpt('');
     script.fwAddRawOpt('(function(){');
     script.fwIndent()
     for (var i=1; i < 6; i++) {
