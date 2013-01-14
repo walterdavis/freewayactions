@@ -15,12 +15,14 @@ var createExternalScript = function(name, fileParameter, content){
   var myFile = new FWFile();
   if(fwParameters[fileParameter].fwHasFile){
     myFile.fwOpenWrite(fwParameters[fileParameter].fwValue, true, 'TEXT');
+    myFile.fwSetEncoding('UTF-8');
   }else{
     var path = fwPage.fwHttpPath();
     path = path.replace(/\//g, '_').split('.');
     var filename = path.pop();
     path = path.join('.') + '_' + name + '.js';
     myFile.fwOpenWrite(path, true, 'TEXT');
+    myFile.fwSetEncoding('UTF-8');
   }
   for (var i=0; i < content.length; i++) {
     myFile.fwWrite(content[i] + "\n");
@@ -72,14 +74,13 @@ var findOrCreateScriptLink = function(name, path){
 }
 
 var pageHasLinkToScript = function(name){
-  var script = false;
   var scripts = fwDocument.fwTags.fwFindAll('script');
   for(i in scripts){
     if(scripts[i].src && scripts[i].src.toString().match(new RegExp(name + '.js'))){
-      script = scripts[i];
+      return scripts[i];
     }
   }
-  return script;
+  return false;
 }
 /**
  * Find a script tag on the page by its ID, or create one if missing.
@@ -101,13 +102,12 @@ var findOrCreateScript = function(name){
 
 var pageHasNamedScript = function(name){
   var scripts = fwDocument.fwTags.fwFindAll('script');
-  var script = false;
   for(i in scripts){
     if(scripts[i].id && scripts[i].id.toString().match(new RegExp(name))){
-      script = scripts[i];
+      return scripts[i];
     }
   }
-  return script;
+  return false;
 }
 
 /**
@@ -217,7 +217,7 @@ function EditCode(codeName){
 </action-javascript>
 </library-action>
 <page-action name="com.wdstudio.protaculous_2" title="Protaculous 2">
-<action-version version="1.0.1">
+<action-version version="1.0.2">
 Protaculous 2
 Copyright 2012 Walter Lee Davis
 
