@@ -217,7 +217,7 @@ function EditCode(codeName){
 </action-javascript>
 </library-action>
 <page-action name="com.wdstudio.protaculous_2" title="Protaculous 2">
-<action-version version="1.0.2">
+<action-version version="1.0.3">
 Protaculous 2
 Copyright 2012 Walter Lee Davis
 
