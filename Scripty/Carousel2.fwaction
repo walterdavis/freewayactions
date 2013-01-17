@@ -137,7 +137,7 @@ var removeClassName = function(element, className) {
 </action-javascript>
 </library-action>
 <item-action name="com.wdstudio.carousel2" title="Carousel 2">
-<action-version version="0.1.5">
+<action-version version="0.1.7">
 Carousel 2
 Copyright 2013 Walter Lee Davis
 
@@ -168,7 +168,7 @@ function fwParameterChanged(){
 function fwAfterEndHTML(){
   addPrototype();
   addScriptaculous('effects');
-  findOrCreateScriptLink('carousel2', 'http://cdn.freewaypro.com/carousel2/0.1.5/carousel2.js');
+  findOrCreateScriptLink('carousel2', 'http://cdn.freewaypro.com/carousel2/0.1.7/carousel2.js');
   var box = fwDocument.fwTags.fwFind('div', fwItem);
   if(box){
     addClassName(box, 'carousel_master')
@@ -182,7 +182,7 @@ function fwAfterEndHTML(){
 </action-javascript>
 </item-action>
 <item-action name="com.wdstudio.carousel2_pane" title="Carousel 2 Pane">
-<action-version version="0.1.5">
+<action-version version="0.1.7">
 Carousel 2 Pane
 Copyright 2013 Walter Lee Davis
 
@@ -220,7 +220,7 @@ function fwParameterChanged(){
 function fwAfterEndHTML(){
   addPrototype();
   addScriptaculous('effects');
-  findOrCreateScriptLink('carousel2', 'http://cdn.freewaypro.com/carousel2/0.1.5/carousel2.js');
+  findOrCreateScriptLink('carousel2', 'http://cdn.freewaypro.com/carousel2/0.1.7/carousel2.js');
   var box = fwDocument.fwTags.fwFind('div', fwItem);
   if(box){
     addClassName(box, 'carousel_pane')
@@ -232,7 +232,7 @@ function fwAfterEndHTML(){
 </item-action>
 <item-action name="com.wdstudio.carousel2_button" title="Carousel 2 Button" generates-link>
 <action-appliesto graphic pass-through/>
-<action-version version="0.1.5">
+<action-version version="0.1.7">
 Carousel 2 Button
 Copyright 2013 Walter Lee Davis
 
@@ -274,7 +274,7 @@ function fwParameterChanged(){
 function fwAfterEndHTML(){
   addPrototype();
   addScriptaculous('effects');
-  findOrCreateScriptLink('carousel2', 'http://cdn.freewaypro.com/carousel2/0.1.5/carousel2.js');
+  findOrCreateScriptLink('carousel2', 'http://cdn.freewaypro.com/carousel2/0.1.7/carousel2.js');
   var box = fwDocument.fwTags.fwFind('img', fwItem);
   if(box){
     var link = box.fwFindEnclosing('a');
@@ -289,7 +289,7 @@ function fwAfterEndHTML(){
 </item-action>
 <item-action name="com.wdstudio.carousel2_tab" title="Carousel 2 Tab" generates-link>
 <action-appliesto graphic pass-through/>
-<action-version version="0.1.5">
+<action-version version="0.1.7">
 Carousel 2 Tab
 Copyright 2013 Walter Lee Davis
 
@@ -327,7 +327,7 @@ function fwParameterChanged(){
 function fwAfterEndHTML(){
   addPrototype();
   addScriptaculous('effects');
-  findOrCreateScriptLink('carousel2', 'http://cdn.freewaypro.com/carousel2/0.1.5/carousel2.js');
+  findOrCreateScriptLink('carousel2', 'http://cdn.freewaypro.com/carousel2/0.1.7/carousel2.js');
   var box = fwDocument.fwTags.fwFind('img',fwItem);
   if(box){
     var link = box.fwFindEnclosing('a');
@@ -339,7 +339,7 @@ function fwAfterEndHTML(){
 </action-javascript>
 </item-action>
 <action name="com.wdstudio.carousel2_text_button" title="Carousel 2 Text Button" preview-text="&link_text;" generates-link height=12 width=100>
-<action-version version="0.1.5">
+<action-version version="0.1.7">
 Carousel 2 Text Button
 Copyright 2013 Walter Lee Davis
 
@@ -382,7 +382,7 @@ function fwParameterChanged(){
 function fwAfterEndHTML(){
   addPrototype();
   addScriptaculous('effects');
-  findOrCreateScriptLink('carousel2', 'http://cdn.freewaypro.com/carousel2/0.1.5/carousel2.js');
+  findOrCreateScriptLink('carousel2', 'http://cdn.freewaypro.com/carousel2/0.1.7/carousel2.js');
   var enclosingTag = fwDocument.fwTags.fwFind("",fwItem);
   if (enclosingTag){
     var link = enclosingTag.fwFindEnclosing("a");
@@ -400,7 +400,7 @@ function fwAfterEndHTML(){
 </action-javascript>
 </action>
 <action name="com.wdstudio.carousel2_text_tab" title="Carousel 2 Text Tab" preview-text="&link_text;" generates-link height=12 width=100>
-<action-version version="0.1.5">
+<action-version version="0.1.7">
 Carousel 2 Text Tab
 Copyright 2013 Walter Lee Davis
 
@@ -438,7 +438,7 @@ function fwParameterChanged(){
 function fwAfterEndHTML(){
   addPrototype();
   addScriptaculous('effects');
-  findOrCreateScriptLink('carousel2', 'http://cdn.freewaypro.com/carousel2/0.1.5/carousel2.js');
+  findOrCreateScriptLink('carousel2', 'http://cdn.freewaypro.com/carousel2/0.1.7/carousel2.js');
   var enclosingTag = fwDocument.fwTags.fwFind("",fwItem);
   if (enclosingTag){
     var link = enclosingTag.fwFindEnclosing("a");
