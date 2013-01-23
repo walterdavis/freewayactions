@@ -1,0 +1,96 @@
+<action-encoding>UTF-8</action-encoding>
+<item-action name="com.wdstudio.chirp" title="Chirp">
+<action-appliesto xhtmlstrict xhtml html />
+<action-version version="0.1">
+Chirp
+Copyright 2012 Walter Lee Davis
+
+Add a Twitter feed to your Freeway page.
+</action-version>
+<action-text name="handle" title="Twitter Handle" />
+<action-checkbox name="limit" title="Limit Tweets" default=no />
+<action-number name="maximum" title=" " default=5 advance=no />
+<action-javascript>
+function fwBeforeEndHead(){
+  if(!fwPage.chirp){
+    fwPage['chirp'] = true;
+    //add styles and link to script to head
+    var head = fwDocument.fwTags.fwFind('head');
+    if(head){
+      head.fwAddRawOpt('<script src="https://raw.github.com/rogie/Chirp.js/master/chirp.min.js" type="text/javascript" charset="utf-8"></script>');
+    }
+  }
+}
+function fwInterface(){
+  fwParameters['maximum'].fwVisible = fwParameters['limit'].fwBoolValue;
+}
+function fwBeforeEndBody(){
+  var element = fwDocument.fwTags.fwFind("div",fwItem);
+  if(element.fwFindAll('td').length == 1){
+    element = element.fwFind('td');
+  }else if(element.fwFindAll('td').length == 9){
+    element = element.fwFindAll('td')[4];
+  }
+  if(element.fwFind('img')){
+    element.fwFind('img').fwDelete();
+  }
+  if(!!element){
+    element.fwAddRawln();
+    element.fwIndent();
+    var script = element.fwAddJavaScript();
+    element.fwAddRawln();
+    script.fwIndent();
+    if(GetCSSAttribute(element, 'font-size') == '1px')
+      SetCSSAttribute(element,'font-size', null);
+    var handle = fwParameters['handle'].toString().replace(/@/g,'').replace(/\s+/g,'');
+    var maximum = (fwParameters['limit'].fwBoolValue) ? ', max: ' + fwParameters['maximum'].fwValue.toString() : '';
+    script.fwAddRawOpt('Chirp({user:\'' + handle + '\'' + maximum + ',cacheExpire: 1000 * 60 * 2});');
+    script.fwOutdent();
+    element.fwOutdent();
+  }
+}
+function SetCSSAttribute(tag, attributeName, attributeValue) { 
+  // Sets a "CSS" attribute such as "position:absolute" in a tag value 
+  // Passing an attribute value of null removes that attribute entirely
+  if (tag==null) return; 
+  var tagField = tag['style']; 
+  if (tagField == null){
+    tag['style'] = '"'+attributeName+':'+attributeValue+'"'; 
+  }else{
+    var tagField = tagField.toString();
+    var pairs = tagField.slice(1,-1).split(';');
+    var out = new Array();
+    if(attributeValue != null && tagField.indexOf(attributeName) < 0) out.push(attributeName+':'+attributeValue);
+    for(i in pairs){
+      pairs[i] = pairs[i].replace(/^\s*(\S*(\s+\S+)*)\s*$/, "$1"); //javascript equivalent of trim
+      if(pairs[i].slice(0,pairs[i].indexOf(':')) == attributeName) {
+        if(attributeValue != null) out.push(attributeName+':'+attributeValue);
+      }else{
+        out.push(pairs[i]);
+      }
+    }
+    tag['style']= fwQuote(out.join('; ')); 
+  }
+} 
+function GetCSSAttribute(tag, attributeName) { 
+  // Gets a "CSS" attribute such as "position:absolute" from a tag value 
+  // returns NULL if the attribute can not be found 
+  if (tag==null) return null; 
+  var tagField = tag['style']; 
+  if (tagField == null) {
+    return null; 
+  }else { 
+    var tagField = tagField.toString(); 
+    var pairs = tagField.slice(1,-1).split(';');
+    for(i in pairs){
+      pairs[i] = pairs[i].replace(/^\s*(\S*(\s+\S+)*)\s*$/, "$1"); //javascript equivalent of trim
+      if(pairs[i].slice(0,pairs[i].indexOf(':')) == attributeName) {
+        return pairs[i].slice(pairs[i].indexOf(':')+1,pairs[i].length);
+      }
+    }
+    return null; 
+  } 
+}
+
+</action-javascript>
+</item-action>
