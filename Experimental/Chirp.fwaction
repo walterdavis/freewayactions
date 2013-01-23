@@ -1,26 +1,546 @@
 <action-encoding>UTF-8</action-encoding>
+<library-action name="style_accessors">
+<action-version version="1.2.1">
+Style Accessors
+
+Get and set styles on any element, regardless where they were initially defined.
+
+The MIT License (MIT)
+Copyright (c) 2013 Walter Lee Davis
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this
+software and associated documentation files (the "Software"), to deal in the Software
+without restriction, including without limitation the rights to use, copy, modify, merge,
+publish, distribute, sublicense, and/or sell copies of the Software, and to permit
+persons to whom the Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all copies or
+substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
+INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
+PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE
+FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+DEALINGS IN THE SOFTWARE.
+</action-version>
+<action-javascript>
+/**
+* Does this page use a root-based Resources folder?
+* @return boolean
+*/
+if(undefined == FWPage.hasRootResourcesFolder){
+  FWPage.prototype.hasRootResourcesFolder = function(){
+    var head = fwDocument.fwTags.fwFind('head');
+    if(!head) fwAbort('Please call headLinks from fwBeforeEndHead or later.');
+    var links = head.fwFindAll('link', 'href');
+    for(var i in links){
+      if(links[i].href){
+        var link = links[i].href.toString();
+        var page = this.fwFileName.toString().split('.').shift();
+        if(link.match('../css') && link.indexOf(page) > 0){
+          return true;
+        }
+      }
+    }
+    return false;
+  };
+}
+/**
+* Does this page use a Resources folder?
+* @return boolean
+*/
+if(undefined == FWPage.hasNoResourcesFolder){
+  FWPage.prototype.hasNoResourcesFolder = function(){
+    return (! fwClearGif.toString().match('Resources/'))
+  }
+}
+/**
+* Find the folder where the style should be saved
+* @return string
+*/
+if(undefined == FWPage.styleFolder){
+  FWPage.prototype.styleFolder = function(){
+    var rootFolder = fwDocument.fwPages.fwItems[0].fwFolder.fwHttpPath();
+    if(this.hasNoResourcesFolder()){
+      return '/' + this.fwFolder.fwHttpPath();
+    }
+    if(this.hasRootResourcesFolder()){
+      return rootFolder + '/css/';
+    }
+    return '/' + this.fwFolder.fwHttpPath() + 'css/';
+  };
+}
+/**
+* Define a URL for the override sheet for this page
+* @return string relative URL to override sheet
+*/
+if(undefined == FWPage.styleOverrideURL){
+  FWPage.prototype.styleOverrideURL = function(){
+    var folder = this.styleFolder();
+    return folder + this.basename() + '_override.css';
+  };
+}
+/**
+* Define a path to the override sheet for this page.
+* @return string root-relative path to the override sheet
+*/
+if(undefined == FWPage.styleOverridePath){
+  FWPage.prototype.styleOverridePath = function(){
+    var rootFolder = fwDocument.fwPages.fwItems[0].fwFolder;
+    if(!rootFolder) fwAbort('Could not locate the root folder. Make sure there is at least one page in it.')
+    var rootFolderPath =  rootFolder.fwHttpPath(null, true);    
+    return (rootFolderPath + this.styleOverrideURL()).replace(/\//g, ':');
+  };
+}
+/**
+* Basename for the override sheet
+* @return string page filename without extension
+*/
+if(undefined == FWPage.basename){
+  FWPage.prototype.basename = function(){
+    var filename = this.fwFileName.toString().split('.');
+    if(this.hasRootResourcesFolder()){
+      filename = this.fwHttpPath().toString().replace(/\//g,'_').split('.');
+    }
+    filename.pop();
+    return filename.join('.');
+  };
+}
+/**
+* Add a link to an override stylesheet, and create the file for that sheet.
+* Only alters the page once per publish cycle.
+* Must be called from fwBeforeEndHead() or later.
+* @return link to sheet
+*/
+if(undefined == FWPage.addOverride){
+  FWPage.prototype.addOverride = function(){
+    if(this.overrideLink) return this.overrideLink;
+    var head = fwDocument.fwTags.fwFind('head');
+    if(!head) fwAbort('Please call addOverride from fwBeforeEndHead or later.')
+    var link = head.fwAddOpt('link');
+    head.fwAddRawOpt('');
+    var myFile = this.resetOverride();
+    fwParameters['styleOverride'].fwSpecify(myFile);
+    link.rel = fwQuote('stylesheet');
+    link.href = fwQuote(fwParameters['styleOverride'].toString());
+    fwParameters['styleOverride'].fwClear();
+    link.type = fwQuote('text/css');
+    this.overrideLink = link;
+    return link;
+  };
+}
+/**
+* Erase or initialize the reset stylesheet.
+* @return FWFile
+*/
+if(undefined == FWPage.resetOverride){
+  FWPage.prototype.resetOverride = function(){
+    var myFile = new FWFile();
+    myFile.fwOpenWrite(this.styleOverridePath(), true);
+    myFile.fwSetEncoding('UTF-8');
+    myFile.fwWrite('');
+    myFile.fwClose();
+    return myFile;
+  }
+};
+/**
+* Convert a string of CSS into a hash.
+* @return object JSON of styles
+*/
+if(undefined == cssToHash){
+  var cssToHash = function(string){
+    var out = {}, string = string.toString().replace(/^"\s*(.+?)\s*"$/, '$1');
+  var pairs = string.split(/\s*;\s*/);
+  for (var i in pairs){
+  var pair = pairs[i].split(/\s*:\s*/);
+  out[pair[0]] = pair[1];
+};
+return out;
+};
+}
+/**
+* Convert a JSON object of style definitions into CSS.
+* @return string CSS style rules
+*/
+if(undefined == hashToCSS){
+  var hashToCSS = function(hash){
+    var out = [];
+    for (var i in hash){
+      var pair = i + ': ' + hash[i];
+      out.push(pair);
+    }
+    return out.join('; ').toString();
+  };
+}
+/**
+* Write CSS into the override sheet.
+* @return void
+*/
+if(undefined == FWTag.setOverride){
+  FWTag.prototype.setOverride = function(content){
+    var sheet = fwPage.addOverride();
+    var myFile = new FWFile();
+    myFile.fwOpenRead(fwPage.styleOverridePath());
+    var existing = myFile.fwReadString(myFile.fwAvailable);
+    myFile.fwClose();
+    var overwrite = false;
+    if(existing && existing.match(this.id.toString().slice(1,-1))){
+      var re = new RegExp('#' + this.id.toString().slice(1,-1) + ' \\{ (.+?) \\}');
+      existing = existing.replace(re, content);
+      content = existing;
+      overwrite = true;
+    }else{
+      content = content + "\n";
+    }
+    myFile.fwOpenWrite(fwPage.styleOverridePath(), overwrite);
+    myFile.fwSetEncoding('UTF-8');
+    myFile.fwWrite(content);
+    myFile.fwClose();
+    this.style = null;
+  }
+};
+/**
+* Read the content of the entire override sheet.
+* @return object JSON of styles
+*/
+if(undefined == FWTag.getOverride){
+  FWTag.prototype.getOverride = function(){
+    var myFile = new FWFile();
+    myFile.fwOpenRead(fwPage.styleOverridePath(), false);
+    var content = myFile.fwReadString(myFile.fwAvailable);
+    myFile.fwClose();
+    var re = new RegExp('#' + this.id.toString().slice(1,-1) + ' \\{ (.+?) \\}');
+    if( null != content.match(re) && content.match(re).length > 0 )
+    return( cssToHash(content.match(re)[1]) );
+    return {};
+  }
+};
+/**
+* Get one CSS attribute of a single tag.
+* attributeName is an attribute (width, padding...) returns value (if set) or null.
+* @return mixed
+*/
+if(undefined == FWTag.getStyle){
+  FWTag.prototype.getStyle = function(attributeName){
+    var styles = this.getAllStyles();
+    return styles[attributeName] || null;
+  };
+}
+/**
+* Get override CSS attributes of a single tag, in format for writing to external stylesheet.
+* attributeName is an attribute (width, padding...) returns value (if set) or false.
+* @return string or false
+*/
+if(undefined == FWTag.getStyleAsRule){
+  FWTag.prototype.getStyleAsRule = function(){
+    if(this.style){
+      return '#' + this.id.toString().slice(1,-1) + ' { ' + this.style.toString().slice(1,-1) + ' }';
+    }else{
+      return false;
+    }
+  }
+}
+/**
+* Get all CSS attributes of a single tag, regardless where they were set.
+* @return JSON object
+*/
+if(undefined == FWTag.getAllStyles){
+  FWTag.prototype.getAllStyles = function(){
+    if (this==null) return null;
+    var styles = {}, overrides = {};
+    if(fwPage.fwElementStyle){
+      styles = cssToHash(fwPage.fwElementStyle(this));
+    }
+    if(fwDocument.fwExternalStylesheets){
+      overrides = this.getOverride();
+      for(var i in overrides){
+        styles[i] = overrides[i];
+      }
+    }
+    if(this.style){
+      var inline = cssToHash(this.style);
+      for (var i in inline) {
+        styles[i] = inline[i];
+      };
+    }
+    return styles;
+  };
+}
+/**
+* Sets a CSS attribute such as "position:absolute" in a tag value 
+* Passing an attribute value of null resets that attribute to default
+* @return void
+*/
+if(undefined == FWTag.setStyle){
+  FWTag.prototype.setStyle = function(attributeName, value){
+    if(this == null || arguments.length < 2) return;
+    if(typeof value == 'string' && value.toLowerCase() == 'null') value = null;
+    var styles = {}, external = {};
+    var reset = { /* BACKGROUND */ 'background': 'none', 'background-attachment':
+    'scroll', 'background-clip': 'border-box', 'background-color': 'inherit',
+    'background-image': 'none', 'background-origin': 'padding-box',
+    'background-position': '0% 0%', 'background-repeat': 'repeat', 'background-size':
+    'auto', /* BORDERS */ 'border-collapse': 'separate', 'border': 'none',
+    'border-width': '0', 'border-style': 'none', 'border-color': '#000000',
+    'border-width': 'none', /* top */ 'border-top': 'none', 'border-top-color':
+    '#000000', 'border-top-style': 'none', 'border-top-width': '0', /* right */
+    'border-right': 'none', 'border-right-color': '#000000', 'border-right-style':
+    'none', 'border-right-width': '0', /* bottom */ 'border-bottom': 'none',
+    'border-bottom-color': '#000000', 'border-bottom-style': 'none',
+    'border-bottom-width': '0', /* left */ 'border-left': 'none', 'border-left-color':
+    '#000000', 'border-left-style': 'none', 'border-left-width': '0', /* border-image */
+    'border-image': 'none', 'border-image-outset': '0', 'border-image-repeat': 'stretch',
+    'border-image-slice': '100%', 'border-image-source': 'none', 'border-image-width':
+    '1', /* border-radius */ 'border-radius': '0', 'border-top-left-radius': '0',
+    'border-top-right-radius': '0', 'border-bottom-left-radius': '0',
+    'border-bottom-right-radius': '0', /* BOX ATTRIBUTES */ 'height': 'auto',
+    'max-height': 'none', 'min-height': '0', 'width': 'auto', 'max-width': 'none',
+    'min-width': '0', 'position': 'static', 'display': 'block', 'visibility': 'visible',
+    'top': 'auto', 'right': 'auto', 'bottom': 'auto', 'left': 'auto', 'float': 'none',
+    'clear': 'none', 'margin': '0', 'margin-top': '0', 'margin-right': '0',
+    'margin-bottom': '0', 'margin-left': '0', 'padding': '0', 'padding-top': '0',
+    'padding-right': '0', 'padding-bottom': '0', 'padding-left': '0', 'opacity': '1',
+    'overflow': 'visible', 'overflow-x': 'visible', 'overflow-y': 'visible', 'z-index':
+    'auto', 'zoom': '1', 'filter': 'none', 'cursor': 'auto', 'box-shadow': 'none',
+    'box-sizing': 'content-box', /* TEXT */ 'color': 'inherit', 'font': 'inherit',
+    'font-family': 'inherit', 'font-size': '1em', 'font-style': 'inherit',
+    'font-variant': 'inherit', 'font-weight': 'inherit', 'letter-spacing': 'inherit',
+    'line-height': 'inherit', 'list-style-image': 'none', 'list-style-position':
+    'outside', 'list-style-type': 'disc', 'list-style': 'disc', 'text-decoration':
+    'none', 'text-indent': '0', 'text-shadow': 'none', 'vertical-align': 'baseline',
+    'white-space': 'normal' };
+    if(fwPage.fwElementStyle){
+      external = cssToHash(fwPage.fwElementStyle(this));
+    }
+    if(fwDocument.fwExternalStylesheets){
+      styles = this.getOverride();
+    }
+    if(this.style){
+      var inlines = cssToHash(this.style);
+      for(var i in inlines){
+        styles[i] = inlines[i];
+      }
+    }
+    if(value == null){
+      if(reset[attributeName] && external[attributeName]){
+        styles[attributeName] = reset[attributeName];
+      }else{
+        delete styles[attributeName];
+      }
+    }else{
+      styles[attributeName] = value;
+    }
+    this.style = fwQuote(hashToCSS(styles));
+    if(fwDocument.fwExternalStylesheets){
+      // write styles to override
+      this.setOverride(this.getStyleAsRule());
+      this.style = null;
+    }
+  };
+}
+</action-javascript>
+</library-action>
+<library-action name="cdn_functions">
+<action-javascript>
+/**
+ * Write a script to an external file.
+ * name: common name of script (domloaded, windowload, custom)
+ * fileParameter: the action-file that holds this file
+ * content: string or array of strings containing the content
+ * returns URL to generated file, for linking purposes
+ */
+var createExternalScript = function(name, fileParameter, content){
+  if(!content.join){
+    content = [content];
+  }
+  var myFile = new FWFile();
+  if(fwParameters[fileParameter].fwHasFile){
+    myFile.fwOpenWrite(fwParameters[fileParameter].fwValue, true, 'TEXT');
+    myFile.fwSetEncoding('UTF-8');
+  }else{
+    var path = fwPage.fwHttpPath();
+    path = path.replace(/\//g, '_').split('.');
+    var filename = path.pop();
+    path = path.join('.') + '_' + name + '.js';
+    myFile.fwOpenWrite(path, true, 'TEXT');
+    myFile.fwSetEncoding('UTF-8');
+  }
+  for (var i=0; i < content.length; i++) {
+    myFile.fwWrite(content[i] + "\n");
+  };
+  myFile.fwClose();
+  fwParameters[fileParameter].fwSpecify(myFile);
+  var filePath = fwParameters[fileParameter].toString();
+  fwParameters[fileParameter].fwClear();
+  return filePath;
+}
+
+/**
+* Create a CDN link to a JavaScript library. 
+* name: common filename for the library (prototype, scriptaculous, jquery)
+* path: (optional) fully-qualified URL to the CDN-hosted file
+* (path is not needed if you are linking to prototype or scriptaculous)
+* WARNING! changes any existing link in the page to the library to the 
+* one specified in path or defaults
+* returns reference to the script
+*/
+var findOrCreateScriptLink = function(name, path){
+  var head = fwDocument.fwTags.fwFind('head');
+  var script = pageHasLinkToScript(name), load = '';
+  var libs = {
+    'prototype': 'http://ajax.googleapis.com/ajax/libs/prototype/1.7/prototype.js',
+    'scriptaculous': 'http://ajax.googleapis.com/ajax/libs/scriptaculous/1.9/scriptaculous.js'
+  };
+  if(!libs[name]){
+    if(!!path){
+      libs[name] = path;
+    }else{
+      fwAbort('Please provide a URL for “' + name + '”. Publishing cannot continue.');
+    }
+  }
+  if(!script){
+    script = head.fwAdd('script', true);
+    script.fwAddRawOpt('');
+    head.fwAddRawOpt('');
+  }
+  //catch any load variables from scriptaculous
+  if(name == 'scriptaculous' && script.src && script.src.toString().match(/\?load=/)){
+    load = script.src.toString().match(/(\?load=.+?)"/)[1]; //"
+  }
+  //overwrite the path to the script to make it current
+  script.src = fwQuote(libs[name] + load);
+  script.type = fwQuote('text/javascript');
+  script.charset = fwQuote('utf-8');
+  return script;
+}
+
+var pageHasLinkToScript = function(name){
+  var script = false;
+  var scripts = fwDocument.fwTags.fwFindAll('script');
+  for(i in scripts){
+    if(scripts[i].src && scripts[i].src.toString().match(new RegExp(name + '\.js'))){
+      script = scripts[i];
+    }
+  }
+  return script;
+}
+
+var findOrCreateStyleLink = function(name, path){
+  var head = fwDocument.fwTags.fwFind('head');
+  var styles = head.fwFindAll('link'), re = new RegExp(name + '\.css');
+  var findStyleLink = function(re){
+    for(i in styles){
+      if(styles[i].href && styles[i].href.toString().match(re)){
+        return styles[i];
+      }
+    }
+  }
+  var style = findStyleLink(re);
+  if(!style){
+    style = head.fwAdd('link', false);
+    head.fwAddRawOpt('');
+  }
+  style.href = fwQuote(path);
+  style.rel = fwQuote('stylesheet');
+  style.type = fwQuote('text/css');
+  style.charset = fwQuote('utf-8');
+  return style;
+}
+
+/**
+* Wrapper to simplify function call
+* returns nothing
+*/
+var addPrototype = function(){
+  findOrCreateScriptLink('prototype');
+}
+
+/**
+* Add scriptaculous to the page, and load any modules needed if fewer than all.
+* modules: comma-separated string or array of scriptaculous modules
+* returns nothing
+*/
+
+var addScriptaculous = function(modules){
+  var scriptaculousLibs = ["builder", "effects", "dragdrop", "controls", "slider", "sound"];
+  var load = [];
+  if(modules.join){
+    modules = modules.join();
+  }
+  var script = findOrCreateScriptLink('scriptaculous');
+  if(script.src.toString().match(/\?load=/)){
+    modules += script.src.toString().split(/\?load=/)[1];
+  }
+  for (var i=0; i < scriptaculousLibs.length; i++) {
+    var re = new RegExp(scriptaculousLibs[i]);
+    if(modules.match(re))
+    load.push(scriptaculousLibs[i]);
+  };
+  if(load.length > 0 && load.length < 6){
+    load = '?load=' + load.join(',');
+    script.src = script.src.toString().replace(/\?load=[^"]+/, '').replace(/"$/, load + '"'); //"
+  }
+}
+
+
+</action-javascript>
+</library-action>
+<library-action name="classname_functions">
+<action-javascript>
+
+if(!'test'.strip) String.prototype.strip = function() {
+  return this.replace(/^\s+/, '').replace(/\s+$/, '');
+};
+
+if(undefined == FWTag.hasClassName){
+  FWTag.prototype.hasClassName = function(className) {
+    className = fwQuote(className,'','"'); //"
+    var elementClassName = (this["class"]) ? fwQuote(this["class"],'','"') : ''; //"
+    return ((elementClassName.length > 0) && (elementClassName == className || new RegExp("\\b" + className + "\\b").test(elementClassName)));
+  };
+}
+if(undefined == FWTag.addClassName){
+  FWTag.prototype.addClassName = function(className) {
+    className = fwQuote(className,'','"'); //"
+    if (!this.hasClassName(className)){
+      var elementClassName = (this["class"]) ? fwQuote(this["class"],'','"') : ''; //"
+      var out = (elementClassName + ' ' + className).strip();
+      this["class"] = fwQuote(out);
+      return this;
+    }
+  };
+}
+if(undefined == FWTag.removeClassName){
+  FWTag.prototype.removeClassName = function(className) {
+    var className = fwQuote(className,'','"');//"
+    var elementClassName = (this['class']) ? fwQuote(this['class'],'','"') : '';//"
+    elementClassName = elementClassName.replace(
+      new RegExp("(^|\\s+)" + className + "(\\s+|$)"), ' ').strip();
+    this['class'] = (elementClassName.length > 0) ? fwQuote(elementClassName) : null;
+    return this;
+  };
+}
+</action-javascript>
+</library-action>
 <item-action name="com.wdstudio.chirp" title="Chirp">
-<action-appliesto xhtmlstrict xhtml html />
-<action-version version="0.1">
+<action-appliesto xhtmlstrict xhtml html4 />
+<action-version version="0.2">
 Chirp
 Copyright 2012 Walter Lee Davis
 
 Add a Twitter feed to your Freeway page.
 </action-version>
+<action-file name="chirp_initializer" var />
+<action-file name="styleOverride" var />
 <action-text name="handle" title="Twitter Handle" />
 <action-checkbox name="limit" title="Limit Tweets" default=no />
 <action-number name="maximum" title=" " default=5 advance=no />
 <action-javascript>
-function fwBeforeEndHead(){
-  if(!fwPage.chirp){
-    fwPage['chirp'] = true;
-    //add styles and link to script to head
-    var head = fwDocument.fwTags.fwFind('head');
-    if(head){
-      head.fwAddRawOpt('<script src="https://raw.github.com/rogie/Chirp.js/master/chirp.min.js" type="text/javascript" charset="utf-8"></script>');
-    }
-  }
-}
+<action-include name="cdn_functions">
+<action-include name="classname_functions">
+<action-include name="style_accessors">
+
 function fwInterface(){
   fwParameters['maximum'].fwVisible = fwParameters['limit'].fwBoolValue;
 }
@@ -35,62 +555,20 @@ function fwBeforeEndBody(){
     element.fwFind('img').fwDelete();
   }
   if(!!element){
+    if(element.getStyle('font-size') == '1px')
+      element.setStyle('font-size', null);
     element.fwAddRawln();
     element.fwIndent();
     var script = element.fwAddJavaScript();
     element.fwAddRawln();
     script.fwIndent();
-    if(GetCSSAttribute(element, 'font-size') == '1px')
-      SetCSSAttribute(element,'font-size', null);
     var handle = fwParameters['handle'].toString().replace(/@/g,'').replace(/\s+/g,'');
     var maximum = (fwParameters['limit'].fwBoolValue) ? ', max: ' + fwParameters['maximum'].fwValue.toString() : '';
     script.fwAddRawOpt('Chirp({user:\'' + handle + '\'' + maximum + ',cacheExpire: 1000 * 60 * 2});');
     script.fwOutdent();
     element.fwOutdent();
+    findOrCreateScriptLink('chirp.min', 'https://raw.github.com/rogie/Chirp.js/master/chirp.min.js');
   }
 }
-function SetCSSAttribute(tag, attributeName, attributeValue) { 
-  // Sets a "CSS" attribute such as "position:absolute" in a tag value 
-  // Passing an attribute value of null removes that attribute entirely
-  if (tag==null) return; 
-  var tagField = tag['style']; 
-  if (tagField == null){
-    tag['style'] = '"'+attributeName+':'+attributeValue+'"'; 
-  }else{
-    var tagField = tagField.toString();
-    var pairs = tagField.slice(1,-1).split(';');
-    var out = new Array();
-    if(attributeValue != null && tagField.indexOf(attributeName) < 0) out.push(attributeName+':'+attributeValue);
-    for(i in pairs){
-      pairs[i] = pairs[i].replace(/^\s*(\S*(\s+\S+)*)\s*$/, "$1"); //javascript equivalent of trim
-      if(pairs[i].slice(0,pairs[i].indexOf(':')) == attributeName) {
-        if(attributeValue != null) out.push(attributeName+':'+attributeValue);
-      }else{
-        out.push(pairs[i]);
-      }
-    }
-    tag['style']= fwQuote(out.join('; ')); 
-  }
-} 
-function GetCSSAttribute(tag, attributeName) { 
-  // Gets a "CSS" attribute such as "position:absolute" from a tag value 
-  // returns NULL if the attribute can not be found 
-  if (tag==null) return null; 
-  var tagField = tag['style']; 
-  if (tagField == null) {
-    return null; 
-  }else { 
-    var tagField = tagField.toString(); 
-    var pairs = tagField.slice(1,-1).split(';');
-    for(i in pairs){
-      pairs[i] = pairs[i].replace(/^\s*(\S*(\s+\S+)*)\s*$/, "$1"); //javascript equivalent of trim
-      if(pairs[i].slice(0,pairs[i].indexOf(':')) == attributeName) {
-        return pairs[i].slice(pairs[i].indexOf(':')+1,pairs[i].length);
-      }
-    }
-    return null; 
-  } 
-}
-
 </action-javascript>
 </item-action>
