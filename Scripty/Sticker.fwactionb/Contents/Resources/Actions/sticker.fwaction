@@ -259,9 +259,9 @@
 
 <item-action name="Sticker">
 <action-appliesto non-html32 />
-<action-version version="0.5.2">
+<action-version version="0.6.1">
 Sticker
-Action (c)2011 Walter Lee Davis.
+Action (c)2011, 2013 Walter Lee Davis.
 
 Apply the action to an HTML item to cause it to stay stuck to the top of the screen while the rest of the page scrolls.
 </action-version>
@@ -271,7 +271,7 @@ Apply the action to an HTML item to cause it to stay stuck to the top of the scr
 	var width = document.viewport.getWidth();
 	var offset = __offset__;
 	var test = new Element('div',{style:'position:fixed'});
-	var cantBeFixed = (__mobilesafari__test.style.position.toLowerCase() != 'fixed');
+	var cantBeFixed = (test.style.position.toLowerCase() != 'fixed');
 	sticker['_style'] = sticker.readAttribute('style');
 	function stick(){
 		var scrolled = document.viewport.getScrollOffsets()[1];
@@ -308,7 +308,6 @@ Apply the action to an HTML item to cause it to stay stuck to the top of the scr
 <action-file name ="scriptaculous181packer" var/>
 <action-number name="offset" title="Offset from top" default=10>
 <action-label name="unit" title="(pixels)" advance=no />
-<action-checkbox name="mobile" title="Support MobileSafari" />
 <action-javascript>
 	<action-include name="scriptyHandlerFunctions">
 	function fwAfterStartHead()
@@ -323,8 +322,7 @@ Apply the action to an HTML item to cause it to stay stuck to the top of the scr
 		AddFiles(filesString, [1]);
 	}
 	function fwBeforeEndBody(){
-		var mobilesafari = (fwParameters['mobile'].fwBoolValue) ? 'Prototype.Browser.MobileSafari || ' : '';
-		var thisItem = fwDocument.fwTags.fwFind("div", fwItem);
+		var thisItem = fwDocument.fwTags.fwFind(fwItem);
 		if (thisItem){
 			var myHead = fwDocument.fwTags.fwFind("head");
 			if (myHead){
@@ -333,7 +331,6 @@ Apply the action to an HTML item to cause it to stay stuck to the top of the scr
 				theMarkup = theMarkup.toString();
 				theMarkup = theMarkup.replace(/__elm__/,thisItem['id']);
 				theMarkup = theMarkup.replace(/__offset__/,parseInt(fwParameters['offset'].fwValue,10));
-				theMarkup = theMarkup.replace(/__mobilesafari__/,mobilesafari);
 				theMarkup.fwConvertLineEndings = true;
 				myScript.fwAddRaw(theMarkup);
 				myHead.fwAddRawln('');
