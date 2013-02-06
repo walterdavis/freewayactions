@@ -175,7 +175,7 @@ function fwBeforeEndBody(){
 </item-action>
 <item-action name="com.wdstudio.table_kit_header" title="TableKit Header">
 <action-appliesto table-cell />
-<action-version version="0.1">
+<action-version version="0.3">
 TableKit Header
 Copyright 2012 Walter Lee Davis
 
