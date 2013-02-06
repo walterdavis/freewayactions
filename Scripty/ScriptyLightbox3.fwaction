@@ -1,0 +1,320 @@
+<action-encoding>UTF-8</action-encoding>
+<library-action name="functions">
+<action-javascript>
+
+/**
+* Create a CDN link to a JavaScript library. 
+* name: common filename for the library (prototype, scriptaculous, jquery)
+* path: (optional) fully-qualified URL to the CDN-hosted file
+* (path is not needed if you are linking to prototype or scriptaculous)
+* WARNING! changes any existing link in the page to the library to the 
+* one specified in path or defaults
+* returns reference to the script
+*/
+var findOrCreateScriptLink = function(name, path){
+  var head = fwDocument.fwTags.fwFind('head');
+  var script = pageHasLinkToScript(name), load = '';
+  var libs = {
+    'prototype': 'http://ajax.googleapis.com/ajax/libs/prototype/1.7/prototype.js',
+    'scriptaculous': 'http://ajax.googleapis.com/ajax/libs/scriptaculous/1.9/scriptaculous.js'
+  };
+  if(!libs[name]){
+    if(!!path){
+      libs[name] = path;
+    }else{
+      fwAbort('Please provide a URL for “' + name + '”. Publishing cannot continue.');
+    }
+  }
+  if(!script){
+    script = head.fwAdd('script', true);
+    script.fwAddRawOpt('');
+    head.fwAddRawOpt('');
+  }
+  //catch any load variables from scriptaculous
+  if(name == 'scriptaculous' && script.src && script.src.toString().match(/\?load=/)){
+    load = script.src.toString().match(/(\?load=.+?)"/)[1]; //"
+  }
+  //overwrite the path to the script to make it current
+  script.src = fwQuote(libs[name] + load);
+  script.type = fwQuote('text/javascript');
+  script.charset = fwQuote('utf-8');
+  return script;
+}
+
+var pageHasLinkToScript = function(name){
+  var script = false;
+  var scripts = fwDocument.fwTags.fwFindAll('script');
+  for(i in scripts){
+    if(scripts[i].src && scripts[i].src.toString().match(new RegExp(name + '.js'))){
+      script = scripts[i];
+    }
+  }
+  return script;
+}
+
+var findOrCreateStyleLink = function(name, path){
+  var head = fwDocument.fwTags.fwFind('head');
+  var styles = head.fwFindAll('link'), re = new RegExp(name + '\.css');
+  var findStyleLink = function(re){
+    for(i in styles){
+      if(styles[i].href && styles[i].href.toString().match(re)){
+        return styles[i];
+      }
+    }
+  }
+  var style = findStyleLink(re);
+  if(!style){
+    style = head.fwAdd('link', false);
+    head.fwAddRawOpt('');
+  }
+  style.href = fwQuote(path);
+  style.rel = fwQuote('stylesheet');
+  style.type = fwQuote('text/css');
+  style.charset = fwQuote('utf-8');
+  return style;
+}
+
+/**
+* Wrapper to simplify function call
+* returns nothing
+*/
+var addPrototype = function(){
+  findOrCreateScriptLink('prototype');
+}
+
+/**
+* Add scriptaculous to the page, and load any modules needed if fewer than all.
+* modules: comma-separated string or array of scriptaculous modules
+* returns nothing
+*/
+
+var addScriptaculous = function(modules){
+  var scriptaculousLibs = ["builder", "effects", "dragdrop", "controls", "slider", "sound"];
+  var load = [];
+  if(modules.join){
+    modules = modules.join();
+  }
+  var script = findOrCreateScriptLink('scriptaculous');
+  if(script.src.toString().match(/\?load=/)){
+    modules += script.src.toString().split(/\?load=/)[1];
+  }
+  for (var i=0; i < scriptaculousLibs.length; i++) {
+    var re = new RegExp(scriptaculousLibs[i]);
+    if(modules.match(re))
+    load.push(scriptaculousLibs[i]);
+  };
+  if(load.length > 0 && load.length < 6){
+    load = '?load=' + load.join(',');
+    script.src = script.src.toString().replace(/\?load=[^"]+/, '').replace(/"$/, load + '"'); //"
+  }
+}
+
+
+if(!'test'.strip) String.prototype.strip = function() {
+  return this.replace(/^\s+/, '').replace(/\s+$/, '');
+};
+
+if(undefined == FWTag.hasClassName){
+  FWTag.prototype.hasClassName = function(className) {
+    className = fwQuote(className,'','"'); //"
+    var elementClassName = (this["class"]) ? fwQuote(this["class"],'','"') : ''; //"
+    return ((elementClassName.length > 0) && (elementClassName == className || new RegExp("\\b" + className + "\\b").test(elementClassName)));
+  };
+}
+if(undefined == FWTag.addClassName){
+  FWTag.prototype.addClassName = function(className) {
+    className = fwQuote(className,'','"'); //"
+    if (!this.hasClassName(className)){
+      var elementClassName = (this["class"]) ? fwQuote(this["class"],'','"') : ''; //"
+      var out = (elementClassName + ' ' + className).strip();
+      this["class"] = fwQuote(out);
+      return this;
+    }
+  };
+}
+if(undefined == FWTag.removeClassName){
+  FWTag.prototype.removeClassName = function(className) {
+    var className = fwQuote(className,'','"');//"
+    var elementClassName = (this['class']) ? fwQuote(this['class'],'','"') : '';//"
+    elementClassName = elementClassName.replace(
+      new RegExp("(^|\\s+)" + className + "(\\s+|$)"), ' ').strip();
+    this['class'] = (elementClassName.length > 0) ? fwQuote(elementClassName) : null;
+    return this;
+  };
+}
+
+</action-javascript>
+</library-action>
+<item-action name="com.wdstudio.scripty_lightbox_3" title="ScriptyLightbox3">
+<action-appliesto graphic pass-through/>
+<action-version version="0.2.1">
+ScriptyLightbox3
+Copyright 2013 Walter Lee Davis
+
+Yet another lighbox for Freeway Pro
+</action-version>
+<action-checkbox name="pages" title="Use Page/URL as Target" default="no" />
+<action-file name = "original" title="Original File" />
+<action-url name = "original_page" title="Page/URL" />
+<action-checkbox name="autoplay" title="Auto-play QuickTime Movie" default="no" advance="no" />
+<action-number name = "width" title="Width" />
+<action-number name = "height" title="Height" />
+<action-popup name = "radius" title="Corner Radius">
+<value name="0">
+<value name="3">
+<value name="5">
+<value name="7">
+<value name="9">
+<value name="11">
+<value name="13" default>
+<value name="15">
+<value name="17">
+</action-popup>
+<action-popup name="closer" title="Close Box Position">
+<value name="left">
+<value name="right">
+</action-popup>
+<action-color name="borderColor" title="Border Color" default="#333333" />
+<action-number name="percentage" title="Maximum size" default="80" />
+<action-label name="%" advance="no" />
+<action-javascript>
+<action-include name="functions">
+function fwInterface(){
+  var has_a_movie = false; 
+  if (fwParameters.original.fwHasFile){ 
+    var myFile = fwParameters["original"].fwFileName.toString(); 
+    has_a_movie = ( myFile.split('.').pop().toLowerCase().match(/(mov|m4v|mp4)/i) != null ); 
+  }
+  fwParameters['original'].fwVisible = ! fwParameters['pages'].fwBoolValue
+  fwParameters['original_page'].fwVisible = !! fwParameters['pages'].fwBoolValue
+  if(fwParameters.original_page.fwVisible){
+    has_a_movie = ( fwParameters.original_page.fwValue.toString().substr(fwParameters.original_page.fwValue.toString().lastIndexOf('.') + 1).toLowerCase().match(/(mov|m4v|mp4)/) != null ); 
+  }
+  fwParameters['autoplay'].fwVisible = has_a_movie; 
+}
+function fwBeforeEndHead(){
+  addPrototype();
+  findOrCreateScriptLink('scripty_lightbox_3', 'http://cdn.freewaypro.com/scripty_lightbox_3/0.2.1/scripty_lightbox_3.js');
+  findOrCreateStyleLink('scripty_lightbox_3', 'http://cdn.freewaypro.com/scripty_lightbox_3/0.2.1/scripty_lightbox_3.css');
+}
+function fwBeforeEndBody(){
+  var borderColor = fwParameters['borderColor'].fwValue.fwHex;
+  if(borderColor != undefined){
+    borderColor = '#' + borderColor;
+  }else{
+    borderColor = '';
+  }
+
+  var myItem = fwDocument.fwTags.fwFind("img",fwItem);
+  if(myItem){
+    if(fwParameters.original && fwParameters.original.fwHasFile || fwParameters.original_page && fwParameters.original_page.fwValue){
+      var link = myItem.fwFindEnclosing('a');
+      var relText = [];
+      if(!link){
+        link = myItem.fwAddEnclosing('a',true);
+      }
+      var original = (fwParameters.original.fwHasFile ? fwParameters.original : fwParameters.original_page);
+      link['href'] = fwQuote(original.toString());
+      if(borderColor) link['data-border'] = fwQuote(borderColor);
+      link['data-size'] = fwQuote(parseFloat(fwParameters['percentage'].fwValue) / 100);
+      link['data-radius'] = fwQuote(fwParameters['radius'].fwValue);
+      if(parseInt(fwParameters.width.fwValue,10) > 0 && parseInt(fwParameters.height.fwValue,10) > 0){
+        relText.push( fwParameters.width.fwValue.toString() + 'x' + fwParameters.height.fwValue.toString() );
+      }
+      if(fwParameters['autoplay'].fwBoolValue){
+        relText.push( 'autoplay:true' );
+      }
+      link['rel'] = fwQuote(relText.join('; '));
+      link.addClassName('popup');
+      if(fwParameters['closer'].fwValue == 'right') link.addClassName('right');
+    }
+  }
+}
+</action-javascript>
+</item-action>
+<action name="com.wdstudio.scripty_lightbox_3" title="ScriptyLightbox3" preview-text="&Text;" generates-link height="12" width="100">
+<action-version version="0.2.1">
+ScriptyLightbox3
+Copyright 2013 Walter Lee Davis
+
+Yet another lighbox for Freeway Pro
+</action-version>
+<action-text name="Text" script default="link text"/>
+<action-checkbox name="pages" title="Use Page/URL as Target" default="no" />
+<action-file name = "original" title="Original File" />
+<action-url name = "original_page" title="Page/URL" />
+<action-checkbox name="autoplay" title="Auto-play QuickTime Movie" default="no" advance="no" />
+<action-number name = "width" title="Width" />
+<action-number name = "height" title="Height" />
+<action-popup name = "radius" title="Corner Radius">
+<value name="0">
+<value name="3">
+<value name="5">
+<value name="7">
+<value name="9">
+<value name="11">
+<value name="13" default>
+<value name="15">
+<value name="17">
+</action-popup>
+<action-popup name="closer" title="Close Box Position">
+<value name="left">
+<value name="right">
+</action-popup>
+<action-color name="borderColor" title="Border Color" default="#333333" />
+<action-number name="percentage" title="Maximum size" default="80" />
+<action-label name="%" advance="no" />
+<action-javascript>
+<action-include name="functions">
+function fwInterface(){
+  var has_a_movie = false; 
+  if (fwParameters.original.fwHasFile){ 
+    var myFile = fwParameters["original"].fwFileName.toString(); 
+    has_a_movie = ( myFile.split('.').pop().toLowerCase().match(/(mov|m4v|mp4)/i) != null ); 
+  }
+  fwParameters['original'].fwVisible = ! fwParameters['pages'].fwBoolValue
+  fwParameters['original_page'].fwVisible = !! fwParameters['pages'].fwBoolValue
+  if(fwParameters.original_page.fwVisible){
+    has_a_movie = ( fwParameters.original_page.fwValue.toString().substr(fwParameters.original_page.fwValue.toString().lastIndexOf('.') + 1).toLowerCase().match(/(mov|m4v|mp4)/) != null ); 
+  }
+  fwParameters['autoplay'].fwVisible = has_a_movie; 
+}
+function fwBeforeEndBody(){
+  addPrototype();
+  findOrCreateScriptLink('scripty_lightbox_3', 'http://cdn.freewaypro.com/scripty_lightbox_3/0.2.1/scripty_lightbox_3.js');
+  findOrCreateStyleLink('scripty_lightbox_3', 'http://cdn.freewaypro.com/scripty_lightbox_3/0.2.1/scripty_lightbox_3.css');
+  var borderColor = fwParameters['borderColor'].fwValue.fwHex;
+  if(borderColor != undefined){
+    borderColor = '#' + borderColor;
+  }else{
+    borderColor = '';
+  }
+
+  var myItem = fwDocument.fwTags.fwFind("",fwItem);
+  if(myItem){
+    if(fwParameters.original && fwParameters.original.fwHasFile || fwParameters.original_page && fwParameters.original_page.fwValue){
+      var link = myItem.fwFindEnclosing('a');
+      var relText = [];
+      if(!link){
+        link = myItem.fwAddEnclosing('a',true);
+      }
+      var original = (fwParameters.original.fwHasFile ? fwParameters.original : fwParameters.original_page);
+      link['href'] = fwQuote(original.toString());
+      if(borderColor) link['data-border'] = fwQuote(borderColor);
+      link['data-size'] = fwQuote(parseFloat(fwParameters['percentage'].fwValue) / 100);
+      link['data-radius'] = fwQuote(fwParameters['radius'].fwValue);
+      if(parseInt(fwParameters.width.fwValue,10) > 0 && parseInt(fwParameters.height.fwValue,10) > 0){
+        relText.push( fwParameters.width.fwValue.toString() + 'x' + fwParameters.height.fwValue.toString() );
+      }
+      if(fwParameters['autoplay'].fwBoolValue){
+        relText.push( 'autoplay:true' );
+      }
+      link['rel'] = fwQuote(relText.join('; '));
+      link.addClassName('popup');
+      if(fwParameters['closer'].fwValue == 'right') link.addClassName('right');
+      link.fwAddRaw(fwEncode(fwParameters.Text, fwPage));
+    }
+  }
+}
+</action-javascript>
+</action>
