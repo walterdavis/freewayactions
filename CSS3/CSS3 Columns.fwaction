@@ -1,6 +1,6 @@
 <item-action name="com.wdstudio.css3columns" title="CSS3 Columns">
-<action-appliesto html4 html32css xhtml xhtmlstrict />
-<action-version version="0.3">
+<action-appliesto non-html32 />
+<action-version version="0.3.1">
 “CSS3 Columns” Action
 Walter Davis Studio 2009, 2012
 
