@@ -1,0 +1,16 @@
+div.chirp p {
+	overflow: hidden;
+	margin-bottom: .4em;
+}
+
+div.chirp p img:first-child {
+	float: left;
+	margin-right: .5em;
+}
+
+span.meta {
+	font-size: 80%;
+	display: block;
+	border-bottom: 1px solid #ccc;
+	padding-bottom: 1em;
+}

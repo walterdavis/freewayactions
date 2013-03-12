@@ -524,8 +524,8 @@ if(undefined == FWTag.removeClassName){
 </action-javascript>
 </library-action>
 <item-action name="com.wdstudio.chirp" title="Chirp">
-<action-appliesto xhtmlstrict xhtml html4 />
-<action-version version="0.2">
+<action-appliesto non-html32 />
+<action-version version="0.3">
 Chirp
 Copyright 2012 Walter Lee Davis
 
@@ -534,6 +534,7 @@ Add a Twitter feed to your Freeway page.
 <action-file name="chirp_initializer" var />
 <action-file name="styleOverride" var />
 <action-text name="handle" title="Twitter Handle" />
+<action-checkbox name="image" title="Show Avatar" default=no />
 <action-checkbox name="limit" title="Limit Tweets" default=no />
 <action-number name="maximum" title=" " default=5 advance=no />
 <action-javascript>
@@ -564,10 +565,12 @@ function fwBeforeEndBody(){
     script.fwIndent();
     var handle = fwParameters['handle'].toString().replace(/@/g,'').replace(/\s+/g,'');
     var maximum = (fwParameters['limit'].fwBoolValue) ? ', max: ' + fwParameters['maximum'].fwValue.toString() : '';
-    script.fwAddRawOpt('Chirp({user:\'' + handle + '\'' + maximum + ',cacheExpire: 1000 * 60 * 2});');
+    var img = fwParameters['image'].fwBoolValue ? '<img src="{{user.profile_image_url}}" alt="{{user.screen_name}}"/>' : '';
+    script.fwAddRawOpt('Chirp({user:\'' + handle + '\'' + maximum + ',cacheExpire: 1000 * 60 * 2, templates: { base: \'<div class="chirp">{{tweets}}</div>\', tweet: \'<p>' + img + '{{html}}</p><span class="meta"><time><a href="http://twitter.com/{{user.screen_name}}/statuses/{{id_str}}">{{time_ago}}</a></time> — via <a href="http://twitter.com/{{user.screen_name}}" title="{{user.name}} — {{user.description}}">{{user.name}}</a></span>\' }});');
     script.fwOutdent();
     element.fwOutdent();
     findOrCreateScriptLink('chirp.min', 'https://raw.github.com/rogie/Chirp.js/master/chirp.min.js');
+    findOrCreateStyleLink('chirp', 'http://cdn.freewaypro.com/chirp/0.3/chirp.css');
   }
 }
 </action-javascript>
