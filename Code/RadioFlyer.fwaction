@@ -1,0 +1,21 @@
+<action-encoding>UTF-8</action-encoding>
+<item-action name="com.wdstudio.radio_flyer" title="RadioFlyer">
+<action-version version="0.1">
+RadioFlyer
+Copyright 2013 Walter Lee Davis
+</action-version>
+<action-appliesto radio-button />
+<action-javascript>
+function fwBeforeEndBody(){
+  var element = fwDocument.fwTags.fwFind("input",fwItem);
+  if(element){
+    var name = element.name
+    var val = element.value
+    if(!val) fwAbort('Please set a value for ' + name.toString());
+    var tag = element.fwAddRaw('', name);
+    tag.fwAddRaw('<?php if(isset($' + name + ') && $' + name + ' == "' + val + '") print \'checked="checked"\'; ?>');
+  }
+}
+
+</action-javascript>
+</item-action>
