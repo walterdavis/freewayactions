@@ -1,14 +1,15 @@
 <item-action name="com.wdstudio.css3shadow" title="CSS3 Shadow">
-<action-appliesto html4 html32css xhtml xhtmlstrict />
-<action-version version="0.3">
+<action-appliesto non-html32 />
+<action-version version="0.4">
 “CSS3 Shadow” Action
-Walter Davis Studio 2009, 2012
+Walter Davis Studio 2009, 2012, 2013
 
 Apply to an HTML item to give it a drop shadow using pure CSS3.
 </action-version>
-<action-text name="xOffset" title="X-axis Offset (px)" />
-<action-text name="yOffset" title="Y-axis Offset (px)" />
-<action-text name="blur" title="Shadow blur (px)" />
+<action-number name="xOffset" title="X-axis Offset (px)" real-numbers />
+<action-number name="yOffset" title="Y-axis Offset (px)" real-numbers />
+<action-number name="blur" title="Shadow blur (px)" real-numbers />
+<action-number name="spread" title="Spread (px)" default="0" real-numbers/>
 <action-color name="shadowColor" title="Shadow Color" />
 <action-javascript>
   function array_search(array, element){
@@ -55,15 +56,16 @@ Apply to an HTML item to give it a drop shadow using pure CSS3.
 		xOffset = (xOffset < 0 || xOffset > 0) ? parseInt(xOffset,10) : 0;
 		yOffset = (yOffset < 0 || yOffset > 0) ? parseInt(yOffset,10) : 0;
 		var shadowColor = fwParameters['shadowColor'].fwValue.fwHex;
+		var spread = fwParameters['spread'].fwValue;
 		if(shadowColor != undefined){
-  	  var selector = ['c3s', blur, xOffset, yOffset, shadowColor].join('-');
+  	  var selector = ['c3s', blur, xOffset, yOffset, spread, shadowColor].join('-');
 			shadowColor = '#' + shadowColor;
 			if(array_search(fwPage.shadows, selector) == false){
 			  fwPage.shadows.push(selector);
     		var myhead = fwDocument.fwTags.fwFind("head");
     		if(myhead){
 					var cssStyles = myhead.fwAddCSSStyles();
-					var style = xOffset + 'px ' + yOffset + 'px ' + blur + 'px ' + shadowColor;
+					var style = xOffset + 'px ' + yOffset + 'px ' + blur + 'px ' + spread + 'px ' + shadowColor;
 					cssStyles.fwAddRawln("." + selector + " { -webkit-box-shadow: " + style + "; -moz-box-shadow: " + style + "; box-shadow: " + style + " }");
     		}
 			}
