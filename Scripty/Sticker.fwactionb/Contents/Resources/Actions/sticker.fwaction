@@ -259,7 +259,7 @@
 
 <item-action name="Sticker">
 <action-appliesto non-html32 />
-<action-version version="0.6.1">
+<action-version version="0.6.2">
 Sticker
 Action (c)2011, 2013 Walter Lee Davis.
 
@@ -272,7 +272,7 @@ Apply the action to an HTML item to cause it to stay stuck to the top of the scr
 	var offset = __offset__;
 	var test = new Element('div',{style:'position:fixed'});
 	var cantBeFixed = (test.style.position.toLowerCase() != 'fixed');
-	sticker['_style'] = sticker.readAttribute('style');
+	sticker['_style'] = sticker.readAttribute('style') || null;
 	function stick(){
 		var scrolled = document.viewport.getScrollOffsets()[1];
 		if(scrolled >= (origin['top'] - offset)){
