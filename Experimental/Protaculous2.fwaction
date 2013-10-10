@@ -331,7 +331,7 @@ function clearParam(num){
   fwParameters[name].fwValue = fwParameters[path].fwValue = '';
 }
 
-function fwAfterEndHTML(){
+function fwBeforeEndHTML(){
   //we always add Prototype, no reason to make it conditional
   addPrototype();
   //add scriptaculous libs
