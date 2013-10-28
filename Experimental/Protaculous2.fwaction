@@ -331,6 +331,17 @@ function clearParam(num){
   fwParameters[name].fwValue = fwParameters[path].fwValue = '';
 }
 
+function fwAfterStartHead(){
+  addPrototype();
+  var libs = [];
+  var scriptaculousLibs = ["builder", "effects", "dragdrop", "controls", "slider", "sound"];
+  for (var i = scriptaculousLibs.length - 1; i >= 0; i--){
+    if(fwParameters[scriptaculousLibs[i]].fwBoolValue) libs.push(scriptaculousLibs[i]);
+  };
+  if((libs.length > 0 && fwParameters['scriptaculous'].fwBoolValue) || pageHasLinkToScript('scriptaculous'))
+    addScriptaculous(libs);
+}
+
 function fwBeforeEndHTML(){
   //we always add Prototype, no reason to make it conditional
   addPrototype();
