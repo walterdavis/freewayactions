@@ -1,11 +1,13 @@
 <item-action name="AddSelector">
-<action-version version="0.2b">
+// an item-action is applied to an element on the page
+<action-version version="0.2.1">
 AddSelector
 ©2004 Walter Lee Davis
 
 Apply the action to an HTML box to add CSS ID or Class attributes.
 
 </action-version>
+// picking list of field types the Action will apply to
 <action-popup name="appliesTo" title="Add Selector to Tag">
 	<value name="p" title="Paragraph" default>
 	<value name="td" title="TD">
@@ -15,10 +17,14 @@ Apply the action to an HTML box to add CSS ID or Class attributes.
 	<value name="element" title="Form Element">
 	<value name="form" title="FORM">
 </action-popup>
-
+// text fields for the attributes you can add/edit
 <action-text name="id" title="ID">
 <action-text name="class" title="Class">
+
+// the main body of the Action program
 <action-javascript>
+
+// setup to enable/disable fields based on picker choices
 	function fwInterface(myField,myAction){
 		if (myField && myAction){
 		//alert (myField + " = " + myAction);
@@ -34,6 +40,8 @@ Apply the action to an HTML box to add CSS ID or Class attributes.
 			fwParameters["id"].fwEnable = false;
 		}
 	}
+	
+	// only enable the ID if you're not dealing with a P tag
 	function fwParameterChanged(newParam,oldParam){
 		if (newParam.fwName == "appliesTo"){
 			if(newParam.fwValue.toString() != "p"){
@@ -42,22 +50,29 @@ Apply the action to an HTML box to add CSS ID or Class attributes.
 			return fwInterface("id","no");
 	   }
 	}
+	
+	// the main callback function, run after the page is completely written
 	function fwAfterEndBody(){
+	  // find the item this Action is applied to -- selects any element
 		var thisItem = fwDocument.fwTags.fwFind("", fwItem);
 		if (thisItem){
-		//alert(thisItem);
+		// only run if the item is found
 			var myTag=fwParameters["appliesTo"].fwValue;
 			if(myTag == "element"){
+			  // shortcut to all form elements (well, *all* as of the original year this was written)
 				myTag = Array("input","textarea","select");
 			}
+			// if the element is a P or input or a table, extend the search to children of the selected element
 			if (myTag == "p" || myTag[0] == "input" || (myTag == "table" && fwItem.fwIsTable == true)){
 				var myItem = fwDocument.fwTags.fwFindAll(myTag,fwItem);
+				// repeat the following with each [selected tag] child of the selected item
 				for (var i in myItem){
 					if (myItem[i] && myItem[i] != null){
 						enclosingTag = myItem[i];
 						if (enclosingTag){
 							var myID = fwParameters["id"].fwValue;
 							var myClass = fwParameters["class"].fwValue;
+							// only apply to input or table in this case
 							if(myID && ( myTag[0] == "input" || myTag == "table")){
 								enclosingTag.ID = fwQuote(myID);
 							}
@@ -67,8 +82,9 @@ Apply the action to an HTML box to add CSS ID or Class attributes.
 						}
 					}
 				}
-				//alert (enclosingTag);
 			}else{
+			  // okay, it's not a p or input or table, so we go the opposite direction
+			  // find the first PARENT element of the selected item that is a [selected tag]
 				var enclosingTag = thisItem.fwFindEnclosing(myTag);
 				if(enclosingTag){
 					var myID = fwParameters["id"].fwValue;
@@ -77,9 +93,11 @@ Apply the action to an HTML box to add CSS ID or Class attributes.
 						enclosingTag.ID = fwQuote(myID);
 					}
 					if(myClass){
+					  // note: this is old-school class manipulation -- it strips off any existing class attribute
 						enclosingTag.CLASS = fwQuote(myClass);
 					}
 				}else{
+				  // the selected tag could not be found either as a nested child or as an ancestor to the selected item
 					alert("The Action AddSelector applied to " + fwItem + " failed to produce any results.");
 				}
 			}
@@ -87,14 +105,21 @@ Apply the action to an HTML box to add CSS ID or Class attributes.
 	}
 </action-javascript>
 </item-action>
+
+
 <action name="com.wdstudio.addselector" title="AddSelector" height="12">
-<action-version version="0.1">
+// an action is a stand-alone item that you draw or insert into the page
+<action-version version="0.2.1">
 AddSelector
-Copyright 2010 Walter Lee Davis
+Copyright 2010, 2013 Walter Lee Davis
 </action-version>
 <action-text name="id" title="ID">
 <action-text name="class" title="Class">
 <action-javascript>
+  // The following functions are ported from Prototype.js to run inside Actions
+  // This is the new-school way to manipulate classnames, where you don't wipe out
+  // existing classes, unless you deliberately want to do that with removeClassName().
+
 	String.prototype.strip = function() {
 		return this.replace(/^\s+/, '').replace(/\s+$/, '');
 	}
@@ -121,26 +146,38 @@ Copyright 2010 Walter Lee Davis
 			new RegExp("(^|\\s+)" + className + "(\\s+|$)"), ' ').replace(/(^\s+|\s+$)/g,'');
 		return element['class'] = fwQuote(elementClassName);
 	};
-
+	
+	function strip_tags(theString){
+		return theString.replace(/<[^>]+?>/g,'');
+	}
+	// end of Prototype functions
+	
+  // main action callback
 	function fwBeforeEndBody(){
+	  // find the action item in the page
 		var thisItem = fwDocument.fwTags.fwFind(fwItem);
+		// array of all the possible block-like elements that might enclose it
 		var blockTags = ['blockquote','p','li','dd','dt','h1','h2','h3','h4','h5','h6'];
+		// find the first parent item that is in the above array
 		if(thisItem && thisItem.fwFindEnclosing(blockTags)){
 			var thisPara = thisItem.fwFindEnclosing(blockTags);
+			// if you do...
 			if (thisPara){
 				if(fwParameters['id'].fwValue){
+				  // force the ID to the chosen value
 					thisPara['id'] = fwQuote(fwParameters['id'].fwValue);
 				}
 				if(fwParameters['class'].fwValue){
+				  // append the desired classname to the parent block
 					addClassName(thisPara,fwParameters['class'].fwValue);
 				}
 			}else{
+			  // the item did not have a surrounding element from the array above
 				alert('A surrounding tag could not be detected. Your code was not added to the page.');
 			}
 		}
-	}
-	function strip_tags(theString){
-		return theString.replace(/<[^>]+?>/g,'');
+		// clean up after Freeway 6, which leaves a <span id="item42"></span> in place of the Action item.
+		thisItem.fwDelete();
 	}
 </action-javascript>
 </action>
